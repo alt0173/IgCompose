@@ -8,8 +8,8 @@
 //
 //	class scan
 //
-//		A SCAN class is a collection of doubles that contain the precursor 
-//		mass-to-charge ratio, retention time, and precursor charge. SCAN classes 
+//		A SCAN class is a collection of doubles that contain the precursor mass,
+//		precursor charge, mass-to-charge ratio, and retention time. SCAN classes 
 //		are linked to the corresponding fragment ions through a pointer
 //		assignment to an IONS class. The associated IONS class contains as a 
 //		dynamic array of doubles the transition ions of the respective SCAN class 
