@@ -20,7 +20,6 @@
 //		collection of union created SCAN classes are exported to a .mgf file at 
 //		program completion.
 //
-//
 //TYPEDEFS and MEMBER CONSTANTS
 //
 //	typedef _____ value_type
