@@ -6,9 +6,9 @@
 
 //!!
 //
-//  class scan
+//	class scan
 //
-//    A SCAN class is a collection of doubles that contain the precursor 
+//		A SCAN class is a collection of doubles that contain the precursor 
 //		mass-to-charge ratio, retention time, and precursor charge. SCAN classes 
 //		are linked to the corresponding fragment ions through a pointer
 //		assignment to an IONS class. The associated IONS class contains as a 
@@ -25,32 +25,32 @@
 //
 //  typedef _____ value_type
 //
-//    class::value_type is the data type of elements of the the SCAN class.
-//    It may be any C++ built-in type, or a class with a default constructor,
-//    assignment operator, and equality operators.
+//		class::value_type is the data type of elements of the the SCAN class.
+//		It may be any C++ built-in type, or a class with a default constructor,
+//		assignment operator, and equality operators.
 //
 //  typedef _____ size_type
 //
-//    class::size_type is the data type of any variable that is assigned to
-//    enumerate quanity at run-time. For example, scan::element_count is
-//    created to correspond to the quantity of elements in a member of class 
-//    SCAN.
+//		class::size_type is the data type of any variable that is assigned to
+//		enumerate quanity at run-time. For example, scan::element_count is
+//		created to correspond to the quantity of elements in a member of class 
+//		SCAN.
 //
 //  typedef _____ node_type
 //
-//    class::node_type is the data type of a pointer that is assigned to
-//    point to a programmer-defined data type. In practice, a node_type
-// 		 assignment is used to create an association between a SCAN class object
+//		class::node_type is the data type of a pointer that is assigned to
+//		point to a programmer-defined data type. In practice, a node_type
+//		assignment is used to create an association between a SCAN class object
 //		and the corresponding IONS class object.
 //
 //  static const size_type SCAN_DEFAULT_ALLOCATION = _____
 //
-//    scan::SCAN_DEFAULT_ALLOCATION is the initial memory allocation for the
-//    elements of the SCAN class. It assigns a program-defined initial
-//    allocation, and if this allocation is reached, assigns further memory
-//    as defined by the SCAN_ALLOCATE function. Note that the memory call
-//    process defines that greater efficiency is achieved through assigning
-//    memory as a group, rather than unit-wise.
+//		scan::SCAN_DEFAULT_ALLOCATION is the initial memory allocation for the
+//		elements of the SCAN class. It assigns a program-defined initial
+//		allocation, and if this allocation is reached, assigns further memory
+//		as defined by the SCAN_ALLOCATE function. Note that the memory call
+//		process defines that greater efficiency is achieved through assigning
+//		memory as a group, rather than unit-wise.
 //
 //	value_type CONDITION_PRECURSOR_MZ = _____
 //
@@ -78,10 +78,10 @@
 //
 //  scan(size_type class_size = SCAN_DEFAULT_ALLOCATION)
 //
-//    Constructs an empty SCAN class with memory allocation as defined by 
-//    SCAN_DEFAULT_ALLOCATION. Should the SCAN class reach its allocated
-//    memory, further allocation can be assigned with the SCAN_ALLOCATE
-//    function.
+//		Constructs an empty SCAN class with memory allocation as defined by 
+//		SCAN_DEFAULT_ALLOCATION. Should the SCAN class reach its allocated
+// 		memory, further allocation can be assigned with the SCAN_ALLOCATE
+//		function.
 //
 //	scan(const scan& scan_1)
 //
