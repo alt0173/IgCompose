@@ -24,8 +24,8 @@
 //
 //	typedef _____ value_type
 //
-//		class::value_type is the data type of elements of the the SCAN class.
-//		It may be any C++ built-in type, or a class with a default constructor,
+//		class::value_type is the data type of elements of the SCAN class. It may 
+//		be any C++ built-in type, or a class with a default constructor,
 //		assignment operator, and equality operators.
 //
 //	typedef _____ size_type
