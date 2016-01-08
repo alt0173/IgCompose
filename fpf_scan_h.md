@@ -23,27 +23,27 @@
 //
 //TYPEDEFS and MEMBER CONSTANTS
 //
-//  typedef _____ value_type
+//	typedef _____ value_type
 //
 //		class::value_type is the data type of elements of the the SCAN class.
 //		It may be any C++ built-in type, or a class with a default constructor,
 //		assignment operator, and equality operators.
 //
-//  typedef _____ size_type
+//	typedef _____ size_type
 //
 //		class::size_type is the data type of any variable that is assigned to
 //		enumerate quanity at run-time. For example, scan::element_count is
 //		created to correspond to the quantity of elements in a member of class 
 //		SCAN.
 //
-//  typedef _____ node_type
+//	typedef _____ node_type
 //
 //		class::node_type is the data type of a pointer that is assigned to
 //		point to a programmer-defined data type. In practice, a node_type
 //		assignment is used to create an association between a SCAN class object
 //		and the corresponding IONS class object.
 //
-//  static const size_type SCAN_DEFAULT_ALLOCATION = _____
+//	static const size_type SCAN_DEFAULT_ALLOCATION = _____
 //
 //		scan::SCAN_DEFAULT_ALLOCATION is the initial memory allocation for the
 //		elements of the SCAN class. It assigns a program-defined initial
@@ -76,7 +76,7 @@
 //
 //CONSTRUCTORS and DESTRUCTOR
 //
-//  scan(size_type class_size = SCAN_DEFAULT_ALLOCATION)
+//	scan(size_type class_size = SCAN_DEFAULT_ALLOCATION)
 //
 //		Constructs an empty SCAN class with memory allocation as defined by 
 //		SCAN_DEFAULT_ALLOCATION. Should the SCAN class reach its allocated
