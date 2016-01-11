@@ -178,6 +178,7 @@
 #define	FPF_SCAN_H
 #include <cstdlib> // provides size_t
 #include <fstream> // provides std::ifstream
+#include <istream> // provides std::istream::get
 
 namespace scan_class {       
 	class scan {
@@ -220,19 +221,19 @@ namespace scan_class {
 			node_type nt_ions;
 	};
         
-            	class main {
+            	class parse {
 		public:
 			// TYPEDEFS and MEMBER CONSTANTS
                         typedef int size_type;
-                        static const size_type MAIN_DEFAULT_ALLOCATION = 10000;
+                        static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
 			
 			// CONSTRUCTORS and DESTRUCTOR
-			main(size_type class_size = MAIN_DEFAULT_ALLOCATION);
-			main(const main& main_1);
-			~main();
+			parse(size_type class_size = PARSE_DEFAULT_ALLOCATION);
+			parse(const parse& parse);
+			~parse();
 			
 			// MODIFICATION MEMBER FUNCTIONS
-                        main main_parse(std::ifstream& fin);
+                        parse input_parse(std::ifstream& fin);
                         void insert(const scan& scan_1);
 			
 			// CONSTANT MEMBER FUNCTIONS
