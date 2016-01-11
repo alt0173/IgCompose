@@ -127,6 +127,12 @@
 //		member function. The default value for SCAN classes created through the
 //		constructor is FALSE.
 //
+//	node_type ions()
+//
+//		Returns a pointer to the IONS class for the associated SCAN class. The 
+//		pointer	directs to the node of the head of a linked list which is read 
+//		by order of fragmentation ion mass-to-charge ratio.
+//
 //CONSTANT MEMBER FUNCTIONS
 //
 //	value_type precursor_mass() const
@@ -145,7 +151,7 @@
 //
 //		Returns the precursor retention time of a SCAN class.
 //
-//	node_type ions() const
+//	const node_type ions() const
 //
 //		Returns a pointer to the IONS class for the associated SCAN class. The 
 //		pointer	directs to the node of the head of a linked list which is read 
@@ -193,13 +199,14 @@ namespace scan_class {
 			scan scan_union(const scan& scan_1, const scan& scan_2);			
 			scan operator +(const scan& scan_1, const scan& scan_2);
 			boolean scan_union_created(scan& scan_1);
+			node_type ions();
 			
 			// CONSTANT MEMBER FUNCTIONS
 			value_type precursor_mass() const;
 			value_type precursor_charge() const;
 			value_type precursor_mz() const
 			value_type precursor_rt() const;
-			node_type ions() const;
+			const node_type ions() const;
 			boolean union_precursor_mz(const scan& scan_1, const scan& scan_2);
 			boolean union_fragment_ion(const scan& scan_1, const scan& scan_2);
 			boolean union_retention_time(const scan& scan_1, const scan& scan_2);
