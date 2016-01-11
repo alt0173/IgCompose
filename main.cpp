@@ -22,57 +22,53 @@ const std::string version = "v.0.0.1";
 namespace scan_class {
     // TYPEDEFS and MEMBER CONSTANTS
     const scan::size_type scan::SCAN_DEFAULT_ALLOCATION;
-    const parse::size_type parse::PARSE_DEFAULT_ALLOCATION;       
-    
+    const parse::size_type parse::PARSE_DEFAULT_ALLOCATION;
+
     // CONSTRUCTORS and DESTRUCTOR
-    scan::scan(size_type class_size){
+
+    scan::scan(size_type class_size) {
         vt_precursor_mass = 0;
         vt_precursor_charge = 0;
         vt_precursor_mz = 0;
         vt_precursor_rt = 0;
         nt_ions = NULL;
     }
-    
-    scan::~scan(){        
+
+    scan::~scan() {
     }
-    
+
     parse::parse(size_type class_size) {
         ct_scan = new scan[class_size];
         st_capacity = class_size;
         st_used = 0;
     }
-    
-    parse::~parse(){
+
+    parse::~parse() {
         delete [] ct_scan;
     }
-    
+
     // MODIFICATION MEMBER FUNCTIONS
-    parse parse::input_parse(std::ifstream& fin)
-    {
+
+    void parse::input_parse(std::ifstream& fin, parse& parse_class) {
         char constructor_input;
-        while(fin.std::istream::get(constructor_input)){
-            
+        while (fin.std::istream::get(constructor_input)) {
+
         }
-        return parse;
     }
 }
 
-
-
-
-
 int main() {
-    
-    std::cout << "-- IgCompose " << version << " --\n\n\n";      
+
+    std::cout << "-- IgCompose " << version << " --\n\n\n";
     std::cout << "Input file?\n\n";
-    
+
     std::string input_file;
-    std::cin >> input_file;       
+    std::cin >> input_file;
     std::ifstream fin_input(input_file);
-    
+   
     parse main_parse = parse();
-    parse::input_parse(input_file);
-    
+    main_parse.input_parse(fin_input, main_parse);
+
     return 0;
 }
 
