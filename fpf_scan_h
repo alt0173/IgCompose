@@ -14,9 +14,9 @@
 //		assignment to an IONS class. The associated IONS class contains as a 
 //		dynamic array of doubles the transition ions of the respective SCAN class 
 //		element(s). Should two or more SCAN classes be determined to be suitable
-//		for spectral summing, as tested by boolean conditions, the union of 
+//		for spectral summing, as tested by bool conditions, the union of 
 //		these classes is created in a new SCAN class. SCAN classes created 
-//		through the union process are identifiable by boolean value. The 
+//		through the union process are identifiable by bool value. The 
 //		collection of union created SCAN classes are exported to a .mgf file at 
 //		program completion.
 //
@@ -102,18 +102,18 @@
 //			3 - Retention time
 //			4 - ?
 //
-//		Conditional selection is boolean tested with the corresponding functions
+//		Conditional selection is bool tested with the corresponding functions
 //		(prototyped below with CONSTANT MEMBER FUNCTIONS) -
 //
-//			1 - boolean union_precursor_mz(const scan& scan_1, const scan& scan_2)
-//			2 - boolean union_fragment_ion(const scan& scan_1, const scan& scan_2)
-//			3 - boolean union_retention_time(const scan& scan_1, const scan& scan_2)
+//			1 - bool union_precursor_mz(const scan& scan_1, const scan& scan_2)
+//			2 - bool union_fragment_ion(const scan& scan_1, const scan& scan_2)
+//			3 - bool union_retention_time(const scan& scan_1, const scan& scan_2)
 //			4 - ?
 //
 //		Fragment ion similarity is determined by the IONS class. Should two
 //		fragment ions be suitable for spectral summing, the average fragment ion
 //		mass-to-charge ratio and the summation of intensities is calculated for
-//		the resulting SCAN class. Union SCAN classes are boolean TRUE for being
+//		the resulting SCAN class. Union SCAN classes are bool TRUE for being
 //		created through the SCAN_UNION member function and at program completion are
 //		exported to a .mgf file for downstream analysis.
 //
@@ -121,7 +121,7 @@
 //
 //		Overloads a + operator assignment to create the union of two SCAN classes.
 //
-//	boolean scan_union_created(scan& scan_1)
+//	bool scan_union_created(scan& scan_1)
 //
 //		Returns TRUE if the SCAN class was created through the SCAN_UNION member
 //		member function. The default value for SCAN classes created through the
@@ -157,17 +157,17 @@
 //		pointer	directs to the node of the head of a linked list which is read 
 //		by order of fragmentation ion mass-to-charge ratio.
 //
-//	boolean union_precursor_mz(const scan& scan_1, const scan& scan_2)
+//	bool union_precursor_mz(const scan& scan_1, const scan& scan_2)
 //
 //		Returns TRUE if the precursor mass-to-charge ratios of two SCAN classes 
 //		are within the delta-value range defined by CONDITION_PRECURSOR_MZ.
 //
-//	boolean union_fragment_ion(const scan& scan_1, const scan& scan_2)
+//	bool union_fragment_ion(const scan& scan_1, const scan& scan_2)
 //
 //		Returns TRUE if the fragment ion similarity score is within the
 //		limit-value as defined by CONDITION_FRAGMENT_ION.
 //
-//	boolean union_retention_time(const scan& scan_1, const scan& scan_2)
+//	bool union_retention_time(const scan& scan_1, const scan& scan_2)
 //
 //		Returns TRUE if the retention times of two SCAN classes are within the 
 //		delta-value range defined by CONDITION_RETENTION_TIME.
@@ -184,7 +184,7 @@ namespace scan_class {
 			// TYPEDEFS and MEMBER CONSTANTS
 			typedef double value_type;
 			typedef int size_type;
-			typedef *scan node_type;
+			typedef scan* node_type;
 			static const size_type SCAN_DEFAULT_ALLOCATION = 10000;
 			value_type CONDITION_PRECURSOR_MZ = 0.05;
 			value_type CONDITION_FRAGMENT_ION = 95;
@@ -198,27 +198,26 @@ namespace scan_class {
 			// MODIFICATION MEMBER FUNCTIONS
 			scan scan_union(const scan& scan_1, const scan& scan_2);			
 			scan operator +(const scan& scan_1, const scan& scan_2);
-			boolean scan_union_created(scan& scan_1);
+			bool scan_union_created(scan& scan_1);
 			node_type ions();
 			
 			// CONSTANT MEMBER FUNCTIONS
 			value_type precursor_mass() const;
 			value_type precursor_charge() const;
-			value_type precursor_mz() const
+			value_type precursor_mz() const;
 			value_type precursor_rt() const;
 			const node_type ions() const;
-			boolean union_precursor_mz(const scan& scan_1, const scan& scan_2);
-			boolean union_fragment_ion(const scan& scan_1, const scan& scan_2);
-			boolean union_retention_time(const scan& scan_1, const scan& scan_2);
+			bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
+			bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
+			bool union_retention_time(const scan& scan_1, const scan& scan_2);
 			
 		private:
-			value_type precursor_mass;
-			value_type precursor_charge;
-			value_type precursor_mz;
-			value_type precursor_rt;
+			value_type vt_precursor_mass;
+			value_type vt_precursor_charge;
+			value_type vt_precursor_mz;
+			value_type vt_precursor_rt;
 			node_type ions;
 	}
 }
 
 #endif
-
