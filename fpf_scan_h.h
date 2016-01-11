@@ -240,10 +240,9 @@ namespace scan_class {
                         size_type capacity() const;
 			
 		private:
-                    size_type *ct_main;
-                    size_type st_used;
+                    scan *ct_scan;
                     size_type st_capacity;
-                    
+                    size_type st_used;                    
 	};
 }
 
