@@ -13,26 +13,18 @@
 #include <iostream> //provides - cin, cout
 #include "fpf_scan_h.h"
 
+using namespace scan_class;
+
 const std::string version = "v.0.0.1";
 
 // namespace scan_class defines object elements for fpf_scan_h
 
 namespace scan_class {
     // TYPEDEFS and MEMBER CONSTANTS
-    const main::size_type main::MAIN_DEFAULT_ALLOCATION;
-    const scan::size_type scan::SCAN_DEFAULT_ALLOCATION;   
+    const scan::size_type scan::SCAN_DEFAULT_ALLOCATION;
+    const parse::size_type parse::PARSE_DEFAULT_ALLOCATION;       
     
     // CONSTRUCTORS and DESTRUCTOR
-    main::main(size_type class_size) {
-        ct_scan = new scan[class_size];
-        st_capacity = class_size;
-        st_used = 0;
-    }
-    
-    main::~main(){
-        delete [] ct_scan;
-    }
-    
     scan::scan(size_type class_size){
         vt_precursor_mass = 0;
         vt_precursor_charge = 0;
@@ -41,8 +33,27 @@ namespace scan_class {
         nt_ions = NULL;
     }
     
-    scan::~scan(){
-        
+    scan::~scan(){        
+    }
+    
+    parse::parse(size_type class_size) {
+        ct_scan = new scan[class_size];
+        st_capacity = class_size;
+        st_used = 0;
+    }
+    
+    parse::~parse(){
+        delete [] ct_scan;
+    }
+    
+    // MODIFICATION MEMBER FUNCTIONS
+    parse parse::input_parse(std::ifstream& fin)
+    {
+        char constructor_input;
+        while(fin.std::istream::get(constructor_input)){
+            
+        }
+        return parse;
     }
 }
 
@@ -58,6 +69,10 @@ int main() {
     std::string input_file;
     std::cin >> input_file;       
     std::ifstream fin_input(input_file);
+    
+    parse main_parse = parse();
+    parse::input_parse(input_file);
+    
     return 0;
 }
 
