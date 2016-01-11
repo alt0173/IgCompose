@@ -172,7 +172,7 @@
 //		Returns TRUE if the retention times of two SCAN classes are within the 
 //		delta-value range defined by CONDITION_RETENTION_TIME.
 
-    
+
 
 #ifndef FPF_SCAN_H
 #define	FPF_SCAN_H
@@ -180,71 +180,72 @@
 #include <fstream> // provides std::ifstream
 #include <istream> // provides std::istream::get
 
-namespace scan_class {       
-	class scan {
-		public:
-			// TYPEDEFS and MEMBER CONSTANTS
-			typedef double value_type;
-			typedef int size_type;
-			typedef scan* node_type;
-			static const size_type SCAN_DEFAULT_ALLOCATION = 100;
-			value_type CONDITION_PRECURSOR_MZ = 0.05;
-			value_type CONDITION_FRAGMENT_ION = 95;
-			value_type CONDITION_RETENTION_TIME = 120;
-			
-			// CONSTRUCTORS and DESTRUCTOR
-			scan(size_type class_size = SCAN_DEFAULT_ALLOCATION);
-			scan(const scan& scan_1);
-			~scan();
-			
-			// MODIFICATION MEMBER FUNCTIONS
-			scan scan_union(const scan& scan_1, const scan& scan_2);			
-			scan operator +(const scan& scan_1);
-			bool scan_union_created(scan& scan_1);
-			node_type ions();
-			
-			// CONSTANT MEMBER FUNCTIONS
-			value_type precursor_mass() const;
-			value_type precursor_charge() const;
-			value_type precursor_mz() const;
-			value_type precursor_rt() const;
-			const node_type ions() const;
-			bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
-			bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
-			bool union_retention_time(const scan& scan_1, const scan& scan_2);
-			
-		private:
-			value_type vt_precursor_mass;
-			value_type vt_precursor_charge;
-			value_type vt_precursor_mz;
-			value_type vt_precursor_rt;
-			node_type nt_ions;
-	};
-        
-            	class parse {
-		public:
-			// TYPEDEFS and MEMBER CONSTANTS
-                        typedef int size_type;
-                        static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
-			
-			// CONSTRUCTORS and DESTRUCTOR
-			parse(size_type class_size = PARSE_DEFAULT_ALLOCATION);
-			parse(const parse& parse);
-			~parse();
-			
-			// MODIFICATION MEMBER FUNCTIONS
-                        parse input_parse(std::ifstream& fin);
-                        void insert(const scan& scan_1);
-			
-			// CONSTANT MEMBER FUNCTIONS
-                        size_type used() const;
-                        size_type capacity() const;
-			
-		private:
-                    scan *ct_scan;
-                    size_type st_capacity;
-                    size_type st_used;                    
-	};
+namespace scan_class {
+
+    class scan {
+    public:
+        // TYPEDEFS and MEMBER CONSTANTS
+        typedef double value_type;
+        typedef int size_type;
+        typedef scan* node_type;
+        static const size_type SCAN_DEFAULT_ALLOCATION = 100;
+        value_type CONDITION_PRECURSOR_MZ = 0.05;
+        value_type CONDITION_FRAGMENT_ION = 95;
+        value_type CONDITION_RETENTION_TIME = 120;
+
+        // CONSTRUCTORS and DESTRUCTOR
+        scan(size_type class_size = SCAN_DEFAULT_ALLOCATION);
+        scan(const scan& scan_1);
+        ~scan();
+
+        // MODIFICATION MEMBER FUNCTIONS
+        scan scan_union(const scan& scan_1, const scan& scan_2);
+        scan operator+(const scan& scan_1);
+        bool scan_union_created(scan& scan_1);
+        node_type ions();
+
+        // CONSTANT MEMBER FUNCTIONS
+        value_type precursor_mass() const;
+        value_type precursor_charge() const;
+        value_type precursor_mz() const;
+        value_type precursor_rt() const;
+        const node_type ions() const;
+        bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
+        bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
+        bool union_retention_time(const scan& scan_1, const scan& scan_2);
+
+    private:
+        value_type vt_precursor_mass;
+        value_type vt_precursor_charge;
+        value_type vt_precursor_mz;
+        value_type vt_precursor_rt;
+        node_type nt_ions;
+    };
+
+    class parse {
+    public:
+        // TYPEDEFS and MEMBER CONSTANTS
+        typedef int size_type;
+        static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
+
+        // CONSTRUCTORS and DESTRUCTOR
+        parse(size_type class_size = PARSE_DEFAULT_ALLOCATION);
+        parse(const parse& parse);
+        ~parse();
+
+        // MODIFICATION MEMBER FUNCTIONS
+        void input_parse(std::ifstream& fin, parse& parse_class);
+        void insert(const scan& scan_1);
+
+        // CONSTANT MEMBER FUNCTIONS
+        size_type used() const;
+        size_type capacity() const;
+
+    private:
+        scan *ct_scan;
+        size_type st_capacity;
+        size_type st_used;
+    };
 }
 
 #endif
