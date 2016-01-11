@@ -197,7 +197,7 @@ namespace scan_class {
 			
 			// MODIFICATION MEMBER FUNCTIONS
 			scan scan_union(const scan& scan_1, const scan& scan_2);			
-			scan operator +(const scan& scan_1, const scan& scan_2);
+			scan operator +(const scan& scan_1);
 			bool scan_union_created(scan& scan_1);
 			node_type ions();
 			
@@ -216,8 +216,8 @@ namespace scan_class {
 			value_type vt_precursor_charge;
 			value_type vt_precursor_mz;
 			value_type vt_precursor_rt;
-			node_type ions;
-	}
+			node_type nt_ions;
+	};
 }
 
 #endif
