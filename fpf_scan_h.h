@@ -174,18 +174,19 @@
 
     
 
-#ifndef fpf_scan_h
-#define	fpf_scan_h
+#ifndef FPF_SCAN_H
+#define	FPF_SCAN_H
 #include <cstdlib> // provides size_t
+#include <fstream> // provides std::ifstream
 
-namespace scan_class {
+namespace scan_class {       
 	class scan {
 		public:
 			// TYPEDEFS and MEMBER CONSTANTS
 			typedef double value_type;
 			typedef int size_type;
 			typedef scan* node_type;
-			static const size_type SCAN_DEFAULT_ALLOCATION = 10000;
+			static const size_type SCAN_DEFAULT_ALLOCATION = 100;
 			value_type CONDITION_PRECURSOR_MZ = 0.05;
 			value_type CONDITION_FRAGMENT_ION = 95;
 			value_type CONDITION_RETENTION_TIME = 120;
@@ -217,6 +218,32 @@ namespace scan_class {
 			value_type vt_precursor_mz;
 			value_type vt_precursor_rt;
 			node_type nt_ions;
+	};
+        
+            	class main {
+		public:
+			// TYPEDEFS and MEMBER CONSTANTS
+                        typedef int size_type;
+                        static const size_type MAIN_DEFAULT_ALLOCATION = 10000;
+			
+			// CONSTRUCTORS and DESTRUCTOR
+			main(size_type class_size = MAIN_DEFAULT_ALLOCATION);
+			main(const main& main_1);
+			~main();
+			
+			// MODIFICATION MEMBER FUNCTIONS
+                        main main_parse(std::ifstream& fin);
+                        void insert(const scan& scan_1);
+			
+			// CONSTANT MEMBER FUNCTIONS
+                        size_type used() const;
+                        size_type capacity() const;
+			
+		private:
+                    size_type *ct_main;
+                    size_type st_used;
+                    size_type st_capacity;
+                    
 	};
 }
 
