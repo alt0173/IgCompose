@@ -1,7 +1,7 @@
 /*
-* File:   fpf_scan.h
-* Author: Lukah Dykes
-*/
+ * File:   fpf_scan.h
+ * Author: Lukah Dykes
+ */
 
 
 //!!
@@ -183,76 +183,77 @@
 
 namespace scan_class {
 
-	class scan {
-	public:
-		// TYPEDEFS and MEMBER CONSTANTS
-		typedef double value_type;
-		typedef unsigned int size_type;
-		typedef scan* node_type;
-		static const size_type SCAN_DEFAULT_ALLOCATION = 100;
-		value_type CONDITION_PRECURSOR_MZ = 0.05;
-		value_type CONDITION_FRAGMENT_ION = 95;
-		value_type CONDITION_RETENTION_TIME = 120;
+    class scan {
+    public:
+        // TYPEDEFS and MEMBER CONSTANTS
+        typedef double value_type;
+        typedef unsigned int size_type;
+        typedef scan* node_type;
+        value_type CONDITION_PRECURSOR_MASS = 0.05;
+        value_type CONDITION_PRECURSOR_MZ = 0.05;
+        value_type CONDITION_PRECURSOR_RT = 120;
+        value_type CONDITION_FRAGMENT_ION = 95;
 
-		// CONSTRUCTORS and DESTRUCTOR
-		scan(size_type class_size = SCAN_DEFAULT_ALLOCATION);
-		scan(const scan& scan_1);
-		~scan();
+        // CONSTRUCTORS and DESTRUCTOR
+        scan();
+        ~scan();
 
-		// MODIFICATION MEMBER FUNCTIONS
-		void scan_modify_precursor_mass(scan& scan_1, value_type parse_precursor_mass);
-		void scan_modify_precursor_mz(scan& scan_1, value_type parse_precursor_mz);
-		void scan_modify_precursor_rt(scan& scan_1, value_type parse_precursor_rt);
-		void scan_modify_precursor_charge(scan& scan_1, size_type parse_precursor_charge);
-		void scan_union_created(scan& scan_1);
-		scan scan_union_(const scan& scan_1, const scan& scan_2);
-		scan operator+(const scan& scan_1);
-		node_type ions();
+        // MODIFICATION MEMBER FUNCTIONS
+        void scan_modify_precursor_mass(scan& scan_1, value_type parse_precursor_mass);
+        void scan_modify_precursor_mz(scan& scan_1, value_type parse_precursor_mz);
+        void scan_modify_precursor_rt(scan& scan_1, value_type parse_precursor_rt);
+        void scan_modify_precursor_charge(scan& scan_1, size_type parse_precursor_charge);
+        void scan_union_created(scan& scan_1);
+        scan scan_union(const scan& scan_1, const scan& scan_2);
+        scan operator+(const scan& scan_1);
+        node_type ions();
 
-		// CONSTANT MEMBER FUNCTIONS
-		const value_type precursor_mass(const scan& scan_1) const;
-		const value_type precursor_charge(const scan& scan_1) const;
-		const value_type precursor_mz(const scan& scan_1) const;
-		const size_type precursor_rt(const scan& scan_1) const;
-		const node_type ions(const scan& scan_1) const;
-		bool union_precursor_mz(const scan& scan_1, const scan& scan_2) const;
-		bool union_fragment_ion(const scan& scan_1, const scan& scan_2) const;
-		bool union_retention_time(const scan& scan_1, const scan& scan_2) const;
+        // CONSTANT MEMBER FUNCTIONS
+        const value_type precursor_mass(const scan& scan_1) const;
+        const value_type precursor_charge(const scan& scan_1) const;
+        const value_type precursor_mz(const scan& scan_1) const;
+        const size_type precursor_rt(const scan& scan_1) const;
+        const node_type ions(const scan& scan_1) const;
+        const bool union_created(const scan& scan_1) const;
+        bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
+        bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
+        bool union_retention_time(const scan& scan_1, const scan& scan_2);
 
-	private:
-		value_type vt_precursor_mass;		
-		value_type vt_precursor_mz;
-		value_type vt_precursor_rt;
-		size_type vt_precursor_charge;
-		node_type nt_ions;
-		bool b_union_created;
-	};
+    private:
+        value_type vt_precursor_mass;
+        value_type vt_precursor_mz;
+        value_type vt_precursor_rt;
+        size_type vt_precursor_charge;
+        node_type nt_ions;
+        bool b_union_created;
+    };
 
-	class parse {
-	public:
-		// TYPEDEFS and MEMBER CONSTANTS
-		typedef double value_type;
-		typedef unsigned int size_type;
-		static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
+    class parse {
+    public:
+        // TYPEDEFS and MEMBER CONSTANTS
+        typedef double value_type;
+        typedef unsigned int size_type;
+        static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
 
-		// CONSTRUCTORS and DESTRUCTOR
-		parse(size_type class_size = PARSE_DEFAULT_ALLOCATION);
-		parse(const parse& parse);
-		~parse();
+        // CONSTRUCTORS and DESTRUCTOR
+        parse(size_type class_size = PARSE_DEFAULT_ALLOCATION);
+        parse(const parse& parse);
+        ~parse();
 
-		// MODIFICATION MEMBER FUNCTIONS
-		void input_parse(std::ifstream& fin, parse& parse_class);
-		void insert(const scan& scan_1);
+        // MODIFICATION MEMBER FUNCTIONS
+        void input_parse(std::ifstream& fin, parse& parse_class);
+        void insert(const scan& scan_1);
 
-		// CONSTANT MEMBER FUNCTIONS
-		size_type used() const;
-		size_type capacity() const;
+        // CONSTANT MEMBER FUNCTIONS
+        const scan* scan_link(const parse& parse_1) const;
+        const size_type used(const parse& parse_1) const;
+        const size_type capacity(const parse& parse_1) const;
 
-	private:
-		scan *ct_scan;
-		size_type st_capacity;
-		size_type st_used;
-	};
+    private:
+        scan* ct_scan;
+        size_type st_capacity;
+        size_type st_used;
+    };
 }
 
 #endif
