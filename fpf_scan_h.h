@@ -241,13 +241,13 @@ namespace scan_class {
         ~parse();
 
         // MODIFICATION MEMBER FUNCTIONS
-        void input_parse(std::ifstream& fin, parse& parse_1);
-        
+        void input_parse(std::ifstream& fin, parse& parse_1);      
 
         // CONSTANT MEMBER FUNCTIONS
-        const scan* scan_link(const parse& parse_1) const;
-        const size_type used(const parse& parse_1) const;
-        const size_type capacity(const parse& parse_1) const;
+        const scan* scan_link() const;
+        const size_type used() const;
+        const size_type capacity() const;
+        void read_parse() const;
 
     private:
         scan* ct_scan;
