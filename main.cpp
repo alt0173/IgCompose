@@ -22,12 +22,19 @@ const std::string version = "v.0.0.1";
 
 namespace scan_class {
     // TYPEDEFS and MEMBER CONSTANTS
-    const scan::size_type scan::SCAN_DEFAULT_ALLOCATION;
+    scan::value_type CONDITION_PRECURSOR_MASS = 0.05;
+
+    scan::value_type CONDITION_PRECURSOR_MZ = 0.05;
+
+    scan::value_type CONDITION_PRECURSOR_RT = 120;
+
+    scan::value_type CONDITION_FRAGMENT_ION = 95;
+
     const parse::size_type parse::PARSE_DEFAULT_ALLOCATION;
 
     // CONSTRUCTORS and DESTRUCTOR
 
-    scan::scan(size_type class_size) {
+    scan::scan() {
         vt_precursor_mass = 0;
         vt_precursor_charge = 0;
         vt_precursor_mz = 0;
@@ -92,8 +99,8 @@ namespace scan_class {
             }
             if ((switch_inputstream == 2) && (subswitch_inputstream == 1) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
-                value_type vt_inputstream = ss_inputstream;
-                parse_class.ct_scan[st_used].scan_modify_precursor_mass(parse_class.ct_scan[st_used], vt_inputstream);
+                //typecov to value_type??
+                //ct_scan[st_used].scan_modify_precursor_mass(ss_inputstream);
                 subswitch_inputstream = 0;
             }
             if (s_inputstream == "END IONS") {
@@ -108,20 +115,36 @@ namespace scan_class {
         return scan_1.vt_precursor_mass;
     };
 
-    const scan::value_type scan::precursor_charge(const scan& scan_1) {
+    const scan::value_type scan::precursor_charge(const scan& scan_1) const {
         return scan_1.vt_precursor_mz;
     };
 
-    const scan::value_type scan::precursor_mz(const scan& scan_1) {
+    const scan::value_type scan::precursor_mz(const scan& scan_1) const {
         return scan_1.vt_precursor_rt;
     };
 
-    const scan::size_type scan::precursor_rt(const scan& scan_1) {
+    const scan::size_type scan::precursor_rt(const scan& scan_1) const {
         return scan_1.vt_precursor_charge;
     };
 
-    const scan::node_type scan::ions(const scan& scan_1) {
+    const scan::node_type scan::ions(const scan& scan_1) const {
         return scan_1.nt_ions;
+    };
+
+    const bool scan::union_created(const scan& scan_1) const {
+        return scan_1.b_union_created;
+    };
+
+    const scan* parse::scan_link(const parse& parse_1) const {
+        return parse_1.ct_scan;
+    };
+
+    const parse::size_type parse::used(const parse& parse_1) const {
+        return parse_1.st_used;
+    };
+
+    const parse::size_type parse::capacity(const parse& parse_1) const {
+        return parse_1.st_capacity;
     };
 }
 
@@ -136,6 +159,13 @@ int main() {
 
     parse main_parse = parse();
     main_parse.input_parse(fin_input, main_parse);
+    for (unsigned i = 0; i < main_parse.used(main_parse); ++i) {
+        //if (main_parse->scan_link(main_parse).precursor_mass(main_parse.scan_link(main_parse)) < CONDITION_PRECURSOR_MASS) {
+        //&& (main_parse.scan_link[i].precursor_mz < CONDITION_PRECURSOR_MZ)
+        //&& (main_parse.scan_link[i].precursor_rt < CONDITION_PRECURSOR_RT)) 
+        //std::cout << "test";
+        //}
+    }
 
     return 0;
 }
