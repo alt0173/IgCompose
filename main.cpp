@@ -35,10 +35,10 @@ namespace scan_class {
     // CONSTRUCTORS and DESTRUCTOR
 
     scan::scan() {
-        vt_precursor_mass = 0;
-        vt_precursor_charge = 0;
+        vt_precursor_mass = 0;        
         vt_precursor_mz = 0;
         vt_precursor_rt = 0;
+        st_precursor_charge = 0;
         nt_ions = NULL;
         b_union_created = false;
     }
@@ -58,27 +58,27 @@ namespace scan_class {
 
     // MODIFICATION MEMBER FUNCTIONS
 
-    void scan::scan_modify_precursor_mass(scan& scan_1, value_type parse_precursor_mass) {
-        scan_1.vt_precursor_mass = parse_precursor_mass;
+    void scan::scan_modify_precursor_mass(value_type parse_precursor_mass) {
+        vt_precursor_mass = parse_precursor_mass;
     };
 
-    void scan::scan_modify_precursor_mz(scan& scan_1, value_type parse_precursor_mz) {
-        scan_1.vt_precursor_mz = parse_precursor_mz;
+    void scan::scan_modify_precursor_mz(value_type parse_precursor_mz) {
+        vt_precursor_mz = parse_precursor_mz;
     };
 
-    void scan::scan_modify_precursor_rt(scan& scan_1, value_type parse_precursor_rt) {
-        scan_1.vt_precursor_rt = parse_precursor_rt;
+    void scan::scan_modify_precursor_rt(value_type parse_precursor_rt) {
+        vt_precursor_rt = parse_precursor_rt;
     };
 
-    void scan::scan_modify_precursor_charge(scan& scan_1, size_type parse_precursor_charge) {
-        scan_1.vt_precursor_charge = parse_precursor_charge;
+    void scan::scan_modify_precursor_charge(size_type parse_precursor_charge) {
+        st_precursor_charge = parse_precursor_charge;
     };
 
-    void scan::scan_union_created(scan& scan_1) {
-        scan_1.b_union_created = true;
+    void scan::scan_union_created() {
+        b_union_created = true;
     };
 
-    void parse::input_parse(std::ifstream& fin, parse& parse_class) {
+    void parse::input_parse(std::ifstream& fin, parse& parse_1) {
         char c_inputstream;
         std::string s_inputstream = "";
         int switch_inputstream = 0;
@@ -88,51 +88,62 @@ namespace scan_class {
             if (c_inputstream != '\n') {
                 s_inputstream += c_inputstream;
             }
-            if (s_inputstream == "BEGIN IONS") {
-                switch_inputstream = 1;
-                s_inputstream.clear();
-            }
-            if (s_inputstream == "RTINSECONDS: ") {
+            if (s_inputstream == "RTINSECONDS=") {
                 switch_inputstream = 2;
-                subswitch_inputstream = 1;
                 s_inputstream.clear();
             }
-            if ((switch_inputstream == 2) && (subswitch_inputstream == 1) && (c_inputstream == '\n')) {
+            if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
-                //typecov to value_type??
-                //ct_scan[st_used].scan_modify_precursor_mass(ss_inputstream);
+                parse::value_type vt_inputstream = ss_inputstream;
+                ct_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
                 subswitch_inputstream = 0;
+                s_inputstream.clear();
+                std::cout << ct_scan[st_used].precursor_rt() << "\n\n";
+            }
+            if (s_inputstream == "PEPMASS=") {
+                switch_inputstream = 3;
+                s_inputstream.clear();
+            }
+            if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
+                std::istringstream(s_inputstream) >> ss_inputstream;
+                parse::value_type vt_inputstream = ss_inputstream;
+                ct_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
+                subswitch_inputstream = 0;
+                s_inputstream.clear();
             }
             if (s_inputstream == "END IONS") {
-                //++count;
+                ++parse_1.st_used;
+            }
+            if (c_inputstream == '\n') {
+                s_inputstream.clear();
             }
         }
     }
 
     // CONSTANT MEMBER FUNCTIONS
 
-    const scan::value_type scan::precursor_mass(const scan& scan_1) const {
-        return scan_1.vt_precursor_mass;
+    const scan::value_type scan::precursor_mass() const {
+        return vt_precursor_mass;
     };
 
-    const scan::value_type scan::precursor_charge(const scan& scan_1) const {
-        return scan_1.vt_precursor_mz;
+    const scan::value_type scan::precursor_mz() const {
+        return vt_precursor_mz;
     };
 
-    const scan::value_type scan::precursor_mz(const scan& scan_1) const {
-        return scan_1.vt_precursor_rt;
+    const scan::value_type scan::precursor_rt() const {
+        return vt_precursor_rt;
+    };
+    
+    const scan::size_type scan::precursor_charge() const {
+        return st_precursor_charge;
     };
 
-    const scan::size_type scan::precursor_rt(const scan& scan_1) const {
-        return scan_1.vt_precursor_charge;
+    const scan::node_type scan::ions() const {
+        return nt_ions;
     };
 
-    const scan::node_type scan::ions(const scan& scan_1) const {
-        return scan_1.nt_ions;
-    };
-
-    const bool scan::union_created(const scan& scan_1) const {
-        return scan_1.b_union_created;
+    const bool scan::union_created() const {
+        return b_union_created;
     };
 
     const scan* parse::scan_link(const parse& parse_1) const {
@@ -166,7 +177,11 @@ int main() {
         //std::cout << "test";
         //}
     }
-
+    
+    std::string pong;
+    std::cout << "\n\nping..\n\n";
+    std::cin >> pong;
+    
     return 0;
 }
 
