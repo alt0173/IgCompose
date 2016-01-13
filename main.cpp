@@ -82,7 +82,6 @@ namespace scan_class {
         char c_inputstream;
         std::string s_inputstream = "";
         int switch_inputstream = 0;
-        int subswitch_inputstream = 0;
         value_type ss_inputstream;
         while (fin.std::istream::get(c_inputstream)) {
             if (c_inputstream != '\n') {
@@ -96,9 +95,7 @@ namespace scan_class {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
                 ct_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
-                subswitch_inputstream = 0;
-                s_inputstream.clear();
-                std::cout << ct_scan[st_used].precursor_rt() << "\n\n";
+                s_inputstream.clear();               
             }
             if (s_inputstream == "PEPMASS=") {
                 switch_inputstream = 3;
@@ -108,10 +105,13 @@ namespace scan_class {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
                 ct_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
-                subswitch_inputstream = 0;
+                switch_inputstream = 0;
                 s_inputstream.clear();
+                std::cout << "ping!";
+                std::cout << ct_scan[st_used].precursor_rt();
             }
-            if (s_inputstream == "END IONS") {
+            if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {
+                std::cout << "  " << st_used << "\n\n";
                 ++parse_1.st_used;
             }
             if (c_inputstream == '\n') {
@@ -146,16 +146,28 @@ namespace scan_class {
         return b_union_created;
     };
 
-    const scan* parse::scan_link(const parse& parse_1) const {
-        return parse_1.ct_scan;
+    const scan* parse::scan_link() const {
+        return ct_scan;
     };
 
-    const parse::size_type parse::used(const parse& parse_1) const {
-        return parse_1.st_used;
+    const parse::size_type parse::used() const {
+        return st_used;
     };
 
-    const parse::size_type parse::capacity(const parse& parse_1) const {
-        return parse_1.st_capacity;
+    const parse::size_type parse::capacity() const {
+        return st_capacity;
+    };
+    
+    void parse::read_parse() const{
+    for (unsigned i = 0; i < used(); ++i) {
+        std::cout << i << "  ";
+        std::cout << ct_scan[st_used].precursor_rt() << "\n\n";
+        //if (main_parse->scan_link(main_parse).precursor_mass(main_parse.scan_link(main_parse)) < CONDITION_PRECURSOR_MASS) {
+        //&& (main_parse.scan_link[i].precursor_mz < CONDITION_PRECURSOR_MZ)
+        //&& (main_parse.scan_link[i].precursor_rt < CONDITION_PRECURSOR_RT)) 
+        //std::cout << "test";
+        //}
+    }
     };
 }
 
@@ -170,13 +182,8 @@ int main() {
 
     parse main_parse = parse();
     main_parse.input_parse(fin_input, main_parse);
-    for (unsigned i = 0; i < main_parse.used(main_parse); ++i) {
-        //if (main_parse->scan_link(main_parse).precursor_mass(main_parse.scan_link(main_parse)) < CONDITION_PRECURSOR_MASS) {
-        //&& (main_parse.scan_link[i].precursor_mz < CONDITION_PRECURSOR_MZ)
-        //&& (main_parse.scan_link[i].precursor_rt < CONDITION_PRECURSOR_RT)) 
-        //std::cout << "test";
-        //}
-    }
+    main_parse.read_parse();
+
     
     std::string pong;
     std::cout << "\n\nping..\n\n";
