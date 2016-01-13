@@ -199,22 +199,22 @@ namespace scan_class {
         ~scan();
 
         // MODIFICATION MEMBER FUNCTIONS
-        void scan_modify_precursor_mass(scan& scan_1, value_type parse_precursor_mass);
-        void scan_modify_precursor_mz(scan& scan_1, value_type parse_precursor_mz);
-        void scan_modify_precursor_rt(scan& scan_1, value_type parse_precursor_rt);
-        void scan_modify_precursor_charge(scan& scan_1, size_type parse_precursor_charge);
-        void scan_union_created(scan& scan_1);
+        void scan_modify_precursor_mass(value_type parse_precursor_mass);
+        void scan_modify_precursor_mz(value_type parse_precursor_mz);
+        void scan_modify_precursor_rt(value_type parse_precursor_rt);
+        void scan_modify_precursor_charge(size_type parse_precursor_charge);
+        void scan_union_created();
         scan scan_union(const scan& scan_1, const scan& scan_2);
         scan operator+(const scan& scan_1);
         node_type ions();
 
         // CONSTANT MEMBER FUNCTIONS
-        const value_type precursor_mass(const scan& scan_1) const;
-        const value_type precursor_charge(const scan& scan_1) const;
-        const value_type precursor_mz(const scan& scan_1) const;
-        const size_type precursor_rt(const scan& scan_1) const;
-        const node_type ions(const scan& scan_1) const;
-        const bool union_created(const scan& scan_1) const;
+        const value_type precursor_mass() const;        
+        const value_type precursor_mz() const;
+        const value_type precursor_rt() const;
+        const size_type precursor_charge() const;       
+        const node_type ions() const;
+        const bool union_created() const;
         bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
         bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
         bool union_retention_time(const scan& scan_1, const scan& scan_2);
@@ -223,7 +223,7 @@ namespace scan_class {
         value_type vt_precursor_mass;
         value_type vt_precursor_mz;
         value_type vt_precursor_rt;
-        size_type vt_precursor_charge;
+        size_type st_precursor_charge;
         node_type nt_ions;
         bool b_union_created;
     };
@@ -241,8 +241,8 @@ namespace scan_class {
         ~parse();
 
         // MODIFICATION MEMBER FUNCTIONS
-        void input_parse(std::ifstream& fin, parse& parse_class);
-        void insert(const scan& scan_1);
+        void input_parse(std::ifstream& fin, parse& parse_1);
+        
 
         // CONSTANT MEMBER FUNCTIONS
         const scan* scan_link(const parse& parse_1) const;
