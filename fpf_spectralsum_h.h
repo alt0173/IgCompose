@@ -1,5 +1,5 @@
 /*
- * File:   fpf_scan.h
+ * File:   fpf_spectralsum_h.h
  * Author: Lukah Dykes
  */
 
@@ -31,7 +31,7 @@
 //	typedef _____ size_type
 //
 //		scan::size_type is the data type of any variable that is assigned to
-//		enumerate quanity at run-time.
+//		enumerate quantity at run-time.
 //
 //	typedef _____ node_type
 //
@@ -127,7 +127,7 @@
 //		member function. The default value for SCAN classes created through the
 //		constructor is FALSE.
 //
-//	node_type ions()
+//	node_type link_ions()
 //
 //		Returns a pointer to the IONS class for the associated SCAN class. The 
 //		pointer	directs to the node of the head of a linked list which is read 
@@ -151,7 +151,7 @@
 //
 //		Returns the precursor retention time of a SCAN class.
 //
-//	const node_type ions() const
+//	const node_type link_ions() const
 //
 //		Returns a pointer to the IONS class for the associated SCAN class. The 
 //		pointer	directs to the node of the head of a linked list which is read 
@@ -173,7 +173,6 @@
 //		delta-value range defined by CONDITION_RETENTION_TIME.
 
 
-
 #ifndef FPF_SCAN_H
 #define	FPF_SCAN_H
 #include <cstdlib> // provides - size_t
@@ -183,12 +182,37 @@
 
 namespace scan_class {
 
+    class ions {
+    public:
+        // TYPEDEFS and MEMBER CONSTANTS
+        typedef double value_type;
+        typedef unsigned int size_type;
+        static const size_type IONS_DEFAULT_ALLOCATION = 200;
+
+        // CONSTRUCTORS and DESTRUCTOR
+        ions(size_type class_size = IONS_DEFAULT_ALLOCATION);
+        ~ions();
+
+        // MODIFICATION MEMBER FUNCTIONS
+        void link_ions();
+        void ions_modify_ion_mz(value_type parse_ion_mz);
+        void ions_modify_ion_intensity(value_type parse_ion_intensity);
+
+        // CONSTANT MEMBER FUNCTIONS
+        const value_type ion_mz() const;
+        const value_type ion_intensity() const;
+
+    private:
+        value_type vt_ion_mz;
+        value_type vt_ion_intensity;
+    };
+
     class scan {
     public:
         // TYPEDEFS and MEMBER CONSTANTS
         typedef double value_type;
         typedef unsigned int size_type;
-        typedef scan* node_type;
+        typedef ions* ions_node_type;
         value_type CONDITION_PRECURSOR_MASS = 0.05;
         value_type CONDITION_PRECURSOR_MZ = 0.05;
         value_type CONDITION_PRECURSOR_RT = 120;
@@ -206,14 +230,14 @@ namespace scan_class {
         void scan_union_created();
         scan scan_union(const scan& scan_1, const scan& scan_2);
         scan operator+(const scan& scan_1);
-        node_type ions();
+        ions_node_type link_ions();
 
         // CONSTANT MEMBER FUNCTIONS
-        const value_type precursor_mass() const;        
+        const value_type precursor_mass() const;
         const value_type precursor_mz() const;
         const value_type precursor_rt() const;
-        const size_type precursor_charge() const;       
-        const node_type ions() const;
+        const size_type precursor_charge() const;
+        const ions_node_type link_ions() const;
         const bool union_created() const;
         bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
         bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
@@ -224,7 +248,7 @@ namespace scan_class {
         value_type vt_precursor_mz;
         value_type vt_precursor_rt;
         size_type st_precursor_charge;
-        node_type nt_ions;
+        ions_node_type nt_ions;
         bool b_union_created;
     };
 
@@ -233,6 +257,7 @@ namespace scan_class {
         // TYPEDEFS and MEMBER CONSTANTS
         typedef double value_type;
         typedef unsigned int size_type;
+        typedef scan* scan_node_type;
         static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
 
         // CONSTRUCTORS and DESTRUCTOR
@@ -241,16 +266,16 @@ namespace scan_class {
         ~parse();
 
         // MODIFICATION MEMBER FUNCTIONS
-        void input_parse(std::ifstream& fin, parse& parse_1);      
+        void input_parse(std::ifstream& fin, parse& parse_1);
 
         // CONSTANT MEMBER FUNCTIONS
-        const scan* scan_link() const;
+        const scan_node_type scan_link() const;
         const size_type used() const;
         const size_type capacity() const;
         void read_parse() const;
 
     private:
-        scan* ct_scan;
+        scan_node_type ct_scan;
         size_type st_capacity;
         size_type st_used;
     };
