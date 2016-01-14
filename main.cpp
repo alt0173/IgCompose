@@ -66,8 +66,8 @@ namespace scan_class {
         vt_precursor_mz = parse_precursor_mz;
     };
 
-    void scan::scan_modify_precursor_rt(value_type parse_precursor_rt) {
-        vt_precursor_rt = parse_precursor_rt;
+    void scan::scan_modify_precursor_rt(scan& scan_1, value_type parse_precursor_rt) {
+		scan_1.vt_precursor_rt = parse_precursor_rt;
     };
 
     void scan::scan_modify_precursor_charge(size_type parse_precursor_charge) {
@@ -87,31 +87,33 @@ namespace scan_class {
             if (c_inputstream != '\n') {
                 s_inputstream += c_inputstream;
             }
-            if (s_inputstream == "RTINSECONDS=") {
+            if (s_inputstream == "PEPMASS=") {
                 switch_inputstream = 2;
                 s_inputstream.clear();
             }
             if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                ct_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
+				switch_inputstream = 0;
                 s_inputstream.clear();               
             }
-            if (s_inputstream == "PEPMASS=") {
+            if (s_inputstream == "RTINSECONDS=") {
                 switch_inputstream = 3;
                 s_inputstream.clear();
             }
             if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                ct_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
+				std::cout << "\n\n" << st_used;
+				std::cout << "ping!";
+				std::cout << ct_scan[st_used].precursor_rt();
+                ct_scan[st_used].scan_modify_precursor_rt(ct_scan[st_used], vt_inputstream);
                 switch_inputstream = 0;
                 s_inputstream.clear();
                 std::cout << "ping!";
                 std::cout << ct_scan[st_used].precursor_rt();
             }
-            if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {
-                std::cout << "  " << st_used << "\n\n";
+            if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {                
                 ++parse_1.st_used;
             }
             if (c_inputstream == '\n') {
@@ -160,14 +162,9 @@ namespace scan_class {
     
     void parse::read_parse() const{
     for (unsigned i = 0; i < used(); ++i) {
-        std::cout << i << "  ";
-        std::cout << ct_scan[st_used].precursor_rt() << "\n\n";
-        //if (main_parse->scan_link(main_parse).precursor_mass(main_parse.scan_link(main_parse)) < CONDITION_PRECURSOR_MASS) {
-        //&& (main_parse.scan_link[i].precursor_mz < CONDITION_PRECURSOR_MZ)
-        //&& (main_parse.scan_link[i].precursor_rt < CONDITION_PRECURSOR_RT)) 
-        //std::cout << "test";
+        std::cout << "\n\n" << i << "  " << ct_scan[st_used].precursor_rt();
         //}
-    }
+		}
     };
 }
 
