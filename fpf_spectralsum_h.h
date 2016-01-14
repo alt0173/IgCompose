@@ -173,14 +173,14 @@
 //		delta-value range defined by CONDITION_RETENTION_TIME.
 
 
-#ifndef FPF_SCAN_H
-#define	FPF_SCAN_H
+#ifndef FPF_SPECTRALSUM_H
+#define	FPF_SPECTRALSUM_H
 #include <cstdlib> // provides - size_t
 #include <fstream> // provides - std::ifstream
 #include <istream> // provides - std::istream::get
 #include <sstream> // provides - std::istringstream
 
-namespace scan_class {
+namespace fpf_spectralsum {
 
     class ions {
     public:
@@ -227,17 +227,16 @@ namespace scan_class {
         void scan_modify_precursor_mz(value_type parse_precursor_mz);
         void scan_modify_precursor_rt(value_type parse_precursor_rt);
         void scan_modify_precursor_charge(size_type parse_precursor_charge);
+        ions_node_type link_ions();
         void scan_union_created();
         scan scan_union(const scan& scan_1, const scan& scan_2);
         scan operator+(const scan& scan_1);
-        ions_node_type link_ions();
 
         // CONSTANT MEMBER FUNCTIONS
         const value_type precursor_mass() const;
         const value_type precursor_mz() const;
         const value_type precursor_rt() const;
         const size_type precursor_charge() const;
-        const ions_node_type link_ions() const;
         const bool union_created() const;
         bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
         bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
@@ -275,7 +274,7 @@ namespace scan_class {
         void read_parse() const;
 
     private:
-        scan_node_type ct_scan;
+        scan_node_type nt_scan;
         size_type st_capacity;
         size_type st_used;
     };
