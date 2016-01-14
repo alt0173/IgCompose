@@ -201,7 +201,7 @@ namespace scan_class {
         // MODIFICATION MEMBER FUNCTIONS
         void scan_modify_precursor_mass(value_type parse_precursor_mass);
         void scan_modify_precursor_mz(value_type parse_precursor_mz);
-        void scan_modify_precursor_rt(value_type parse_precursor_rt);
+        void scan_modify_precursor_rt(scan& scan_1, value_type parse_precursor_rt);
         void scan_modify_precursor_charge(size_type parse_precursor_charge);
         void scan_union_created();
         scan scan_union(const scan& scan_1, const scan& scan_2);
