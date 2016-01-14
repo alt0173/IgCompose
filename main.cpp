@@ -4,7 +4,7 @@
  */
 
 
-/* IgCompose v.0.0.1
+/* IgCompose v.0.0.5
  *
  *
  *
@@ -12,16 +12,18 @@
 
 #include <iostream> // provides - std::cin, std::cout
 #include <string> // provides - std::string
-#include "fpf_scan_h.h"
+#include "fpf_spectralsum_h.h"
 
-using namespace scan_class;
+using namespace fpf_spectralsum;
 
-const std::string version = "v.0.0.1";
+const std::string version = "v.0.0.5";
 
 // namespace scan_class defines object elements for fpf_scan_h
 
-namespace scan_class {
+namespace fpf_spectralsum {
+
     // TYPEDEFS and MEMBER CONSTANTS
+
     scan::value_type CONDITION_PRECURSOR_MASS = 0.05;
 
     scan::value_type CONDITION_PRECURSOR_MZ = 0.05;
@@ -33,9 +35,17 @@ namespace scan_class {
     const parse::size_type parse::PARSE_DEFAULT_ALLOCATION;
 
     // CONSTRUCTORS and DESTRUCTOR
+    
+    ions::ions(size_type class_size) {
+        value_type vt_ion_mz[class_size];
+        vt_ion_intensity = alue_type[class_size];
+    }
+    
+    ions::~ions() {
+    }
 
     scan::scan() {
-        vt_precursor_mass = 0;        
+        vt_precursor_mass = 0;
         vt_precursor_mz = 0;
         vt_precursor_rt = 0;
         st_precursor_charge = 0;
@@ -47,13 +57,13 @@ namespace scan_class {
     }
 
     parse::parse(size_type class_size) {
-        ct_scan = new scan[class_size];
+        nt_scan = new scan[class_size];
         st_capacity = class_size;
         st_used = 0;
     }
 
     parse::~parse() {
-        delete[] ct_scan;
+        delete[] nt_scan;
     }
 
     // MODIFICATION MEMBER FUNCTIONS
@@ -67,12 +77,16 @@ namespace scan_class {
     };
 
     void scan::scan_modify_precursor_rt(value_type parse_precursor_rt) {
-	vt_precursor_rt = parse_precursor_rt;
+        vt_precursor_rt = parse_precursor_rt;
     };
 
     void scan::scan_modify_precursor_charge(size_type parse_precursor_charge) {
         st_precursor_charge = parse_precursor_charge;
     };
+
+    scan::ions_node_type scan::link_ions() {
+        return nt_ions;
+    }
 
     void scan::scan_union_created() {
         b_union_created = true;
@@ -94,9 +108,9 @@ namespace scan_class {
             if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                ct_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
-		switch_inputstream = 0;
-                s_inputstream.clear();               
+                nt_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
+                switch_inputstream = 0;
+                s_inputstream.clear();
             }
             if (s_inputstream == "RTINSECONDS=") {
                 switch_inputstream = 3;
@@ -105,11 +119,15 @@ namespace scan_class {
             if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                ct_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
-                switch_inputstream = 0;
+                nt_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
+                switch_inputstream = 4;
                 s_inputstream.clear();
             }
-            if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {                
+            if (switch_inputstream == 4) {
+                
+                nt_scan[st_used].link_ions() = new ions;
+            }
+            if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {
                 ++parse_1.st_used;
             }
             if (c_inputstream == '\n') {
@@ -131,21 +149,17 @@ namespace scan_class {
     const scan::value_type scan::precursor_rt() const {
         return vt_precursor_rt;
     };
-    
+
     const scan::size_type scan::precursor_charge() const {
         return st_precursor_charge;
-    };
-
-    const scan::node_type scan::ions() const {
-        return nt_ions;
     };
 
     const bool scan::union_created() const {
         return b_union_created;
     };
 
-    const scan* parse::scan_link() const {
-        return ct_scan;
+    const parse::scan_node_type parse::scan_link() const {
+        return nt_scan;
     };
 
     const parse::size_type parse::used() const {
@@ -155,14 +169,14 @@ namespace scan_class {
     const parse::size_type parse::capacity() const {
         return st_capacity;
     };
-    
-    void parse::read_parse() const{
-    for (unsigned i = 0; i < used(); ++i) {       
-        std::cout << "\n\n" << i;
-        std::cout << "  " << ct_scan[i].precursor_rt();
-        std::cout << "  " << ct_scan[i].precursor_mass();
-        //}
-		}
+
+    void parse::read_parse() const {
+        for (unsigned i = 0; i < used(); ++i) {
+            std::cout << "\n\n" << i;
+            std::cout << "  " << nt_scan[i].precursor_rt();
+            std::cout << "  " << nt_scan[i].precursor_mass();
+            //}
+        }
     };
 }
 
@@ -179,11 +193,11 @@ int main() {
     main_parse.input_parse(fin_input, main_parse);
     main_parse.read_parse();
 
-    
+
     std::string pong;
     std::cout << "\n\nping..\n\n";
     std::cin >> pong;
-    
+
     return 0;
 }
 
