@@ -8,9 +8,10 @@
 #ifndef FPF_NODE_H
 #define	FPF_NODE_H
 #include <cstdlib> // provides - size_t, NULL
+#include <iostream> // provides - std::cin, std::cout
 
 namespace fpf_node {
-
+    
     class node {
     public:
         // TYPEDEFS
@@ -34,8 +35,25 @@ namespace fpf_node {
             nt_node = nt_new_link;
         };
 
-        void insert_head(const node::value_type& vt_new_data, node::node_type& nt_head_ptr) {
+        void insert_head(const node::value_type& vt_new_data, node::node_type& nt_head_ptr, node::node_type& nt_tail_ptr) {
             nt_head_ptr = new node(vt_new_data, nt_head_ptr);
+            if (nt_tail_ptr == NULL) {
+                nt_tail_ptr = nt_head_ptr;
+            }
+        };
+        
+        void insert_tail(const node::value_type& vt_new_data, node::node_type& nt_head_ptr, node::node_type& nt_tail_ptr) {
+            node::node_type nt_new_ptr;           
+            nt_new_ptr = new node;
+            if (nt_head_ptr == NULL) {
+                nt_head_ptr = nt_new_ptr;
+            }
+            if (nt_tail_ptr == NULL) {
+                nt_tail_ptr = nt_new_ptr;
+            }
+            nt_new_ptr->set_data(vt_new_data);
+            nt_tail_ptr->set_node(nt_new_ptr);
+            nt_tail_ptr = nt_tail_ptr->return_node();
         };
 
         void insert(const node::value_type& vt_new_data, node::node_type& nt_prev_ptr) {
@@ -45,7 +63,6 @@ namespace fpf_node {
             nt_new_ptr->set_node(nt_prev_ptr->return_node());
             nt_prev_ptr->set_node(nt_new_ptr);
         };
-
 
         // PRIVATE MEMBER ACCESS FUNCTIONS
 
@@ -59,6 +76,12 @@ namespace fpf_node {
 
         const node_type return_node() const {
             return nt_node;
+        };
+        
+        void cout_all_data(node::node_type& nt_head_ptr) const {
+            for (node::node_type link = nt_head_ptr; link != NULL; link = link->return_node()) {
+                std::cout << "\n" << link->return_data();
+            }
         };
 
     private:
