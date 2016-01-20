@@ -175,7 +175,7 @@
 
 #ifndef FPF_SPECTRALSUM_H
 #define	FPF_SPECTRALSUM_H
-#include <cstdlib> // provides - size_t
+#include <cstdlib> // provides - size_t, NULL
 #include <fstream> // provides - std::ifstream
 #include <istream> // provides - std::istream::get
 #include <sstream> // provides - std::istringstream
@@ -186,32 +186,40 @@ namespace fpf_spectralsum {
     public:
         // TYPEDEFS and MEMBER CONSTANTS
         typedef double value_type;
-        typedef unsigned int size_type;
-        static const size_type IONS_DEFAULT_ALLOCATION = 200;
+        typedef size_t size_type;
+        typedef ions* ions_node_type;
 
         // CONSTRUCTORS and DESTRUCTOR
-        ions(size_type class_size = IONS_DEFAULT_ALLOCATION);
+        ions(const value_type& init_vt_ion_mz = value_type(), const value_type& init_vt_ion_intensity = value_type(), ions_node_type init_nt_ions = NULL);
         ~ions();
 
         // MODIFICATION MEMBER FUNCTIONS
         void link_ions();
-        void ions_modify_ion_mz(value_type parse_ion_mz);
-        void ions_modify_ion_intensity(value_type parse_ion_intensity);
+        void set_ion_mz(const value_type& parse_ion_mz);
+        void set_ion_intensity(const value_type& parse_ion_intensity);
+        void set_data(const value_type& parse_ion_mz, const value_type& parse_ion_intensity);
+        void set_ions(ions_node_type nt_link);
+        void ions_insert();
+        void list_head_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& head_ptr);
+        void list_tail_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& tail_ptr);
 
         // CONSTANT MEMBER FUNCTIONS
-        const value_type ion_mz() const;
-        const value_type ion_intensity() const;
+        const value_type return_ion_mz() const {return vt_ion_mz;};
+        const value_type return_ion_intensity() const {return vt_ion_intensity;};
+        const ions_node_type return_ions() const {return nt_ions;};
+        ions_node_type return_ions() {return nt_ions;};
 
     private:
         value_type vt_ion_mz;
         value_type vt_ion_intensity;
+        ions_node_type nt_ions;
     };
 
     class scan {
     public:
         // TYPEDEFS and MEMBER CONSTANTS
         typedef double value_type;
-        typedef unsigned int size_type;
+        typedef size_t size_type;
         typedef ions* ions_node_type;
         value_type CONDITION_PRECURSOR_MASS = 0.05;
         value_type CONDITION_PRECURSOR_MZ = 0.05;
@@ -227,17 +235,17 @@ namespace fpf_spectralsum {
         void scan_modify_precursor_mz(value_type parse_precursor_mz);
         void scan_modify_precursor_rt(value_type parse_precursor_rt);
         void scan_modify_precursor_charge(size_type parse_precursor_charge);
-        ions_node_type link_ions();
         void scan_union_created();
         scan scan_union(const scan& scan_1, const scan& scan_2);
         scan operator+(const scan& scan_1);
 
         // CONSTANT MEMBER FUNCTIONS
-        const value_type precursor_mass() const;
-        const value_type precursor_mz() const;
-        const value_type precursor_rt() const;
-        const size_type precursor_charge() const;
-        const bool union_created() const;
+        const value_type return_precursor_mass() const {return vt_precursor_mass;};
+        const value_type return_precursor_mz() const {return vt_precursor_mass;};
+        const value_type return_precursor_rt() const {return vt_precursor_mass;};
+        const size_type return_precursor_charge() const {return vt_precursor_mass;};
+        fpf_node::node::node_type& return_head_ptr() {return nt_head_ptr;};
+        fpf_node::node::node_type& return_tail_ptr() {return nt_tail_ptr;};
         bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
         bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
         bool union_retention_time(const scan& scan_1, const scan& scan_2);
@@ -247,15 +255,15 @@ namespace fpf_spectralsum {
         value_type vt_precursor_mz;
         value_type vt_precursor_rt;
         size_type st_precursor_charge;
-        ions_node_type nt_ions;
-        bool b_union_created;
+        fpf_node::node::node_type nt_head_ptr;
+        fpf_node::node::node_type nt_tail_ptr;
     };
 
     class parse {
     public:
         // TYPEDEFS and MEMBER CONSTANTS
         typedef double value_type;
-        typedef unsigned int size_type;
+        typedef size_t size_type;
         typedef scan* scan_node_type;
         static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
 
@@ -268,9 +276,9 @@ namespace fpf_spectralsum {
         void input_parse(std::ifstream& fin, parse& parse_1);
 
         // CONSTANT MEMBER FUNCTIONS
-        const scan_node_type scan_link() const;
-        const size_type used() const;
-        const size_type capacity() const;
+        const scan_node_type return_scan() const {return nt_scan;};
+        const size_type return_capacity() const {return st_capacity;};
+        const size_type return_used() const {return st_used;};
         void read_parse() const;
 
     private:
