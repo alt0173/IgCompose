@@ -12,13 +12,35 @@
 
 #include <iostream> // provides - std::cin, std::cout
 #include <string> // provides - std::string
+#include "fpf_node_h.h"
 #include "fpf_spectralsum_h.h"
 
-using namespace fpf_spectralsum;
+using namespace fpf_node;
 
 const std::string version = "v.0.0.5";
 
-// namespace scan_class defines object elements for fpf_scan_h
+int main() {
+
+    std::cout << "-- IgCompose " << version << " --\n\n\n";
+    std::cout << "Input file?\n\n";
+
+    std::string input_file;
+    std::cin >> input_file;
+    std::ifstream fin_input(input_file);
+
+    fpf_spectralsum::parse main_parse = fpf_spectralsum::parse();
+    main_parse.input_parse(fin_input, main_parse);
+    //main_parse.read_parse();
+
+
+    std::string pong;
+    std::cout << "\n\nping..\n\n";
+    std::cin >> pong;
+
+    return 0;
+}
+
+// namespace scan_class defines object elements for fpf_scan_h 
 
 namespace fpf_spectralsum {
 
@@ -35,22 +57,23 @@ namespace fpf_spectralsum {
     const parse::size_type parse::PARSE_DEFAULT_ALLOCATION;
 
     // CONSTRUCTORS and DESTRUCTOR
-    
-    ions::ions(size_type class_size) {
-        value_type vt_ion_mz[class_size];
-        vt_ion_intensity = alue_type[class_size];
+
+    ions::ions(const value_type& init_vt_ion_mz, const value_type& init_vt_ion_intensity, ions_node_type init_nt_ions) {
+        vt_ion_mz = init_vt_ion_mz;
+        vt_ion_intensity = init_vt_ion_intensity;
+        nt_ions = init_nt_ions;
     }
-    
+
     ions::~ions() {
     }
 
     scan::scan() {
-        vt_precursor_mass = 0;
-        vt_precursor_mz = 0;
-        vt_precursor_rt = 0;
-        st_precursor_charge = 0;
-        nt_ions = NULL;
-        b_union_created = false;
+        vt_precursor_mass = value_type();
+        vt_precursor_mz = value_type();
+        vt_precursor_rt = value_type();
+        st_precursor_charge = size_type();
+        nt_head_ptr = NULL;
+        nt_tail_ptr = NULL;
     }
 
     scan::~scan() {
@@ -59,7 +82,7 @@ namespace fpf_spectralsum {
     parse::parse(size_type class_size) {
         nt_scan = new scan[class_size];
         st_capacity = class_size;
-        st_used = 0;
+        st_used = size_type();
     }
 
     parse::~parse() {
@@ -67,6 +90,35 @@ namespace fpf_spectralsum {
     }
 
     // MODIFICATION MEMBER FUNCTIONS
+
+    void ions::set_ion_mz(const value_type& parse_ion_mz) {
+        vt_ion_mz = parse_ion_mz;
+    };
+
+    void ions::set_ion_intensity(const value_type& parse_ion_intensity) {
+        vt_ion_intensity = parse_ion_intensity;
+    };
+
+    void ions::set_data(const value_type& parse_ion_mz, const value_type& parse_ion_intensity) {
+        ions::set_ion_mz(parse_ion_mz);
+        ions::set_ion_intensity(parse_ion_intensity);
+    };
+    
+    void ions::set_ions(ions_node_type nt_link) {
+        nt_ions = nt_link;
+    }
+
+    void ions::list_head_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& head_ptr) {
+        head_ptr = new ions(set_vt_ion_mz, set_vt_ion_intensity, head_ptr);
+    };
+
+    void ions::list_tail_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& tail_ptr) {
+        ions* prev_ptr;
+        prev_ptr = new ions;
+        prev_ptr->set_ion_mz(set_vt_ion_mz);
+        tail_ptr->set_ions(prev_ptr);
+        tail_ptr = prev_ptr;
+    };
 
     void scan::scan_modify_precursor_mass(value_type parse_precursor_mass) {
         vt_precursor_mass = parse_precursor_mass;
@@ -82,14 +134,6 @@ namespace fpf_spectralsum {
 
     void scan::scan_modify_precursor_charge(size_type parse_precursor_charge) {
         st_precursor_charge = parse_precursor_charge;
-    };
-
-    scan::ions_node_type scan::link_ions() {
-        return nt_ions;
-    }
-
-    void scan::scan_union_created() {
-        b_union_created = true;
     };
 
     void parse::input_parse(std::ifstream& fin, parse& parse_1) {
@@ -109,7 +153,7 @@ namespace fpf_spectralsum {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
                 nt_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
-                switch_inputstream = 0;
+                switch_inputstream = 4;
                 s_inputstream.clear();
             }
             if (s_inputstream == "RTINSECONDS=") {
@@ -120,12 +164,20 @@ namespace fpf_spectralsum {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
                 nt_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
-                switch_inputstream = 4;
                 s_inputstream.clear();
             }
-            if (switch_inputstream == 4) {
-                
-                nt_scan[st_used].link_ions() = new ions;
+            if ((switch_inputstream == 4) && (c_inputstream == '\n')) {
+                std::istringstream(s_inputstream) >> ss_inputstream;
+                parse::value_type vt_inputstream = ss_inputstream;
+                nt_scan[st_used].return_head_ptr()->insert_head(vt_inputstream, nt_scan[st_used].return_head_ptr());
+                std::cout << "\nping! " << nt_scan[st_used].return_head_ptr()->return_data();
+                s_inputstream.clear();
+            }
+            if ((switch_inputstream == 4) && ((c_inputstream == '\n'))) {
+
+            }
+            if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
+                switch_inputstream = 0;
             }
             if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {
                 ++parse_1.st_used;
@@ -138,66 +190,14 @@ namespace fpf_spectralsum {
 
     // CONSTANT MEMBER FUNCTIONS
 
-    const scan::value_type scan::precursor_mass() const {
-        return vt_precursor_mass;
-    };
-
-    const scan::value_type scan::precursor_mz() const {
-        return vt_precursor_mz;
-    };
-
-    const scan::value_type scan::precursor_rt() const {
-        return vt_precursor_rt;
-    };
-
-    const scan::size_type scan::precursor_charge() const {
-        return st_precursor_charge;
-    };
-
-    const bool scan::union_created() const {
-        return b_union_created;
-    };
-
-    const parse::scan_node_type parse::scan_link() const {
-        return nt_scan;
-    };
-
-    const parse::size_type parse::used() const {
-        return st_used;
-    };
-
-    const parse::size_type parse::capacity() const {
-        return st_capacity;
-    };
-
-    void parse::read_parse() const {
-        for (unsigned i = 0; i < used(); ++i) {
-            std::cout << "\n\n" << i;
-            std::cout << "  " << nt_scan[i].precursor_rt();
-            std::cout << "  " << nt_scan[i].precursor_mass();
-            //}
-        }
-    };
-}
-
-int main() {
-
-    std::cout << "-- IgCompose " << version << " --\n\n\n";
-    std::cout << "Input file?\n\n";
-
-    std::string input_file;
-    std::cin >> input_file;
-    std::ifstream fin_input(input_file);
-
-    parse main_parse = parse();
-    main_parse.input_parse(fin_input, main_parse);
-    main_parse.read_parse();
-
-
-    std::string pong;
-    std::cout << "\n\nping..\n\n";
-    std::cin >> pong;
-
-    return 0;
+//    void parse::read_parse() const {
+//        for (unsigned i = 0; i < used(); ++i) {
+//            std::cout << "\n\n" << i;
+//            std::cout << "  " << nt_scan[i].precursor_rt();
+//            std::cout << "  " << nt_scan[i].precursor_mass();
+//            std::cout << "\n\npong!" << nt_scan[i].link_ions()->ion_mz();
+//            //}
+//        }
+//    };
 }
 
