@@ -4,7 +4,7 @@
  */
 
 
-/* IgCompose v.0.0.5
+/* IgCompose v.0.0.7
  *
  *
  *
@@ -15,9 +15,7 @@
 #include "fpf_node_h.h"
 #include "fpf_spectralsum_h.h"
 
-using namespace fpf_node;
-
-const std::string version = "v.0.0.5";
+const std::string version = "v.0.0.7";
 
 int main() {
 
@@ -30,7 +28,7 @@ int main() {
 
     fpf_spectralsum::parse main_parse = fpf_spectralsum::parse();
     main_parse.input_parse(fin_input, main_parse);
-    //main_parse.read_parse();
+    main_parse.read_parse();
 
 
     std::string pong;
@@ -145,32 +143,31 @@ namespace fpf_spectralsum {
             if (c_inputstream != '\n') {
                 s_inputstream += c_inputstream;
             }
-            if (s_inputstream == "PEPMASS=") {
+            if (s_inputstream == "RTINSECONDS=") {
                 switch_inputstream = 2;
                 s_inputstream.clear();
             }
             if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                nt_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
-                switch_inputstream = 4;
+                nt_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
                 s_inputstream.clear();
             }
-            if (s_inputstream == "RTINSECONDS=") {
+            if (s_inputstream == "PEPMASS=") {
                 switch_inputstream = 3;
                 s_inputstream.clear();
             }
             if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                nt_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
+                nt_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
+                switch_inputstream = 4;
                 s_inputstream.clear();
             }
             if ((switch_inputstream == 4) && (c_inputstream == '\n')) {
                 std::istringstream(s_inputstream) >> ss_inputstream;
                 parse::value_type vt_inputstream = ss_inputstream;
-                nt_scan[st_used].return_head_ptr()->insert_head(vt_inputstream, nt_scan[st_used].return_head_ptr());
-                std::cout << "\nping! " << nt_scan[st_used].return_head_ptr()->return_data();
+                nt_scan[st_used].return_head_ptr()->insert_tail(vt_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
                 s_inputstream.clear();
             }
             if ((switch_inputstream == 4) && ((c_inputstream == '\n'))) {
@@ -190,14 +187,16 @@ namespace fpf_spectralsum {
 
     // CONSTANT MEMBER FUNCTIONS
 
-//    void parse::read_parse() const {
-//        for (unsigned i = 0; i < used(); ++i) {
-//            std::cout << "\n\n" << i;
-//            std::cout << "  " << nt_scan[i].precursor_rt();
-//            std::cout << "  " << nt_scan[i].precursor_mass();
-//            std::cout << "\n\npong!" << nt_scan[i].link_ions()->ion_mz();
-//            //}
-//        }
-//    };
+    void parse::read_parse() const {
+        for (unsigned i = 0; i < return_used(); ++i) {
+            std::cout << "\n\n" << i;
+            std::cout << "  " << nt_scan[i].return_precursor_rt();
+            std::cout << "  " << nt_scan[i].return_precursor_mass();
+            std::cout << "\n\npong!\n\n";
+            nt_scan[i].return_head_ptr()->cout_all_data(nt_scan[i].return_head_ptr());
+            std::cout << " ! " << nt_scan[i].return_head_ptr()->return_data();
+            //}
+        }
+    };
 }
 
