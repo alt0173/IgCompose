@@ -9,27 +9,28 @@
 #define	FPF_NODE_H
 #include <cstdlib> // provides - size_t, NULL
 #include <iostream> // provides - std::cout
+#include "fpf_ion_h.h"
 
 namespace fpf_node {
-    class node {
+    
+    class node {      
     public:
-        // TYPEDEFS
-        typedef double value_type;
+        
+        // TYPEDEFS              
+        typedef fpf_ion::ion* value_type;
         typedef node* node_type;
 
         // CONSTRUCTORS
-
         node(const value_type& vt_init_data = value_type(), node_type nt_init_node = NULL) {
             vt_data = vt_init_data;
             nt_node = nt_init_node;
         };
 
         // MODIFICATION MEMBER FUNCTIONS
-
         void set_data(const value_type& vt_new_data) {
             vt_data = vt_new_data;
         };
-
+        
         void set_node(node_type nt_new_link) {
             nt_node = nt_new_link;
         };
@@ -63,8 +64,7 @@ namespace fpf_node {
             nt_prev_ptr->set_node(nt_new_ptr);
         };
 
-        // PRIVATE MEMBER ACCESS FUNCTIONS
-
+        // PRIVATE MEMBER ACCESS FUNCTIONS       
         value_type return_data() const {
             return vt_data;
         };
@@ -79,7 +79,7 @@ namespace fpf_node {
         
         void cout_all_data(node::node_type& nt_head_ptr) const {
             for (node::node_type link = nt_head_ptr; link != NULL; link = link->return_node()) {
-                std::cout << "\n" << link->return_data();
+                std::cout << "\n" << link->return_data()->return_fragment_ion_mz() << "  " << link->return_data()->return_fragment_ion_int();
             }
         };
 
