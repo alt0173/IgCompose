@@ -8,10 +8,9 @@
 #ifndef FPF_NODE_H
 #define	FPF_NODE_H
 #include <cstdlib> // provides - size_t, NULL
-#include <iostream> // provides - std::cin, std::cout
+#include <iostream> // provides - std::cout
 
 namespace fpf_node {
-    
     class node {
     public:
         // TYPEDEFS
