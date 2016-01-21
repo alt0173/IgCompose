@@ -182,45 +182,11 @@
 
 namespace fpf_spectralsum {
 
-    class ions {
-    public:
-        // TYPEDEFS and MEMBER CONSTANTS
-        typedef double value_type;
-        typedef size_t size_type;
-        typedef ions* ions_node_type;
-
-        // CONSTRUCTORS and DESTRUCTOR
-        ions(const value_type& init_vt_ion_mz = value_type(), const value_type& init_vt_ion_intensity = value_type(), ions_node_type init_nt_ions = NULL);
-        ~ions();
-
-        // MODIFICATION MEMBER FUNCTIONS
-        void link_ions();
-        void set_ion_mz(const value_type& parse_ion_mz);
-        void set_ion_intensity(const value_type& parse_ion_intensity);
-        void set_data(const value_type& parse_ion_mz, const value_type& parse_ion_intensity);
-        void set_ions(ions_node_type nt_link);
-        void ions_insert();
-        void list_head_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& head_ptr);
-        void list_tail_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& tail_ptr);
-
-        // CONSTANT MEMBER FUNCTIONS
-        const value_type return_ion_mz() const {return vt_ion_mz;};
-        const value_type return_ion_intensity() const {return vt_ion_intensity;};
-        const ions_node_type return_ions() const {return nt_ions;};
-        ions_node_type return_ions() {return nt_ions;};
-
-    private:
-        value_type vt_ion_mz;
-        value_type vt_ion_intensity;
-        ions_node_type nt_ions;
-    };
-
     class scan {
     public:
         // TYPEDEFS and MEMBER CONSTANTS
         typedef double value_type;
         typedef size_t size_type;
-        typedef ions* ions_node_type;
         value_type CONDITION_PRECURSOR_MASS = 0.05;
         value_type CONDITION_PRECURSOR_MZ = 0.05;
         value_type CONDITION_PRECURSOR_RT = 120;
