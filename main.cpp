@@ -56,15 +56,6 @@ namespace fpf_spectralsum {
 
     // CONSTRUCTORS and DESTRUCTOR
 
-    ions::ions(const value_type& init_vt_ion_mz, const value_type& init_vt_ion_intensity, ions_node_type init_nt_ions) {
-        vt_ion_mz = init_vt_ion_mz;
-        vt_ion_intensity = init_vt_ion_intensity;
-        nt_ions = init_nt_ions;
-    }
-
-    ions::~ions() {
-    }
-
     scan::scan() {
         vt_precursor_mass = value_type();
         vt_precursor_mz = value_type();
@@ -88,35 +79,6 @@ namespace fpf_spectralsum {
     }
 
     // MODIFICATION MEMBER FUNCTIONS
-
-    void ions::set_ion_mz(const value_type& parse_ion_mz) {
-        vt_ion_mz = parse_ion_mz;
-    };
-
-    void ions::set_ion_intensity(const value_type& parse_ion_intensity) {
-        vt_ion_intensity = parse_ion_intensity;
-    };
-
-    void ions::set_data(const value_type& parse_ion_mz, const value_type& parse_ion_intensity) {
-        ions::set_ion_mz(parse_ion_mz);
-        ions::set_ion_intensity(parse_ion_intensity);
-    };
-    
-    void ions::set_ions(ions_node_type nt_link) {
-        nt_ions = nt_link;
-    }
-
-    void ions::list_head_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& head_ptr) {
-        head_ptr = new ions(set_vt_ion_mz, set_vt_ion_intensity, head_ptr);
-    };
-
-    void ions::list_tail_insert(const ions::value_type& set_vt_ion_mz, const ions::value_type& set_vt_ion_intensity, ions*& tail_ptr) {
-        ions* prev_ptr;
-        prev_ptr = new ions;
-        prev_ptr->set_ion_mz(set_vt_ion_mz);
-        tail_ptr->set_ions(prev_ptr);
-        tail_ptr = prev_ptr;
-    };
 
     void scan::scan_modify_precursor_mass(value_type parse_precursor_mass) {
         vt_precursor_mass = parse_precursor_mass;
@@ -153,6 +115,20 @@ namespace fpf_spectralsum {
                 nt_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
                 s_inputstream.clear();
             }
+            if ((switch_inputstream == 4) && (c_inputstream == ' ')) {
+                std::istringstream(s_inputstream) >> ss_inputstream;
+                parse::value_type vt_inputstream = ss_inputstream;
+                nt_scan[st_used].return_head_ptr()->insert_tail(vt_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
+                switch_inputstream = 5;
+                s_inputstream.clear();
+            }
+            if ((switch_inputstream == 5) && (c_inputstream == '\n')) {
+                std::istringstream(s_inputstream) >> ss_inputstream;
+                parse::value_type vt_inputstream = ss_inputstream;
+                nt_scan[st_used].return_head_ptr()->insert_tail(vt_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
+                switch_inputstream = 4;
+                s_inputstream.clear();
+            }
             if (s_inputstream == "PEPMASS=") {
                 switch_inputstream = 3;
                 s_inputstream.clear();
@@ -163,15 +139,6 @@ namespace fpf_spectralsum {
                 nt_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
                 switch_inputstream = 4;
                 s_inputstream.clear();
-            }
-            if ((switch_inputstream == 4) && (c_inputstream == '\n')) {
-                std::istringstream(s_inputstream) >> ss_inputstream;
-                parse::value_type vt_inputstream = ss_inputstream;
-                nt_scan[st_used].return_head_ptr()->insert_tail(vt_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
-                s_inputstream.clear();
-            }
-            if ((switch_inputstream == 4) && ((c_inputstream == '\n'))) {
-
             }
             if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
                 switch_inputstream = 0;
