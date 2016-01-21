@@ -179,6 +179,8 @@
 #include <fstream> // provides - std::ifstream
 #include <istream> // provides - std::istream::get
 #include <sstream> // provides - std::istringstream
+#include <string> // provides - std::string
+#include <iostream> // provides - std::cin, std::cout
 
 namespace fpf_spectralsum {
 
@@ -193,28 +195,78 @@ namespace fpf_spectralsum {
         value_type CONDITION_FRAGMENT_ION = 95;
 
         // CONSTRUCTORS and DESTRUCTOR
-        scan();
-        ~scan();
+
+        scan() {
+            vt_precursor_mass = value_type();
+            vt_precursor_mz = value_type();
+            vt_precursor_rt = value_type();
+            st_precursor_charge = size_type();
+            nt_head_ptr = NULL;
+            nt_tail_ptr = NULL;
+        };
+
+        ~scan() {
+        };
 
         // MODIFICATION MEMBER FUNCTIONS
-        void scan_modify_precursor_mass(value_type parse_precursor_mass);
-        void scan_modify_precursor_mz(value_type parse_precursor_mz);
-        void scan_modify_precursor_rt(value_type parse_precursor_rt);
-        void scan_modify_precursor_charge(size_type parse_precursor_charge);
+
+        void scan_modify_precursor_mass(value_type parse_precursor_mass) {
+            vt_precursor_mass = parse_precursor_mass;
+        };
+
+        void scan_modify_precursor_mz(value_type parse_precursor_mz) {
+            vt_precursor_mz = parse_precursor_mz;
+        };
+
+        void scan_modify_precursor_rt(value_type parse_precursor_rt) {
+            vt_precursor_rt = parse_precursor_rt;
+        };
+
+        void scan_modify_precursor_charge(size_type parse_precursor_charge) {
+            st_precursor_charge = parse_precursor_charge;
+        };
         void scan_union_created();
-        scan scan_union(const scan& scan_1, const scan& scan_2);
+
+        scan scan_union(const scan& scan_1, const scan& scan_2) {
+            // overload + operator...
+            scan scan_3 = scan();
+            scan_3.scan_modify_precursor_mass((scan_1.return_precursor_mass() + scan_2.return_precursor_mass()) / 2);
+            return scan_3;
+        };
+        
         scan operator+(const scan& scan_1);
 
         // CONSTANT MEMBER FUNCTIONS
-        const value_type return_precursor_mass() const {return vt_precursor_mass;};
-        const value_type return_precursor_mz() const {return vt_precursor_mass;};
-        const value_type return_precursor_rt() const {return vt_precursor_mass;};
-        const size_type return_precursor_charge() const {return vt_precursor_mass;};
-        fpf_node::node::node_type& return_head_ptr() {return nt_head_ptr;};
-        fpf_node::node::node_type& return_tail_ptr() {return nt_tail_ptr;};
-        bool union_precursor_mz(const scan& scan_1, const scan& scan_2);
-        bool union_fragment_ion(const scan& scan_1, const scan& scan_2);
-        bool union_retention_time(const scan& scan_1, const scan& scan_2);
+
+        const value_type return_precursor_mass() const {
+            return vt_precursor_mass;
+        };
+
+        const value_type return_precursor_mz() const {
+            return vt_precursor_mz;
+        };
+
+        const value_type return_precursor_rt() const {
+            return vt_precursor_rt;
+        };
+
+        const size_type return_precursor_charge() const {
+            return st_precursor_charge;
+        };
+
+        fpf_node::node::node_type& return_head_ptr() {
+            return nt_head_ptr;
+        };
+
+        fpf_node::node::node_type& return_tail_ptr() {
+            return nt_tail_ptr;
+        };
+
+        bool union_precursor_mass(const scan& scan_1, const scan& scan_2) {
+            return ((scan_1.return_precursor_mass() < scan_2.return_precursor_mass() + CONDITION_PRECURSOR_MASS) && (scan_1.return_precursor_mass() > scan_2.return_precursor_mass() - CONDITION_PRECURSOR_MASS));
+        };
+        bool union_retention_time(const scan& scan_1, const scan & scan_2);
+        bool union_fragment_ion(const scan& scan_1, const scan & scan_2);
 
     private:
         value_type vt_precursor_mass;
@@ -234,17 +286,108 @@ namespace fpf_spectralsum {
         static const size_type PARSE_DEFAULT_ALLOCATION = 10000;
 
         // CONSTRUCTORS and DESTRUCTOR
-        parse(size_type class_size = PARSE_DEFAULT_ALLOCATION);
+
+        parse(size_type class_size = PARSE_DEFAULT_ALLOCATION) {
+            nt_scan = new scan[class_size];
+            st_capacity = class_size;
+            st_used = size_type();
+        };
         parse(const parse& parse);
-        ~parse();
+
+        ~parse() {
+            delete[] nt_scan;
+        };
 
         // MODIFICATION MEMBER FUNCTIONS
-        void input_parse(std::ifstream& fin, parse& parse_1);
+
+        void input_parse(std::ifstream& fin, parse& parse_1) {
+            char c_inputstream;
+            std::string s_inputstream = "";
+            int switch_inputstream = 0;
+            value_type ss_inputstream;
+            fpf_ion::ion* ion_inputstream;
+            while (fin.std::istream::get(c_inputstream)) {
+                if (c_inputstream != '\n') {
+                    s_inputstream += c_inputstream;
+                }
+                if (s_inputstream == "RTINSECONDS=") {
+                    switch_inputstream = 2;
+                    s_inputstream.clear();
+                }
+                if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
+                    std::istringstream(s_inputstream) >> ss_inputstream;
+                    parse::value_type vt_inputstream = ss_inputstream;
+                    nt_scan[st_used].scan_modify_precursor_rt(vt_inputstream);
+                    s_inputstream.clear();
+                }
+                if ((switch_inputstream == 4) && (c_inputstream == ' ')) {
+                    std::istringstream(s_inputstream) >> ss_inputstream;
+                    parse::value_type vt_inputstream = ss_inputstream;
+                    ion_inputstream = new fpf_ion::ion();
+                    ion_inputstream->set_fragment_ion_mz(vt_inputstream);
+                    switch_inputstream = 5;
+                    s_inputstream.clear();
+                }
+                if ((switch_inputstream == 5) && (c_inputstream == '\n')) {
+                    std::istringstream(s_inputstream) >> ss_inputstream;
+                    parse::value_type vt_inputstream = ss_inputstream;
+                    ion_inputstream->set_fragment_ion_int(vt_inputstream);
+                    nt_scan[st_used].return_head_ptr()->insert_tail(ion_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
+                    switch_inputstream = 4;
+                    s_inputstream.clear();
+                }
+                if (s_inputstream == "PEPMASS=") {
+                    switch_inputstream = 3;
+                    s_inputstream.clear();
+                }
+                if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
+                    std::istringstream(s_inputstream) >> ss_inputstream;
+                    parse::value_type vt_inputstream = ss_inputstream;
+                    nt_scan[st_used].scan_modify_precursor_mass(vt_inputstream);
+                    switch_inputstream = 4;
+                    s_inputstream.clear();
+                }
+                if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
+                    switch_inputstream = 0;
+                }
+                if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {
+                    ++parse_1.st_used;
+                }
+                if (c_inputstream == '\n') {
+                    s_inputstream.clear();
+                }
+            }
+        };
+
+        parse read_parse_union(parse& parse_1) {
+            parse union_parse = parse();
+            for (size_type i = 0; i < return_used(); ++i) {
+                for (size_type j = 1; i + j < return_used(); ++j) {
+                    if ((nt_scan[i].return_precursor_mass() < nt_scan[i + j].return_precursor_mass() + 10) && (nt_scan[i].return_precursor_mass() > nt_scan[i + j].return_precursor_mass() - 10)) {    
+                        // copy constructor?
+                        union_parse.nt_scan[union_parse.st_used] = nt_scan[i].scan_union(nt_scan[i], nt_scan[i + j]);
+                        ++union_parse.st_used;
+                        std::cout << "\nzing!" << union_parse.st_used;
+                    }
+                }
+            }
+            return union_parse;
+        };
 
         // CONSTANT MEMBER FUNCTIONS
-        const scan_node_type return_scan() const {return nt_scan;};
-        const size_type return_capacity() const {return st_capacity;};
-        const size_type return_used() const {return st_used;};
+
+        const scan_node_type return_scan() const {
+
+            return nt_scan;
+        };
+
+        const size_type return_capacity() const {
+            return st_capacity;
+        };
+
+        const size_type return_used() const {
+            return st_used;
+        };
         void read_parse() const;
 
     private:
