@@ -32,6 +32,9 @@ int main() {
 
     fpf_spectralsum::parse union_parse = main_parse.read_parse_union(main_parse);
     union_parse.read_parse();
+    
+    //fpf_spectralsum::parse test_parse = fpf_spectralsum::parse();
+    //fpf_node::copy(main_parse.return_scan()->return_head_ptr(), test_parse.return_scan()->return_head_ptr(), test_parse.return_scan()->return_tail_ptr());
 
 
 
