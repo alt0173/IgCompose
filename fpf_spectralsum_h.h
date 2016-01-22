@@ -205,6 +205,8 @@ namespace fpf_spectralsum {
             nt_tail_ptr = NULL;
         };
 
+        //scan() {}
+
         ~scan() {
         };
 
@@ -227,13 +229,6 @@ namespace fpf_spectralsum {
         };
         void scan_union_created();
 
-        scan scan_union(const scan& scan_1, const scan& scan_2) {
-            // overload + operator...
-            scan scan_3 = scan();
-            scan_3.scan_modify_precursor_mass((scan_1.return_precursor_mass() + scan_2.return_precursor_mass()) / 2);
-            return scan_3;
-        };
-        
         scan operator+(const scan& scan_1);
 
         // CONSTANT MEMBER FUNCTIONS
@@ -276,6 +271,15 @@ namespace fpf_spectralsum {
         fpf_node::node::node_type nt_head_ptr;
         fpf_node::node::node_type nt_tail_ptr;
     };
+    
+    // FUNCTIONS
+
+    scan scan_union(const scan& scan_1, const scan& scan_2) {
+        // overload + operator...
+        scan scan_3 = scan();
+        scan_3.scan_modify_precursor_mass((scan_1.return_precursor_mass() + scan_2.return_precursor_mass()) / 2);
+        return scan_3;
+    };
 
     class parse {
     public:
@@ -298,9 +302,15 @@ namespace fpf_spectralsum {
             delete[] nt_scan;
         };
 
+        // OPERATORS
+
+        void operator=(const parse parse_0) {
+            parse* tail_ptr;
+        };
+
         // MODIFICATION MEMBER FUNCTIONS
 
-        void input_parse(std::ifstream& fin, parse& parse_1) {
+        void input_parse(std::ifstream& fin, parse& parse_0) {
             char c_inputstream;
             std::string s_inputstream = "";
             int switch_inputstream = 0;
@@ -332,7 +342,7 @@ namespace fpf_spectralsum {
                     std::istringstream(s_inputstream) >> ss_inputstream;
                     parse::value_type vt_inputstream = ss_inputstream;
                     ion_inputstream->set_fragment_ion_int(vt_inputstream);
-                    nt_scan[st_used].return_head_ptr()->insert_tail(ion_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
+                    fpf_node::insert_tail(ion_inputstream, nt_scan[st_used].return_head_ptr(), nt_scan[st_used].return_tail_ptr());
                     switch_inputstream = 4;
                     s_inputstream.clear();
                 }
@@ -349,9 +359,7 @@ namespace fpf_spectralsum {
                 }
                 if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
                     switch_inputstream = 0;
-                }
-                if ((s_inputstream == "END IONS") && (c_inputstream != '\n')) {
-                    ++parse_1.st_used;
+                    ++parse_0.st_used;
                 }
                 if (c_inputstream == '\n') {
                     s_inputstream.clear();
@@ -363,9 +371,9 @@ namespace fpf_spectralsum {
             parse union_parse = parse();
             for (size_type i = 0; i < return_used(); ++i) {
                 for (size_type j = 1; i + j < return_used(); ++j) {
-                    if ((nt_scan[i].return_precursor_mass() < nt_scan[i + j].return_precursor_mass() + 10) && (nt_scan[i].return_precursor_mass() > nt_scan[i + j].return_precursor_mass() - 10)) {    
+                    if ((nt_scan[i].return_precursor_mass() < nt_scan[i + j].return_precursor_mass() + 10) && (nt_scan[i].return_precursor_mass() > nt_scan[i + j].return_precursor_mass() - 10)) {
                         // copy constructor?
-                        union_parse.nt_scan[union_parse.st_used] = nt_scan[i].scan_union(nt_scan[i], nt_scan[i + j]);
+                        union_parse.nt_scan[union_parse.st_used] = scan_union(nt_scan[i], nt_scan[i + j]);
                         ++union_parse.st_used;
                         std::cout << "\nzing!" << union_parse.st_used;
                     }
@@ -377,7 +385,6 @@ namespace fpf_spectralsum {
         // CONSTANT MEMBER FUNCTIONS
 
         const scan_node_type return_scan() const {
-
             return nt_scan;
         };
 
