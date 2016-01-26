@@ -17,6 +17,7 @@ namespace fpf_node {
 
         // TYPEDEFS              
         typedef fpf_ion::ion* data_type;
+		typedef fpf_ion::ion::value_type value_type;
         typedef node* node_type;
 
         // CONSTRUCTORS
@@ -28,25 +29,25 @@ namespace fpf_node {
 
         // MODIFICATION MEMBER FUNCTIONS
 
-        void set_data(const data_type& vt_new_data) {
+        void set_data_dt(const data_type& vt_new_data) {
             vt_data = vt_new_data;
         };
 
-        void set_node(node_type nt_new_link) {
+        void set_node_nt(node_type nt_new_link) {
             nt_node = nt_new_link;
         };
 
         // PRIVATE MEMBER ACCESS FUNCTIONS       
 
-        data_type return_data() const {
+        data_type return_data_dt() const {
             return vt_data;
         };
 
-        node_type return_node() {
+        node_type return_node_nt() {
             return nt_node;
         };
 
-        const node_type return_node() const {
+        const node_type return_node_nt() const {
             return nt_node;
         };
 
@@ -57,14 +58,14 @@ namespace fpf_node {
     
     // FUNCTIONS
 
-    void insert_head(const node::data_type& vt_new_data, node::node_type& nt_head_ptr, node::node_type& nt_tail_ptr) {
+    void list_insert_head(const node::data_type& vt_new_data, node::node_type& nt_head_ptr, node::node_type& nt_tail_ptr) {
         nt_head_ptr = new node(vt_new_data, nt_head_ptr);
         if (nt_tail_ptr == NULL) {
             nt_tail_ptr = nt_head_ptr;
         }
     };
 
-    void insert_tail(const node::data_type& vt_new_data, node::node_type& nt_head_ptr, node::node_type& nt_tail_ptr) {
+    void list_insert_tail(const node::data_type& vt_new_data, node::node_type& nt_head_ptr, node::node_type& nt_tail_ptr) {
         node::node_type nt_new_ptr;
         nt_new_ptr = new node;
         if (nt_head_ptr == NULL) {
@@ -73,34 +74,52 @@ namespace fpf_node {
         if (nt_tail_ptr == NULL) {
             nt_tail_ptr = nt_new_ptr;
         }
-        nt_new_ptr->set_data(vt_new_data);
-        nt_tail_ptr->set_node(nt_new_ptr);
-        nt_tail_ptr = nt_tail_ptr->return_node();
+        nt_new_ptr->set_data_dt(vt_new_data);
+        nt_tail_ptr->set_node_nt(nt_new_ptr);
+        nt_tail_ptr = nt_tail_ptr->return_node_nt();
     };
 
-    void insert(const node::data_type& vt_new_data, node::node_type& nt_prev_ptr) {
+    void list_insert(const node::data_type& vt_new_data, node::node_type& nt_prev_ptr) {
         // case of empty list?
         node::node_type nt_new_ptr;
         nt_new_ptr = new node;
-        nt_new_ptr->set_data(vt_new_data);
-        nt_new_ptr->set_node(nt_prev_ptr->return_node());
-        nt_prev_ptr->set_node(nt_new_ptr);
+        nt_new_ptr->set_data_dt(vt_new_data);
+        nt_new_ptr->set_node_nt(nt_prev_ptr->return_node_nt());
+        nt_prev_ptr->set_node_nt(nt_new_ptr);
     };
 
-    void copy(node::node_type nt_call_ptr, node::node_type& nt_new_head_ptr, node::node_type& nt_new_tail_ptr) {
-        nt_new_head_ptr = NULL;
+    void list_copy(node::node_type nt_call_ptr, node::node_type& nt_new_head_ptr, node::node_type& nt_new_tail_ptr) {
+		if (nt_call_ptr == NULL) {
+			return;
+		}
+		nt_new_head_ptr = NULL;
         nt_new_tail_ptr = NULL;
-        if (nt_call_ptr == NULL) {
-            return;
-        }
-        insert_head(nt_call_ptr->return_data(), nt_new_head_ptr, nt_new_tail_ptr);
-        nt_call_ptr = nt_call_ptr->return_node();
+        list_insert_head(nt_call_ptr->return_data_dt(), nt_new_head_ptr, nt_new_tail_ptr);
+        nt_call_ptr = nt_call_ptr->return_node_nt();
         while (nt_call_ptr != NULL) {
-            insert_tail(nt_call_ptr->return_data(), nt_new_head_ptr, nt_new_tail_ptr);
-            nt_new_tail_ptr = nt_new_tail_ptr->return_node();
-            nt_call_ptr = nt_call_ptr->return_node();
+            list_insert_tail(nt_call_ptr->return_data_dt(), nt_new_head_ptr, nt_new_tail_ptr);
+            nt_new_tail_ptr = nt_new_tail_ptr->return_node_nt();
+            nt_call_ptr = nt_call_ptr->return_node_nt();
         }
     };
+
+	//void sort_sup(node::node_type nt_call_ptr, node::value_type vt_sort, node::node_type& nt_new_head_ptr, node::node_type& nt_new_tail_ptr) {
+	//	if (nt_call_ptr == NULL) {
+	//		return;
+	//	}
+	//	nt_new_head_ptr = NULL;
+	//	nt_new_tail_ptr = NULL;
+	//	list_insert_head(nt_call_ptr->return_data_dt(), nt_new_head_ptr, nt_new_tail_ptr);
+	//	nt_call_ptr = nt_call_ptr->return_node_nt();
+	//	while (nt_call_ptr != NULL) {
+	//		for (nt_new_head_ptr; nt_new_head_ptr != NULL; nt_new_head_ptr = nt_new_head_ptr->return_node_nt) {
+	//			if (vt_sort > nt_new_head_ptr->return_data_dt())
+	//		}
+	//		list_insert_tail(nt_call_ptr->return_data_dt(), nt_new_head_ptr, nt_new_tail_ptr);
+	//		nt_new_tail_ptr = nt_new_tail_ptr->return_node_nt();
+	//		nt_call_ptr = nt_call_ptr->return_node_nt();
+	//	}
+	//};
 }
 
 #endif
