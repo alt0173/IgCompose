@@ -4,22 +4,24 @@
  */
 
 
- /*	IgCompose v.0.1.5
+ /*	IgCompose v.0.7.0
   *
   *
   *
   */
 
+#include <cstdlib> // provides - size_t, NULL
 #include <iostream> // provides - std::cin, std::cout, std::ofstream::open
 #include <string> // provides - std::string
 #include "fpf_spectralsum_h.h"
 
 
-const std::string version = "v.0.1.5";
+const std::string version = "v.0.7.0";
 
 int main() {
 
 	static int DEBUG_MODE = 0;
+	static size_t UNION_MEM_ALLOC = 700000;
 
 	std::cout << "-- IgCompose " << version << " --\n\n\n";
 
@@ -34,7 +36,7 @@ int main() {
 		main_parse.debug_parse();
 	}
 
-	fpf_spectralsum::parse union_parse;
+	fpf_spectralsum::parse union_parse = fpf_spectralsum::parse::parse(UNION_MEM_ALLOC);
 	main_parse.read_parse_union(main_parse, union_parse);
 	if (DEBUG_MODE >= 2) {
 		union_parse.debug_parse();
@@ -54,7 +56,3 @@ int main() {
 
 	return 0;
 }
-
-//	the struggle is real ->
-//
-//	ion_union->set_fragment_ion_mz((i->return_data()->return_fragment_ion_mz());
