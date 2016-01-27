@@ -13,6 +13,7 @@
 #include <cstdlib> // provides - size_t, NULL
 #include <iostream> // provides - std::cin, std::cout, std::ofstream::open
 #include <string> // provides - std::string
+#include <iomanip> // provides - std::setw
 #include "fpf_spectralsum_h.h"
 
 
@@ -45,10 +46,10 @@ int main() {
 		union_parse.cout_mgf();
 	}
 
-	std::string s_output_file = "output.mgf";
-	std::ofstream output_fout;
-	output_fout.open(s_output_file);
-	union_parse.fout_mgf(output_fout);
+	//std::string s_output_file = "output.mgf";
+	//std::ofstream output_fout;
+	//output_fout.open(s_output_file);
+	//union_parse.fout_mgf(output_fout);
 
 	std::string pong;
 	std::cout << "\n\n\nping..\n\n";
