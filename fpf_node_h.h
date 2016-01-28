@@ -23,14 +23,14 @@ namespace fpf_node {
 		// CONSTRUCTORS
 
 		node(const data_type& vt_init_data = data_type(), node_type nt_init_node = NULL) {
-			vt_data = vt_init_data;
+			dt_data = vt_init_data;
 			nt_node = nt_init_node;
 		};
 
 		// MODIFICATION MEMBER FUNCTIONS
 
 		void set_data_dt(const data_type& vt_new_data) {
-			vt_data = vt_new_data;
+			dt_data = vt_new_data;
 		};
 
 		void set_node_nt(node_type nt_new_link) {
@@ -40,7 +40,7 @@ namespace fpf_node {
 		// PRIVATE MEMBER ACCESS FUNCTIONS       
 
 		data_type return_data_dt() const {
-			return vt_data;
+			return dt_data;
 		};
 
 		node_type return_node_nt() {
@@ -52,7 +52,7 @@ namespace fpf_node {
 		};
 
 	private:
-		data_type vt_data;
+		data_type dt_data;
 		node_type nt_node;
 	};
 
