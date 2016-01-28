@@ -82,7 +82,7 @@
 #include "fpf_ion_h.h"
 #include "fpf_node_h.h"
 
-static int fpf_spectralsum_DEBUG_MODE = 2;
+static int fpf_spectralsum_DEBUG_MODE = 0;
 
 namespace fpf_spectralsum {
 
@@ -117,7 +117,7 @@ namespace fpf_spectralsum {
     //		time to determine if two classes are suitable for spectral summing. 
     //		It can be program-defined, or called from an external source.
     
-    static value_type CONDITION_FRAGMENT_ION_INTENSITY = 3;
+    static value_type CONDITION_FRAGMENT_ION_INTENSITY = 5;
     //
     //
 
@@ -354,41 +354,45 @@ namespace fpf_spectralsum {
 
     scan scan_union(scan& scan_1, scan & scan_2) {
         scan scan_3 = scan();
-        scan_3.set_union_n();
         fpf_ion::ion* ion_union;
         scan_3.set_precursor_mass((scan_1.return_precursor_mass() + scan_2.return_precursor_mass()) / 2);
         scan_3.set_precursor_rt((scan_1.return_precursor_rt() + scan_2.return_precursor_rt()) / 2);
+        scan_3.set_union_n();
         for (node_type scan_1_ptr_itr = scan_1.return_head_ptr(); scan_1_ptr_itr != NULL; scan_1_ptr_itr = scan_1_ptr_itr->return_node_nt()) {
-            ion_union = new fpf_ion::ion();
-            ion_union->set_fragment_ion_mz_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_mz());
-            ion_union->set_fragment_ion_intensity_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
-            fpf_node::list_insert_tail(ion_union, scan_3.return_head_ptr(), scan_3.return_tail_ptr());
             for (node_type scan_2_ptr_itr = scan_2.return_head_ptr(); scan_2_ptr_itr != NULL; scan_2_ptr_itr = scan_2_ptr_itr->return_node_nt()) {
-                if (scan_1_ptr_itr == scan_1.return_head_ptr()) {
-                    ion_union = new fpf_ion::ion();
-                    ion_union->set_fragment_ion_mz_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz());
-                    ion_union->set_fragment_ion_intensity_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
-                    fpf_node::list_insert_tail(ion_union, scan_3.return_head_ptr(), scan_3.return_tail_ptr());
-                }
                 if (union_fragment_ion_mz(scan_1_ptr_itr->return_data_dt(), scan_2_ptr_itr->return_data_dt())) {
                     ion_union = new fpf_ion::ion();
                     ion_union->set_fragment_ion_mz_vt((scan_1_ptr_itr->return_data_dt()->return_fragment_ion_mz() + scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz()) / 2);
                     ion_union->set_fragment_ion_intensity_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity() + scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
                     ion_union->set_union_b();
+                    scan_1_ptr_itr->return_data_dt()->set_union_init_b();
+                    scan_2_ptr_itr->return_data_dt()->set_union_init_b();
                     fpf_node::list_insert_tail(ion_union, scan_3.return_head_ptr(), scan_3.return_tail_ptr());
                 }
+                if ((scan_1_ptr_itr == scan_1.return_head_ptr()) && !scan_1_ptr_itr->return_data_dt()->return_union_init()) {
+                    ion_union = new fpf_ion::ion();
+                    ion_union->set_fragment_ion_mz_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz());
+                    ion_union->set_fragment_ion_intensity_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
+                    fpf_node::list_insert_tail(ion_union, scan_3.return_head_ptr(), scan_3.return_tail_ptr());
+                }
+            }
+            if (!scan_1_ptr_itr->return_data_dt()->return_union_init()) {
+                ion_union = new fpf_ion::ion();
+                ion_union->set_fragment_ion_mz_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_mz());
+                ion_union->set_fragment_ion_intensity_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
+                fpf_node::list_insert_tail(ion_union, scan_3.return_head_ptr(), scan_3.return_tail_ptr());
             }
         }
         return scan_3;
     };
-    //		Returns a SCAN class that is the union of two SCAN classes. Referenced 
-    //		scan_1 and scan_2 are required to be within the conditional definition
-    // 		for spectral summing. Conditional selection is determined by -
-    //
-    //			1a - Precursor mass
-    //			1b - Retention time
-    //			2 - Fragment ion distribution
-    //			- - ?
+//		Returns a SCAN class that is the union of two SCAN classes. Referenced 
+//		scan_1 and scan_2 are required to be within the conditional definition
+// 		for spectral summing. Conditional selection is determined by -
+//
+//			1a - Precursor mass
+//			1b - Retention time
+//			2 - Fragment ion distribution
+//			- - ?
     //
     //		Conditional selection is bool tested with the corresponding member functions -
     //
@@ -532,14 +536,18 @@ namespace fpf_spectralsum {
             size_type st_used_prev = size_type();
             static size_type st_output_interval = 100;
             bool union_condition = bool();
+            size_type forward_match_false = size_type();
+            size_type forward_match_true = size_type();
+            size_type forward_match_false_matched = size_type();
             for (parse::size_type i = 0; i < parse_1.return_used(); ++i) {
                 for (parse::size_type j = i; j < parse_1.return_used(); j) {
                     // note i != j only for intrascan sum
                     if ((i != j) && (union_precursor_mass(parse_1.nt_scan[i], parse_1.nt_scan[j])) && union_precursor_rt(parse_1.nt_scan[i], parse_1.nt_scan[j]) && union_fragment_ion_sup_intensities(parse_1.nt_scan[i], parse_1.nt_scan[j])) {
                         // copy constructor?                       
-                        if (fpf_spectralsum_DEBUG_MODE == 2) {
+                        if (fpf_spectralsum_DEBUG_MODE >= 2) {
+                            ++forward_match_true;
                             std::cout << "\nscan_1 mass " << nt_scan[i].return_precursor_mass() << " retention time " << (nt_scan[i].return_precursor_rt() / 60) << "   scan_2 mass " << nt_scan[j].return_precursor_mass() << " retention time " << (nt_scan[j].return_precursor_rt() / 60) << "  !  scan_1.return_union() " << parse_1.nt_scan[i].return_union() << "  scan_2.return_union() " << parse_1.nt_scan[j].return_union() << "  union_precursor_mass() " << union_precursor_mass(parse_1.nt_scan[i], parse_1.nt_scan[j]) << "  union_precursor_rt() " << union_precursor_rt(parse_1.nt_scan[i], parse_1.nt_scan[j]);
-                            std::cout << "\n\nforward match for scan " << i << " with scan " << j << "\n\n";
+                            std::cout << "\n\n--- forward match for scan " << i << " with scan " << j << "  !  " << forward_match_true << "\n\n";
                         }
                         parse_1.nt_scan[i].set_union_n();
                         parse_1.nt_scan[j].set_union_n();
@@ -551,10 +559,29 @@ namespace fpf_spectralsum {
                         if (!(parse_1.nt_scan[i].return_union())) {
                             union_parse.nt_scan[union_parse.st_used] = parse_1.nt_scan[i];
                             ++union_parse.st_used;
+                            ++forward_match_false_matched;
                         }
-                        std::cout << "\nno forward match for scan " << i;
+                        ++forward_match_false;
+                        if (fpf_spectralsum_DEBUG_MODE >= 2) {
+                            std::cout << "\n--- no forward match for scan " << i << "  !  " << (parse_1.nt_scan[i].return_union()) << "  !  " << forward_match_false << "  !  " << forward_match_false_matched;
+                        }
                     }
                     if (union_condition) {
+                        if ((i > 0) && (i % st_output_interval == 0)) {
+                            std::cout << "\nscan - " << i << "   union itr 0 - " << union_parse.st_used;
+                            // here?
+                            if (parse_1.st_used > 2 * st_output_interval - 1) {
+                                std::cout << "   delta - " << union_parse.st_used - st_used_prev;
+                            }
+                            std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                            st_used_prev = union_parse.st_used;
+                        }
+                        if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
+                            std::cout << "\nscan - " << parse_1.return_used() << "   union itr 0 - " << union_parse.st_used;
+                            if (union_parse.st_used > 2 * st_output_interval - 1) {
+                                std::cout << "   delta - " << union_parse.st_used - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                            }
+                        }
                         ++i;
                         ++j;
                         union_condition = false;
@@ -562,22 +589,23 @@ namespace fpf_spectralsum {
                         ++j;
                     }
                 }
-                // note here
-                if ((i > 0) && (i % st_output_interval == 0)) {
-                    std::cout << "\nscan - " << i << "   union itr 0 - " << union_parse.st_used;
-                    // here?
-                    if (parse_1.st_used > 2 * st_output_interval - 1) {
-                        std::cout << "   delta - " << union_parse.st_used - st_used_prev;
+                if (!union_condition) {
+                    if ((i > 0) && (i % st_output_interval == 0)) {
+                        std::cout << "\nscan - " << i << "   union itr 0 - " << union_parse.st_used;
+                        // here?
+                        if (parse_1.st_used > 2 * st_output_interval - 1) {
+                            std::cout << "   delta - " << union_parse.st_used - st_used_prev;
+                        }
+                        std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                        st_used_prev = union_parse.st_used;
                     }
-                    std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                    st_used_prev = union_parse.st_used;
+                    if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
+                        std::cout << "\nscan - " << parse_1.return_used() << "   union itr 0 - " << union_parse.st_used;
+                        if (union_parse.st_used > 2 * st_output_interval - 1) {
+                            std::cout << "   delta - " << union_parse.st_used - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                        }
+                    }
                 }
-                if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                    std::cout << "\nscan - " << parse_1.return_used() << "   union itr 0 - " << union_parse.st_used;
-                    if (union_parse.st_used > 2 * st_output_interval - 1) {
-                        std::cout << "   delta - " << union_parse.st_used - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                    }
-                };
             }
         };
         //
