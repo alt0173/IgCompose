@@ -539,6 +539,8 @@ namespace fpf_spectralsum {
             size_type forward_match_false = size_type();
             size_type forward_match_true = size_type();
             size_type forward_match_false_matched = size_type();
+            size_type union_false_count = size_type();
+            size_type union_true_count = size_type();
             for (parse::size_type i = 0; i < parse_1.return_used(); ++i) {
                 for (parse::size_type j = i; j < parse_1.return_used(); j) {
                     // note i != j only for intrascan sum
@@ -553,12 +555,14 @@ namespace fpf_spectralsum {
                         parse_1.nt_scan[j].set_union_n();
                         union_parse.nt_scan[union_parse.st_used] = scan_union(parse_1.nt_scan[i], parse_1.nt_scan[j]);
                         ++union_parse.st_used;
+                        ++union_true_count;
                         union_condition = true;
                     }
                     if (j + 1 == parse_1.return_used()) {
                         if (!(parse_1.nt_scan[i].return_union())) {
                             union_parse.nt_scan[union_parse.st_used] = parse_1.nt_scan[i];
                             ++union_parse.st_used;
+                            ++union_false_count;
                             ++forward_match_false_matched;
                         }
                         ++forward_match_false;
@@ -568,19 +572,21 @@ namespace fpf_spectralsum {
                     }
                     if (union_condition) {
                         if ((i > 0) && (i % st_output_interval == 0)) {
-                            std::cout << "\nscan - " << i << "   union itr 0 - " << union_parse.st_used;
+                            std::cout << "\nscan - " << i << "   union itr0 - " << union_true_count;
                             // here?
                             if (parse_1.st_used > 2 * st_output_interval - 1) {
-                                std::cout << "   delta - " << union_parse.st_used - st_used_prev;
+                                std::cout << " - delta " << union_true_count - st_used_prev;
                             }
+                            std::cout << " - unmatched " << union_false_count << " - total " << union_parse.st_used;
                             std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                            st_used_prev = union_parse.st_used;
+                            st_used_prev = union_true_count;
                         }
                         if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                            std::cout << "\nscan - " << parse_1.return_used() << "   union itr 0 - " << union_parse.st_used;
+                            std::cout << "\nscan - " << parse_1.return_used() << "   union itr0 - " << union_true_count ;
+                            std::cout << " - unmatched " << union_false_count << " - total " << union_parse.st_used;
                             if (union_parse.st_used > 2 * st_output_interval - 1) {
-                                std::cout << "   delta - " << union_parse.st_used - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                            }
+                                std::cout << " - delta " << union_true_count - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                            }                            
                         }
                         ++i;
                         ++j;
@@ -591,19 +597,21 @@ namespace fpf_spectralsum {
                 }
                 if (!union_condition) {
                     if ((i > 0) && (i % st_output_interval == 0)) {
-                        std::cout << "\nscan - " << i << "   union itr 0 - " << union_parse.st_used;
+                        std::cout << "\nscan - " << i << "   union itr0 - " << union_true_count;
                         // here?
                         if (parse_1.st_used > 2 * st_output_interval - 1) {
-                            std::cout << "   delta - " << union_parse.st_used - st_used_prev;
+                            std::cout << " - delta " << union_true_count - st_used_prev;
                         }
+                        std::cout << " - unmatched " << union_false_count << " - total " << union_parse.st_used;
                         std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                        st_used_prev = union_parse.st_used;
+                        st_used_prev = union_true_count;
                     }
                     if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                        std::cout << "\nscan - " << parse_1.return_used() << "   union itr 0 - " << union_parse.st_used;
+                        std::cout << "\nscan - " << parse_1.return_used() << "   union itr0 - " << union_true_count;
+                        std::cout << " - unmatched " << union_false_count << " - total " << union_parse.st_used;
                         if (union_parse.st_used > 2 * st_output_interval - 1) {
-                            std::cout << "   delta - " << union_parse.st_used - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                        }
+                            std::cout << " - delta " << union_true_count - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                        }                        
                     }
                 }
             }
