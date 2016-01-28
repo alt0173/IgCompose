@@ -116,7 +116,7 @@ namespace fpf_spectralsum {
     //		scan::CONDITION_PRECURSOR_RT defines the delta-range of retention
     //		time to determine if two classes are suitable for spectral summing. 
     //		It can be program-defined, or called from an external source.
-    
+
     static value_type CONDITION_FRAGMENT_ION_INTENSITY = 5;
     //
     //
@@ -196,8 +196,8 @@ namespace fpf_spectralsum {
             st_precursor_charge = parse_precursor_charge;
         };
 
-        inline void set_union_n() {
-            b_union = true;
+        inline void set_union_n(bool b_new_union) {
+            b_union = b_new_union;
         };
 
         scan operator+(const scan& scan_1);
@@ -357,19 +357,19 @@ namespace fpf_spectralsum {
         fpf_ion::ion* ion_union;
         scan_3.set_precursor_mass((scan_1.return_precursor_mass() + scan_2.return_precursor_mass()) / 2);
         scan_3.set_precursor_rt((scan_1.return_precursor_rt() + scan_2.return_precursor_rt()) / 2);
-        scan_3.set_union_n();
+        scan_3.set_union_n(true);
         for (node_type scan_1_ptr_itr = scan_1.return_head_ptr(); scan_1_ptr_itr != NULL; scan_1_ptr_itr = scan_1_ptr_itr->return_node_nt()) {
             for (node_type scan_2_ptr_itr = scan_2.return_head_ptr(); scan_2_ptr_itr != NULL; scan_2_ptr_itr = scan_2_ptr_itr->return_node_nt()) {
                 if (union_fragment_ion_mz(scan_1_ptr_itr->return_data_dt(), scan_2_ptr_itr->return_data_dt())) {
                     ion_union = new fpf_ion::ion();
                     ion_union->set_fragment_ion_mz_vt((scan_1_ptr_itr->return_data_dt()->return_fragment_ion_mz() + scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz()) / 2);
                     ion_union->set_fragment_ion_intensity_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity() + scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
-                    ion_union->set_union_b();
-                    scan_1_ptr_itr->return_data_dt()->set_union_init_b();
-                    scan_2_ptr_itr->return_data_dt()->set_union_init_b();
+                    ion_union->set_union_b(true);
+                    scan_1_ptr_itr->return_data_dt()->set_union_init_b(true);
+                    scan_2_ptr_itr->return_data_dt()->set_union_init_b(true);
                     fpf_node::list_insert_tail(ion_union, scan_3.return_head_ptr(), scan_3.return_tail_ptr());
                 }
-                if ((scan_1_ptr_itr == scan_1.return_head_ptr()) && !scan_1_ptr_itr->return_data_dt()->return_union_init()) {
+                if ((scan_1_ptr_itr == scan_1.return_tail_ptr()) && !scan_2_ptr_itr->return_data_dt()->return_union_init()) {
                     ion_union = new fpf_ion::ion();
                     ion_union->set_fragment_ion_mz_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz());
                     ion_union->set_fragment_ion_intensity_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
@@ -385,14 +385,14 @@ namespace fpf_spectralsum {
         }
         return scan_3;
     };
-//		Returns a SCAN class that is the union of two SCAN classes. Referenced 
-//		scan_1 and scan_2 are required to be within the conditional definition
-// 		for spectral summing. Conditional selection is determined by -
-//
-//			1a - Precursor mass
-//			1b - Retention time
-//			2 - Fragment ion distribution
-//			- - ?
+    //		Returns a SCAN class that is the union of two SCAN classes. Referenced 
+    //		scan_1 and scan_2 are required to be within the conditional definition
+    // 		for spectral summing. Conditional selection is determined by -
+    //
+    //			1a - Precursor mass
+    //			1b - Retention time
+    //			2 - Fragment ion distribution
+    //			- - ?
     //
     //		Conditional selection is bool tested with the corresponding member functions -
     //
@@ -426,7 +426,7 @@ namespace fpf_spectralsum {
         //
         //
 
-        static const size_type PARSE_DEFAULT_ALLOCATION = 400000;
+        static const size_type PARSE_DEFAULT_ALLOCATION = 200000;
         //
         //
 
@@ -436,6 +436,7 @@ namespace fpf_spectralsum {
             nt_scan = new scan[class_size];
             st_capacity = class_size;
             st_used = size_type();
+            st_union_itr = size_type();
         };
 
         parse(const parse& parse);
@@ -526,8 +527,7 @@ namespace fpf_spectralsum {
             std::cout << "\nscan - " << parse_0.st_used << "   retention time - " << ((nt_scan[st_used - 1].return_precursor_rt()) / 60);
             if (parse_0.st_used > 2 * output_interval - 1) {
                 std::cout << "   delta - " << ((nt_scan[st_used - 1].return_precursor_rt()) / 60) - ((nt_scan[st_used - output_interval - 1].return_precursor_rt()) / 60);
-            }
-            std::cout << "\n\n\nSumming...\n";
+            }           
         };
         //
         //
@@ -541,6 +541,8 @@ namespace fpf_spectralsum {
             size_type forward_match_false_matched = size_type();
             size_type union_false_count = size_type();
             size_type union_true_count = size_type();
+            union_parse.st_union_itr = parse_1.st_union_itr + 1;
+            std::cout << "\n\n\nSumming...\n";
             for (parse::size_type i = 0; i < parse_1.return_used(); ++i) {
                 for (parse::size_type j = i; j < parse_1.return_used(); j) {
                     // note i != j only for intrascan sum
@@ -551,8 +553,8 @@ namespace fpf_spectralsum {
                             std::cout << "\nscan_1 mass " << nt_scan[i].return_precursor_mass() << " retention time " << (nt_scan[i].return_precursor_rt() / 60) << "   scan_2 mass " << nt_scan[j].return_precursor_mass() << " retention time " << (nt_scan[j].return_precursor_rt() / 60) << "  !  scan_1.return_union() " << parse_1.nt_scan[i].return_union() << "  scan_2.return_union() " << parse_1.nt_scan[j].return_union() << "  union_precursor_mass() " << union_precursor_mass(parse_1.nt_scan[i], parse_1.nt_scan[j]) << "  union_precursor_rt() " << union_precursor_rt(parse_1.nt_scan[i], parse_1.nt_scan[j]);
                             std::cout << "\n\n--- forward match for scan " << i << " with scan " << j << "  !  " << forward_match_true << "\n\n";
                         }
-                        parse_1.nt_scan[i].set_union_n();
-                        parse_1.nt_scan[j].set_union_n();
+                        parse_1.nt_scan[i].set_union_n(true);
+                        parse_1.nt_scan[j].set_union_n(true);
                         union_parse.nt_scan[union_parse.st_used] = scan_union(parse_1.nt_scan[i], parse_1.nt_scan[j]);
                         ++union_parse.st_used;
                         ++union_true_count;
@@ -572,7 +574,7 @@ namespace fpf_spectralsum {
                     }
                     if (union_condition) {
                         if ((i > 0) && (i % st_output_interval == 0)) {
-                            std::cout << "\nscan - " << i << "   union itr0 - " << union_true_count;
+                            std::cout << "\nscan - " << i << "   union itr" << union_parse.return_union_itr() << " - " << union_true_count;
                             // here?
                             if (parse_1.st_used > 2 * st_output_interval - 1) {
                                 std::cout << " - delta " << union_true_count - st_used_prev;
@@ -582,11 +584,14 @@ namespace fpf_spectralsum {
                             st_used_prev = union_true_count;
                         }
                         if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                            std::cout << "\nscan - " << parse_1.return_used() << "   union itr0 - " << union_true_count ;
+                            std::cout << "\nscan - " << parse_1.return_used() << "   union itr" << union_parse.return_union_itr() << " - " << union_true_count;
+                            if (union_parse.st_used > 2 * st_output_interval - 1) {
+                                std::cout << " - delta " << union_true_count - st_used_prev;
+                            }
                             std::cout << " - unmatched " << union_false_count << " - total " << union_parse.st_used;
                             if (union_parse.st_used > 2 * st_output_interval - 1) {
-                                std::cout << " - delta " << union_true_count - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                            }                            
+                                std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                            }
                         }
                         ++i;
                         ++j;
@@ -597,7 +602,7 @@ namespace fpf_spectralsum {
                 }
                 if (!union_condition) {
                     if ((i > 0) && (i % st_output_interval == 0)) {
-                        std::cout << "\nscan - " << i << "   union itr0 - " << union_true_count;
+                        std::cout << "\nscan - " << i << "   union itr" << union_parse.return_union_itr() << " - " << union_true_count;
                         // here?
                         if (parse_1.st_used > 2 * st_output_interval - 1) {
                             std::cout << " - delta " << union_true_count - st_used_prev;
@@ -607,11 +612,14 @@ namespace fpf_spectralsum {
                         st_used_prev = union_true_count;
                     }
                     if (i + 1 == parse_1.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                        std::cout << "\nscan - " << parse_1.return_used() << "   union itr0 - " << union_true_count;
+                        std::cout << "\nscan - " << parse_1.return_used() << "   union itr" << union_parse.return_union_itr() << " - " << union_true_count;
+                        if (union_parse.st_used > 2 * st_output_interval - 1) {
+                            std::cout << " - delta " << union_true_count - st_used_prev;
+                        }
                         std::cout << " - unmatched " << union_false_count << " - total " << union_parse.st_used;
                         if (union_parse.st_used > 2 * st_output_interval - 1) {
-                            std::cout << " - delta " << union_true_count - st_used_prev << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
-                        }                        
+                            std::cout << "   retention time - " << ((parse_1.nt_scan[i].return_precursor_rt()) / 60);
+                        }
                     }
                 }
             }
@@ -619,6 +627,16 @@ namespace fpf_spectralsum {
         //
         //
 
+        void main_reset() {
+            for (size_type i = size_type(); i < return_used(); ++i) {
+                nt_scan[i].set_union_n(false);
+                for (node_type scan_ptr_itr = nt_scan[i].return_head_ptr(); scan_ptr_itr != NULL; scan_ptr_itr = scan_ptr_itr->return_node_nt()) {
+                    scan_ptr_itr->return_data_dt()->set_union_b(false);
+                    scan_ptr_itr->return_data_dt()->set_union_init_b(false);
+                }
+            }           
+        }
+        
         // CONSTANT MEMBER FUNCTIONS
 
         inline const scan_node_type return_scan() const {
@@ -633,6 +651,10 @@ namespace fpf_spectralsum {
             return st_used;
         };
 
+        inline const size_type return_union_itr() const {
+            return st_union_itr;
+        };
+
         const int input_summary(std::ifstream& fin) {
             char c_inputstream;
             int scan_objects;
@@ -645,7 +667,7 @@ namespace fpf_spectralsum {
         }
 
         void debug_parse() const {
-            for (unsigned i = 0; i < return_used(); ++i) {
+            for (size_type i = size_type(); i < return_used(); ++i) {
                 std::cout << "\n" << i;
                 std::cout << "\nnt_scan[i].return_precursor_rt() " << nt_scan[i].return_precursor_rt();
                 std::cout << "\nnt_scan[i].return_precursor_mass() " << nt_scan[i].return_precursor_mass();
@@ -691,7 +713,7 @@ namespace fpf_spectralsum {
                 fout << "\nTITLE=" << "NULL";
                 fout << "\nRTINSECONDS=" << nt_scan[i].return_precursor_rt();
                 fout << "\nPEPMASS=" << nt_scan[i].return_precursor_mass();
-                if (fpf_spectralsum_DEBUG_MODE >= 1) {                   
+                if (fpf_spectralsum_DEBUG_MODE >= 1) {
                     if (!nt_scan[i].return_union()) {
                         ++union_false_count;
                     }
@@ -717,6 +739,7 @@ namespace fpf_spectralsum {
         scan_node_type nt_scan;
         size_type st_capacity;
         size_type st_used;
+        size_type st_union_itr;
     };
 }
 
