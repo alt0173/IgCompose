@@ -37,12 +37,12 @@ namespace fpf_ion {
             vt_fragment_ion_intensity = vt_new_fragment_ion_int;
         };
 
-        inline void set_union_b() {
-            bt_union = true;
+        inline void set_union_b(bool b_new_union) {
+            bt_union = b_new_union;
         };
         
-        inline void set_union_init_b() {
-            bt_union_init = true;
+        inline void set_union_init_b(bool b_new_union_init) {
+            bt_union_init = b_new_union_init;
         };
 
         // PRIVATE MEMBER ACCESS FUNCTIONS
