@@ -103,6 +103,20 @@ namespace fpf_node {
 	//	}
 	//};
 
+	void list_remove_head(node::node_type& nt_head_ptr) {
+		node::node_type nt_del_ptr;
+		nt_del_ptr = nt_head_ptr;
+		nt_head_ptr = nt_head_ptr->return_node_nt();
+		delete nt_del_ptr;
+	}
+
+	void list_remove(node::node_type& nt_prev_ptr) {
+		node::node_type nt_del_ptr;
+		nt_del_ptr = nt_prev_ptr->return_node_nt();
+		nt_prev_ptr->set_node_nt(nt_del_ptr->return_node_nt());
+		delete nt_del_ptr;
+	}
+
 	//void sort_sup(node::node_type nt_call_ptr, node::value_type vt_sort, node::node_type& nt_new_head_ptr, node::node_type& nt_new_tail_ptr) {
 	//	
 	//	// read through linked list
