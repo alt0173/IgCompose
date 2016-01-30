@@ -43,6 +43,7 @@ int main() {
     }
 
     fpf_spectralsum::main union_parse = fpf_spectralsum::main(UNION_MEM_ALLOC);
+	main_parse.main_scan_ion_sum(main_parse);
     main_parse.main_scan_sum(main_parse, union_parse);
     if (DEBUG_MODE >= 2) {
         union_parse.debug_parse();
@@ -50,32 +51,34 @@ int main() {
     if (DEBUG_MODE >= 1) {
         union_parse.cout_mgf();
     }
-    //union_parse.main_reset();
+    union_parse.main_reset();
 
-    //fpf_spectralsum::main union_parse2 = fpf_spectralsum::main(UNION_MEM_ALLOC);
-    //union_parse.main_scan_sum(union_parse, union_parse2);
-    //if (DEBUG_MODE >= 2) {
-    //    union_parse2.debug_parse();
-    //}
-    //if (DEBUG_MODE >= 1) {
-    //    union_parse2.cout_mgf();
-    //}
-    //union_parse2.main_reset();
+ //   fpf_spectralsum::main union_parse2 = fpf_spectralsum::main(UNION_MEM_ALLOC);
+	//union_parse.main_scan_ion_sum(main_parse);
+ //   union_parse.main_scan_sum(union_parse, union_parse2);
+ //   if (DEBUG_MODE >= 2) {
+ //       union_parse2.debug_parse();
+ //   }
+ //   if (DEBUG_MODE >= 1) {
+ //       union_parse2.cout_mgf();
+ //   }
+ //   union_parse2.main_reset();
 
-    //fpf_spectralsum::main union_parse3 = fpf_spectralsum::main(UNION_MEM_ALLOC);
-    //union_parse2.main_scan_sum(union_parse2, union_parse3);
-    //if (DEBUG_MODE >= 2) {
-    //    union_parse3.debug_parse();
-    //}
-    //if (DEBUG_MODE >= 1) {
-    //    union_parse3.cout_mgf();
-    //}
+ //   fpf_spectralsum::main union_parse3 = fpf_spectralsum::main(UNION_MEM_ALLOC);
+	//union_parse2.main_scan_ion_sum(main_parse);
+ //   union_parse2.main_scan_sum(union_parse2, union_parse3);
+ //   if (DEBUG_MODE >= 2) {
+ //       union_parse3.debug_parse();
+ //   }
+ //   if (DEBUG_MODE >= 1) {
+ //       union_parse3.cout_mgf();
+ //   }
     //union_parse3.main_reset();
 
     std::string s_output_file = "output.mgf";
     std::ofstream output_fout;
     output_fout.open(s_output_file);
-    union_parse.fout_mgf(output_fout);
+	union_parse.fout_mgf(output_fout);
 
     std::string pong;
     std::cout << "\n\n\nping..\n\n";
