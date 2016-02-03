@@ -1,831 +1,504 @@
 /*
- *	File:   fpf_spectralsum_h.h
+ *	File:   fpf_spectralsum.h
  *	Author: Lukah Dykes
  */
 
 
 
-#ifndef FPF_SPECTRALSUM_H
-#define	FPF_SPECTRALSUM_H
+#ifndef FPF_SPECTRALSUM
+#define	FPF_SPECTRALSUM
 #include <cstdlib> // provides - size_t, NULL
 #include <fstream> // provides - std::ifstream
 #include <istream> // provides - std::istream::get, std::istream::peek
 #include <sstream> // provides - std::istringstream
 #include <string> // provides - std::string
 #include <iostream> // provides - std::cin, std::cout
-#include "fpf_node_h.h"
-#include "fpf_ion_h.h"
+#include "fpf_node.h"
+#include "fpf_scan.h"
+
+
 
 namespace fpf_spectralsum {
 
-    static int fpf_spectralsum_DEBUG_MODE = int();
 
-    typedef fpf_ion::ion::value_type value_type;
-    //
-    //		scan::value_type is the data type of elements of the SCAN class. It may 
-    //		be any C++ built-in type, or an object with a default constructor,
-    //		assignment operator, and equality operators.
+	//
+	// * * SCOPE VARIABLES * * 
+	//
 
-    typedef size_t size_type;
-    //
-    //		scan::size_type is the data type of any variable that is assigned to
-    //		enumerate quantity at run-time.
-
-    typedef fpf_node::node<fpf_ion::ion*>* ion_node_type;
-    //
-    //
-
-    typedef fpf_ion::ion* ion_data_type;
+	typedef long double value_type;
 	//
 	//
 
-    static value_type CONDITION_PRECURSOR_MASS = 0.05;
-    //
-    //
+	typedef size_t size_type;
+	//
+	//
 
-    static value_type CONDITION_PRECURSOR_MZ = 0.05;
-    //
-    //		scan::CONDITION_PRECURSOR_MZ defines the delta-range of precursor
-    //		mass-to-charge ratio to determine if two classes are suitable for
-    //		spectral summing.
+	typedef fpf_node::node<fpf_scan::scan*>* scan_node_type;
+	//
+	//
 
-    static value_type CONDITION_PRECURSOR_RT = 120;
-    //
-    //		scan::CONDITION_PRECURSOR_RT defines the delta-range of retention
-    //		time to determine if two classes are suitable for spectral summing. 
-    //		It can be program-defined, or called from an external source.
+	typedef fpf_scan::scan* scan_data_type;
+	//
+	//
 
-    static value_type CONDITION_FRAGMENT_ION = 95;
-    //
-    //		scan::CONDITION_FRAGMENT_ION defines the score limit-value of fragment
-    //		ion distribution similarity to determine if two classes are suitable for
-    //		for spectral summing. Fragment ion distribution is scored on the basis
-    //		of peak intensity and fragment ion mass-to-charge ratio. Scoring is 
-    //		controlled by the ION class type as defined in FPF_ION_H.H.
+	int fpf_spectralsum_DEBUG_MODE;
+	//
+	//
 
-    static value_type CONDITION_FRAGMENT_ION_MZ = 0.03;
-    //
-    //
+	size_type count_mgf_scan = size_type();
+	//
+	//
 
-    static const size_t CONDITION_COUNT_FRAGMENT_SUP = 7;
-    //
-    //
+	const value_type FILTER_PRECURSOR_RT = 600;
+	//
+	//
 
-    static const size_t CONDITION_FRAGMENT_ION_SUP = 4;
-    //
-    //
+	const value_type FILTER_FRAGMENT_ION_INTENSITY = 3;
+	//
+	//
 
-    static value_type FILTER_PRECURSOR_RT = 600;
-    //
-    //
+	class mgf {
 
-    static value_type FILTER_FRAGMENT_ION_INTENSITY = 3;
-    //
-    //
-
-    /*
-     *
-     */
+	public:
 
 
-    class scan {
-        //
-        //		A SCAN class is a collection of doubles that contain the precursor mass,
-        //		precursor charge, mass-to-charge ratio, and retention time. SCAN classes 
-        //		are linked to the corresponding fragment ions through a pointer
-        //		assignment to an IONS class. The associated IONS class contains as a 
-        //		dynamic array of doubles the transition ions of the respective SCAN class 
-        //		element(s). Should two or more SCAN classes be determined to be suitable
-        //		for spectral summing, as tested by bool conditions, the union of 
-        //		these classes is created in a new SCAN class. SCAN classes created 
-        //		through the union process are identifiable by bool value. The 
-        //		collection of union created SCAN classes are exported to a .mgf file at 
-        //		program completion.
-
-    public:
-
-        scan() {
-            vt_precursor_mass = value_type();
-            vt_precursor_mz = value_type();
-            vt_precursor_rt = value_type();
-            st_precursor_charge = size_type();
-            nt_head_ptr = NULL;
-            nt_tail_ptr = NULL;
-            b_union = bool();
-			st_scan_union_count = 1;
-        };
-
-        ~scan() {
-        };
-
-        /*
-         *
-         *	MEMBER FUNCTIONS
-         *
-         */
-
-        inline void set_precursor_mass(value_type parse_precursor_mass) {
-            vt_precursor_mass = parse_precursor_mass;
-        };
-
-        inline void set_precursor_mz(value_type parse_precursor_mz) {
-            vt_precursor_mz = parse_precursor_mz;
-        };
-
-        inline void set_precursor_rt(value_type parse_precursor_rt) {
-            vt_precursor_rt = parse_precursor_rt;
-        };
-
-        inline void set_precursor_charge(size_type parse_precursor_charge) {
-            st_precursor_charge = parse_precursor_charge;
-        };
-
-        inline void set_union_n(bool b_new_union) {
-            b_union = b_new_union;
-        };
-
-		inline void set_scan_union_count(size_type new_scan_union_cout) {
-			st_scan_union_count = new_scan_union_cout;
-		};
-
-        scan operator+(const scan& scan_1);
-
-        /*
-         *
-         *	CONSTANT MEMBER FUNCTIONS
-         *
-         */
-
-        inline const value_type return_precursor_mass() const {
-            return vt_precursor_mass;
-        };
-        //		Returns the precursor mass of a SCAN class.
-
-        inline const value_type return_precursor_mz() const {
-            return vt_precursor_mz;
-        };
-        //		Returns the precursor mass-to-charge ratio of a SCAN class.
-
-        inline const value_type return_precursor_rt() const {
-            return vt_precursor_rt;
-        };
-        //		Returns the precursor retention time of a SCAN class.
-
-        inline const size_type return_precursor_charge() const {
-            return st_precursor_charge;
-        };
-        //		Returns the precursor charge of a SCAN class.
-
-        inline ion_node_type& return_ion_head_ptr() {
-            return nt_head_ptr;
-        };
-        //		Returns a head pointer to a linked lift of ION classes for the 
-        //		associated SCAN class. The pointer directs to the head node of 
-        //		a linked list.
-
-        inline ion_node_type& return_ion_tail_ptr() {
-            return nt_tail_ptr;
-        };
-        //		Returns a tail pointer to a linked lift of ION classes for the 
-        //		associated SCAN class. The pointer directs to the head node of 
-        //		a linked list.
-
-        inline bool& return_union_b() {
-            return b_union;
-        };
-        //
-        //
-
-		inline size_type return_scan_union_count() {
-			return st_scan_union_count;
-		};
 		//
+		// * * CONSTRUCTORS * * 
 		//
 
-    private:
-        value_type vt_precursor_mass;
-        value_type vt_precursor_mz;
-        value_type vt_precursor_rt;
-        size_type st_precursor_charge;
-		ion_node_type nt_head_ptr;
-        ion_node_type nt_tail_ptr;
-        bool b_union;
-		size_type st_scan_union_count;
-    };
 
-    /*
-     *
-     * FUNCTIONS
-     *
-     */
+		mgf() {
+			scan_node_type nt_scan_head_ptr = NULL;
+			scan_node_type nt_scan_tail_ptr = NULL;
+			size_type st_union_itr = size_type();
+		};
 
-    inline bool union_precursor_mass(const scan& scan_1, const scan& scan_2) {
-        return ((scan_1.return_precursor_mass() < scan_2.return_precursor_mass() + CONDITION_PRECURSOR_MASS) && (scan_1.return_precursor_mass() > scan_2.return_precursor_mass() - CONDITION_PRECURSOR_MASS));
-    };
-    //		Returns TRUE if the precursor masses of two SCAN classes 
-    //		are within the delta-value range defined by CONDITION_PRECURSOR_MASS.
+		~mgf() {
+		};
 
-    inline bool union_precursor_rt(const scan& scan_1, const scan& scan_2) {
-        return ((scan_1.return_precursor_rt() < scan_2.return_precursor_rt() + CONDITION_PRECURSOR_RT) && (scan_1.return_precursor_rt() > scan_2.return_precursor_rt() - CONDITION_PRECURSOR_RT));
-    };
-    //		Returns TRUE if the retention times of two SCAN classes are within the 
-    //		delta-value range defined by CONDITION_RETENTION_TIME.
+		// OPERATORS
 
-    inline bool union_fragment_ion_mz(const ion_data_type d_ion_itr_1, const ion_data_type d_ion_itr_2) {
-        return ((d_ion_itr_1->return_fragment_ion_mz() < d_ion_itr_2->return_fragment_ion_mz() + CONDITION_FRAGMENT_ION_MZ) && (d_ion_itr_1->return_fragment_ion_mz() > d_ion_itr_2->return_fragment_ion_mz() - CONDITION_FRAGMENT_ION_MZ));
-    };
-    //
-    //
+		void operator=(const mgf parse_0) {
+			//mgf* tail_ptr;
+		};
 
-    inline bool union_fragment_ion_mz_boundconst(const ion_data_type d_ion_itr_1, const ion_data_type d_ion_itr_1_hold) {
-        return (d_ion_itr_1->return_fragment_ion_mz() < d_ion_itr_1_hold->return_fragment_ion_mz() + (CONDITION_FRAGMENT_ION_MZ * 1.1) && (d_ion_itr_1->return_fragment_ion_mz() > d_ion_itr_1_hold->return_fragment_ion_mz() - (CONDITION_FRAGMENT_ION_MZ * 1.1)));
-    };
-	//
-	//
+		// MODIFICATION MEMBER FUNCTIONS
 
-    bool union_fragment_ion_sup_intensities(scan& scan_1, scan& scan_2) {
-		ion_data_type default_ion = new fpf_ion::ion();
-		ion_data_type scan_1_fragment_ion_sup[CONDITION_COUNT_FRAGMENT_SUP];
-		ion_data_type scan_2_fragment_ion_sup[CONDITION_COUNT_FRAGMENT_SUP];
-		ion_data_type hold_fragment_ion_sup_intensity = new fpf_ion::ion();
-        size_type count_ion_sup_intensity = size_type();
-        for (size_t i = 0; i < CONDITION_COUNT_FRAGMENT_SUP; ++i) {
-            for (ion_node_type scan_1_ptr_itr = scan_1.return_ion_head_ptr(); scan_1_ptr_itr != NULL; scan_1_ptr_itr = scan_1_ptr_itr->return_up_node_nt()) {
-                if ((i > 0) && (scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity() <= scan_1_fragment_ion_sup[i - 1]->return_fragment_ion_intensity()) && (scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity()) && (scan_1_ptr_itr->return_data_dt()->return_fragment_ion_mz() != scan_1_fragment_ion_sup[i - 1]->return_fragment_ion_mz())) {
-                    hold_fragment_ion_sup_intensity = scan_1_ptr_itr->return_data_dt();
-                }
-                if ((i == 0) && (scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity())) {
-                    hold_fragment_ion_sup_intensity = scan_1_ptr_itr->return_data_dt();
-                }
-            }
-            scan_1_fragment_ion_sup[i] = hold_fragment_ion_sup_intensity;
-            hold_fragment_ion_sup_intensity = default_ion;
-        }
-        for (size_t i = 0; i < CONDITION_COUNT_FRAGMENT_SUP; ++i) {
-            for (ion_node_type scan_2_ptr_itr = scan_2.return_ion_head_ptr(); scan_2_ptr_itr != NULL; scan_2_ptr_itr = scan_2_ptr_itr->return_up_node_nt()) {
-                if ((i > 0) && (scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity() <= scan_2_fragment_ion_sup[i - 1]->return_fragment_ion_intensity()) && (scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity()) && (scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz() != scan_2_fragment_ion_sup[i - 1]->return_fragment_ion_mz())) {
-                    hold_fragment_ion_sup_intensity = scan_2_ptr_itr->return_data_dt();
-                }
-                if ((i == 0) && (scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity())) {
-                    hold_fragment_ion_sup_intensity = scan_2_ptr_itr->return_data_dt();
-                }
-            }
-            scan_2_fragment_ion_sup[i] = hold_fragment_ion_sup_intensity;
-            hold_fragment_ion_sup_intensity = default_ion;
-        }
-        if (fpf_spectralsum_DEBUG_MODE == 2) {
-            std::cout << "\n\n";
-        }
-        for (size_t i = 0; i < CONDITION_COUNT_FRAGMENT_SUP; ++i) {
-            if (fpf_spectralsum_DEBUG_MODE == 2) {
-                std::cout << scan_1_fragment_ion_sup[i]->return_fragment_ion_intensity() << " " << scan_1_fragment_ion_sup[i]->return_fragment_ion_mz() << "   ";
-            }
-            for (size_t j = 0; j < CONDITION_COUNT_FRAGMENT_SUP; ++j) {
-                if (union_fragment_ion_mz(scan_1_fragment_ion_sup[i], scan_2_fragment_ion_sup[j])) {
-                    ++count_ion_sup_intensity;
-                }
-            }
-        }
-        if (fpf_spectralsum_DEBUG_MODE == 2) {
-            std::cout << "\n\n";
-            for (size_t j = 0; j < CONDITION_COUNT_FRAGMENT_SUP; ++j) {
-                std::cout << scan_2_fragment_ion_sup[j]->return_fragment_ion_intensity() << " " << scan_2_fragment_ion_sup[j]->return_fragment_ion_mz() << "   ";
-            }
-            std::cout << "! count_ion_sup_intensity " << count_ion_sup_intensity << "\n";
-            // << "  (count_ion_sup_intensity >= CONDITION_FRAGMENT_ION_SUP) " << (count_ion_sup_intensity >= CONDITION_FRAGMENT_ION_SUP) << "\n";
-        }
-        return (count_ion_sup_intensity >= CONDITION_FRAGMENT_ION_SUP);
-    };
-    //
-    //
 
-    void scan_ion_sum(scan& c_scan) {
-		ion_node_type nt_dummy_ion = ion_node_type();
-		ion_node_type nt_hold_ion = ion_node_type();
-		ion_node_type nt_hold_ion_head_ptr = c_scan.return_ion_head_ptr();
-		ion_data_type d_ion_union;
-        for (ion_node_type nt_ion_itr = c_scan.return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
-            nt_dummy_ion = nt_ion_itr->return_down_node_nt();
-            for (ion_node_type nt_ion_itr_2 = c_scan.return_ion_head_ptr(); nt_ion_itr_2 != NULL; nt_ion_itr_2 = nt_ion_itr_2->return_up_node_nt()) {
-                if ((nt_ion_itr != nt_ion_itr_2) && union_fragment_ion_mz_boundconst(nt_ion_itr->return_data_dt(), nt_ion_itr_2->return_data_dt())) {
-                    d_ion_union = new fpf_ion::ion();
-                    d_ion_union->set_fragment_ion_mz_vt(fpf_ion::return_mean_ion_mz_vt(nt_ion_itr->return_data_dt(), nt_ion_itr_2->return_data_dt()));
-                    d_ion_union->set_fragment_ion_intensity_st(fpf_ion::return_sum_ion_intensity_st(nt_ion_itr->return_data_dt(), nt_ion_itr_2->return_data_dt()));
-                    d_ion_union->set_union_count_st(fpf_ion::return_sum_ion_union_count_st(nt_ion_itr->return_data_dt(), nt_ion_itr_2->return_data_dt()));
-					if (fpf_spectralsum_DEBUG_MODE >= 3) {
-						std::cout << "   ! ";
-						for (ion_node_type nt_ion_itr = c_scan.return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
-							std::cout << " " << nt_ion_itr->return_data_dt()->return_fragment_ion_mz();
+		void input_parse(std::ifstream& fin, mgf& c_mgf) {
+			char c_inputstream;
+			std::string s_inputstream = "";
+			int switch_inputstream = int();
+			scan_data_type nt_scan_itr = new fpf_scan::scan();
+			value_type ss_inputstream;
+			value_type vt_inputstream;
+			value_type vt_inputstream_2;
+			fpf_scan::ion_data_type ion_inputstream;
+			const size_type OUTPUT_INTERVAL = 100;
+			std::cout << "\n\nParsing...\n";
+			while (fin.std::istream::get(c_inputstream)) {
+				if (c_inputstream != '\n') {
+					s_inputstream += c_inputstream;
+				}
+				if (s_inputstream == "RTINSECONDS=") {
+					switch_inputstream = 2;
+					s_inputstream.clear();
+				}
+				if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
+					std::istringstream(s_inputstream) >> ss_inputstream;
+					//long double?
+					vt_inputstream = ss_inputstream;
+					nt_scan_itr->set_precursor_rt(vt_inputstream);
+					s_inputstream.clear();
+				}
+				if ((switch_inputstream == 4) && (c_inputstream == ' ')) {
+					std::istringstream(s_inputstream) >> ss_inputstream;
+					//long double?
+					vt_inputstream = ss_inputstream;
+					switch_inputstream = 5;
+					s_inputstream.clear();
+				}
+				if ((switch_inputstream == 5) && (c_inputstream == '\n')) {
+					std::istringstream(s_inputstream) >> ss_inputstream;
+					//long double?
+					vt_inputstream_2 = ss_inputstream;
+					if (vt_inputstream_2 >= FILTER_FRAGMENT_ION_INTENSITY) {
+						ion_inputstream = new fpf_ion::ion();
+						ion_inputstream->set_fragment_ion_mz_vt(vt_inputstream);
+						ion_inputstream->set_fragment_ion_intensity_st(vt_inputstream_2);
+						fpf_node::list_insert_tail<fpf_scan::ion_data_type>(ion_inputstream, nt_scan_itr->nt_return_ion_head_ptr(), nt_scan_itr->nt_return_ion_tail_ptr());
+					}
+					switch_inputstream = 4;
+					s_inputstream.clear();
+				}
+				if (s_inputstream == "PEPMASS=") {
+					switch_inputstream = 3;
+					s_inputstream.clear();
+				}
+				if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
+					std::istringstream(s_inputstream) >> ss_inputstream;
+					vt_inputstream = ss_inputstream;
+					nt_scan_itr->set_precursor_mass(vt_inputstream);
+					switch_inputstream = 4;
+					s_inputstream.clear();
+				}
+				if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
+					switch_inputstream = 0;
+					if (nt_scan_itr->nt_return_precursor_rt() >= FILTER_PRECURSOR_RT) {
+						fpf_node::list_insert_tail<scan_data_type>(nt_scan_itr, c_mgf.nt_return_scan_head_ptr(), c_mgf.nt_return_scan_tail_ptr());
+						nt_scan_itr = new fpf_scan::scan();
+						++count_mgf_scan;
+					}
+					if ((count_mgf_scan > 0) && (count_mgf_scan % OUTPUT_INTERVAL == 0)) {
+						std::cout << "\nscan - " << count_mgf_scan << "   retention time - " << ((c_mgf.nt_return_scan_tail_ptr()->return_down_node_nt()->return_data_dt()->nt_return_precursor_rt()) / 60);
+						if (count_mgf_scan > 2 * OUTPUT_INTERVAL - 1) {
+							scan_node_type nt_delta_itr = c_mgf.nt_return_scan_tail_ptr();
+							for (size_type i = 0; i < OUTPUT_INTERVAL; ++i) {
+								nt_delta_itr = nt_delta_itr->return_down_node_nt();
+							}
+							std::cout << "   delta - " << ((c_mgf.nt_return_scan_tail_ptr()->return_down_node_nt()->return_data_dt()->nt_return_precursor_rt()) / 60) - ((nt_delta_itr->return_down_node_nt()->return_data_dt()->nt_return_precursor_rt()) / 60);
 						}
 					}
-                    fpf_node::list_insert_up(d_ion_union, nt_ion_itr_2, c_scan.return_ion_head_ptr(), c_scan.return_ion_tail_ptr());
-                    if (fpf_spectralsum_DEBUG_MODE >= 3) {
-                        std::cout << "\n" << nt_ion_itr->return_data_dt()->return_fragment_ion_mz() << " " << nt_ion_itr_2->return_data_dt()->return_fragment_ion_mz() << " " << fpf_ion::return_mean_ion_mz_vt(nt_ion_itr->return_data_dt(), nt_ion_itr_2->return_data_dt());
-                    }
+				}
+				if (c_inputstream == '\n') {
+					s_inputstream.clear();
+				}
+			}
+			if (count_mgf_scan % OUTPUT_INTERVAL != 0) {
+				std::cout << "\nscan - " << count_mgf_scan << "   retention time - " << ((c_mgf.nt_return_scan_tail_ptr()->return_down_node_nt()->return_data_dt()->nt_return_precursor_rt()) / 60);
+				if (count_mgf_scan > 2 * OUTPUT_INTERVAL - 1) {
+					scan_node_type nt_delta_itr = c_mgf.nt_return_scan_tail_ptr();
+					for (size_type i = 0; i < OUTPUT_INTERVAL; ++i) {
+						nt_delta_itr = nt_delta_itr->return_down_node_nt();
+					}
+					std::cout << "   delta - " << ((c_mgf.nt_return_scan_tail_ptr()->return_down_node_nt()->return_data_dt()->nt_return_precursor_rt()) / 60) - ((nt_delta_itr->return_down_node_nt()->return_data_dt()->nt_return_precursor_rt()) / 60);
+				}
+			}
+		};
+		//
+		//
 
-                    if (nt_ion_itr != nt_hold_ion_head_ptr) {
-                        if (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2) {
-                            if (fpf_spectralsum_DEBUG_MODE >= 3) {
-                                std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr) (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-                            }
-                            nt_hold_ion = nt_ion_itr;
-                            nt_ion_itr = nt_ion_itr->return_up_node_nt()->return_up_node_nt();
-                            fpf_node::list_remove(nt_hold_ion);
-                            nt_hold_ion = nt_ion_itr_2;
-                            nt_ion_itr_2 = nt_ion_itr_2->return_up_node_nt();
-                            fpf_node::list_remove(nt_hold_ion);
-                        } else {
-                            if (fpf_spectralsum_DEBUG_MODE >= 3) {
-                                std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr) !(nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-                            }
-                            nt_hold_ion = nt_ion_itr;
-                            nt_ion_itr = nt_ion_itr->return_up_node_nt();
-                            fpf_node::list_remove(nt_hold_ion);
-                            nt_hold_ion = nt_ion_itr_2;
-                            fpf_node::list_remove(nt_hold_ion);
-                            nt_ion_itr_2 = c_scan.return_ion_head_ptr();
-                        }
-                    } else {
-                        if (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2) {
-                            if (fpf_spectralsum_DEBUG_MODE >= 3) {
-                                std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr) (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-                            }
-                            nt_ion_itr = nt_ion_itr->return_up_node_nt()->return_up_node_nt();
-                            fpf_node::list_remove_head(c_scan.return_ion_head_ptr());
-                            fpf_node::list_remove_head(c_scan.return_ion_head_ptr());
-                            nt_hold_ion_head_ptr = c_scan.return_ion_head_ptr();
-                        } else {
-                            if (fpf_spectralsum_DEBUG_MODE >= 3) {
-                                std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr) !(nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-                            }
-                            fpf_node::list_remove_head(c_scan.return_ion_head_ptr());
-                            nt_hold_ion_head_ptr = c_scan.return_ion_head_ptr();
-                            nt_hold_ion = nt_ion_itr_2;
-                            nt_ion_itr_2 = nt_ion_itr_2->return_up_node_nt();
-                            fpf_node::list_remove(nt_hold_ion);
-                        }
-                    }
-                } else {
-                    if (fpf_spectralsum_DEBUG_MODE >= 3) {
-                        std::cout << "\n" << nt_ion_itr->return_data_dt()->return_fragment_ion_mz() << " " << nt_ion_itr_2->return_data_dt()->return_fragment_ion_mz() << " NULL";
-                        std::cout << "   ! ";
-                        for (ion_node_type nt_ion_itr = c_scan.return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
-                            std::cout << " " << nt_ion_itr->return_data_dt()->return_fragment_ion_mz();
-                        }
-                    }
-                }
-            }
-        }
-        if (fpf_spectralsum_DEBUG_MODE >= 3) {
-            std::cout << "\n* * * * *\n";
-            for (ion_node_type nt_ion_itr = c_scan.return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
-                std::cout << " " << nt_ion_itr->return_data_dt()->return_fragment_ion_mz();
-            }
-            std::cout << "\n";
-        }
-    };
-	//
-	//
+		void mgf_scan_ion_sum(mgf& c_mgf) {
+			size_type count_mgf_scan_ion_sum = size_type();
+			const size_type st_output_interval = 100;
+			std::cout << "\n\n\nSumming fragment ion spectra...\n";
+			for (scan_node_type scan_ptr_itr = c_mgf.nt_return_scan_head_ptr(); scan_ptr_itr != NULL; scan_ptr_itr = scan_ptr_itr->return_up_node_nt()) {
+				fpf_scan::scan_ion_sum(scan_ptr_itr->return_data_dt());
+				++count_mgf_scan_ion_sum;
+				if (fpf_spectralsum_DEBUG_MODE == 0) {
+					if ((count_mgf_scan_ion_sum > 0) && (count_mgf_scan_ion_sum % st_output_interval == 0)) {
+						std::cout << "\nscan - " << count_mgf_scan_ion_sum;
+					}
+					if ((count_mgf_scan_ion_sum + 1 == count_mgf_scan) && !((count_mgf_scan_ion_sum > 0) && (count_mgf_scan_ion_sum % st_output_interval == 0))) {
+						std::cout << "\nscan - " << count_mgf_scan_ion_sum;
+					}
+				}
+			}
+		};
 
-	inline value_type return_mean_scan_mass_vt(scan scan_1, scan scan_2) {
-		return (((scan_1.return_scan_union_count() * scan_1.return_precursor_mass())) + ((scan_2.return_scan_union_count() * scan_2.return_precursor_mass()))) / (scan_1.return_scan_union_count() + (scan_2.return_scan_union_count()));
+		void mgf_scan_sum(mgf& c_mgf) {
+			// sup intensities
+			scan_node_type nt_hold_scan = scan_node_type();
+			scan_node_type nt_hold_scan_head_ptr = c_mgf.nt_return_scan_head_ptr();
+			scan_data_type d_scan_union;
+			size_type count_scan_1 = size_type();
+			size_type count_scan_2 = size_type();
+			for (scan_node_type nt_scan_itr = c_mgf.nt_return_scan_head_ptr(); nt_scan_itr != NULL; nt_scan_itr = nt_scan_itr->return_up_node_nt()) {
+				++count_scan_1;
+				for (scan_node_type nt_scan_itr_2 = c_mgf.nt_return_scan_head_ptr(); nt_scan_itr_2 != NULL; nt_scan_itr_2 = nt_scan_itr_2->return_up_node_nt()) {
+					++count_scan_2;
+					if ((nt_scan_itr != nt_scan_itr_2) && fpf_scan::union_precursor_rt(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt()) && fpf_scan::union_precursor_rt(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt())) {
+						d_scan_union = new fpf_scan::scan();
+						d_scan_union->set_precursor_mass(fpf_scan::return_mean_scan_mass_vt(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt()));
+						d_scan_union->set_precursor_rt(fpf_scan::return_mean_scan_rt_vt(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt()));
+						d_scan_union->set_scan_union_count(fpf_scan::return_sum_scan_union_count_st(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt()));
+						fpf_node::list_insert_up<scan_data_type>(d_scan_union, nt_scan_itr_2, c_mgf.nt_return_scan_head_ptr(), c_mgf.nt_return_scan_tail_ptr());
+						if (fpf_spectralsum_DEBUG_MODE == 6) {
+							std::cout << "\n Match for scan " << count_scan_1 << " with scan " << count_scan_2;
+							std::cout << "   ! nt_return_precursor_mass() " << nt_scan_itr->return_data_dt()->nt_return_precursor_mass() << " nt_return_precursor_rt() " << nt_scan_itr->return_data_dt()->nt_return_precursor_rt();
+							std::cout << "  nt_return_precursor_mass() " << nt_scan_itr_2->return_data_dt()->nt_return_precursor_mass() << " nt_return_precursor_rt() " << nt_scan_itr_2->return_data_dt()->nt_return_precursor_rt();
+							std::cout << "   ! return_mean_scan_mass_vt() " << fpf_scan::return_mean_scan_mass_vt(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt());
+							std::cout << " return_mean_scan_rt_vt() " << fpf_scan::return_mean_scan_rt_vt(nt_scan_itr->return_data_dt(), nt_scan_itr_2->return_data_dt());
+						}
+
+						if (nt_scan_itr != nt_hold_scan_head_ptr) {
+							if (nt_scan_itr->return_up_node_nt() == nt_scan_itr_2) {
+								if (fpf_spectralsum_DEBUG_MODE == 6) {
+									std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr) (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
+								}
+								nt_hold_scan = nt_scan_itr;
+								nt_scan_itr = nt_scan_itr->return_up_node_nt()->return_up_node_nt();
+								fpf_node::list_remove<scan_data_type>(nt_hold_scan);
+								nt_scan_itr = nt_scan_itr_2;
+								nt_scan_itr_2 = nt_scan_itr_2->return_up_node_nt();
+								fpf_node::list_remove<scan_data_type>(nt_hold_scan);
+							}
+							else {
+								if (fpf_spectralsum_DEBUG_MODE == 6) {
+									std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr) !(nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
+								}
+								nt_hold_scan = nt_scan_itr;
+								nt_scan_itr = nt_scan_itr->return_up_node_nt();
+								fpf_node::list_remove<scan_data_type>(nt_hold_scan);
+								nt_hold_scan = nt_scan_itr_2;
+								fpf_node::list_remove<scan_data_type>(nt_hold_scan);
+								nt_scan_itr_2 = c_mgf.nt_return_scan_head_ptr();
+							}
+						}
+						else {
+							if (nt_scan_itr->return_up_node_nt() == nt_scan_itr_2) {
+								if (fpf_spectralsum_DEBUG_MODE == 6) {
+									std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr) (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
+								}
+								nt_scan_itr = nt_scan_itr->return_up_node_nt()->return_up_node_nt();
+								fpf_node::list_remove_head<scan_data_type>(c_mgf.nt_return_scan_head_ptr());
+								fpf_node::list_remove_head<scan_data_type>(c_mgf.nt_return_scan_head_ptr());
+								nt_hold_scan_head_ptr = c_mgf.nt_return_scan_head_ptr();
+							}
+							else {
+								if (fpf_spectralsum_DEBUG_MODE == 6) {
+									std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr) !(nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
+								}
+								fpf_node::list_remove_head<scan_data_type>(c_mgf.nt_return_scan_head_ptr());
+								nt_hold_scan_head_ptr = c_mgf.nt_return_scan_head_ptr();
+								nt_hold_scan = nt_scan_itr_2;
+								nt_scan_itr_2 = nt_scan_itr_2->return_up_node_nt();
+								fpf_node::list_remove<scan_data_type>(nt_hold_scan);
+							}
+						}
+					}
+				}
+			}
+		};
+		//
+		//
+
+		//void mgf_scan_sum(const mgf& c_main, mgf& c_union) {
+		//    size_type st_used_prev = size_type();
+		//    static size_type st_output_interval = 100;
+		//    bool union_condition = bool();
+		//    size_type forward_match_false = size_type();
+		//    size_type forward_match_true = size_type();
+		//    size_type forward_match_false_matched = size_type();
+		//    size_type union_false_count = size_type();
+		//    size_type union_true_count = size_type();
+		//    c_union.st_union_itr = c_main.st_union_itr + 1;
+		//    std::cout << "\n\n\nSumming precursor ion spectra...\n";
+		//    for (size_type i = 0; i < c_main.return_used(); ++i) {
+		//        for (size_type j = i; j < c_main.return_used(); j) {
+		//            if ((i != j) && (union_precursor_mass(c_main.nt_scan[i], c_main.nt_scan[j])) && union_precursor_rt(c_main.nt_scan[i], c_main.nt_scan[j])) {
+		//                if (union_fragment_ion_sup_intensities(c_main.nt_scan[i], c_main.nt_scan[j])) {
+		//                    if (fpf_spectralsum_DEBUG_MODE == 2) {
+		//                        ++forward_match_true;
+		//                        std::cout << "\nscan_1 -  mass " << nt_scan[i].nt_return_precursor_mass() << "  retention time " << (nt_scan[i].nt_return_precursor_rt() / 60);
+		//                        std::cout << " -  scan_2 mass " << nt_scan[j].nt_return_precursor_mass() << "  retention time " << (nt_scan[j].nt_return_precursor_rt() / 60)
+		//                                << "   ! scan_1.return_union_b() " << c_main.nt_scan[i].return_union_b() << "  scan_2.return_union_b() " << c_main.nt_scan[j].return_union_b()
+		//                                << "  union_precursor_mass() " << union_precursor_mass(c_main.nt_scan[i], c_main.nt_scan[j]) << "  union_precursor_rt() " << union_precursor_rt(c_main.nt_scan[i], c_main.nt_scan[j]);
+		//                        std::cout << "\n\n--- forward match for scan " << i << " with scan " << j << "   ! forward_match_true " << forward_match_true << "\n\n";
+		//                    }
+		//                    c_main.nt_scan[i].set_union_n(true);
+		//                    c_main.nt_scan[j].set_union_n(true);
+		//                    c_union.nt_scan[c_union.st_used] = scan_union(c_main.nt_scan[i], c_main.nt_scan[j]);
+		//                    ++c_union.st_used;
+		//                    ++union_true_count;
+		//                    union_condition = true;
+		//                } else {
+		//                    if (fpf_spectralsum_DEBUG_MODE == 2) {
+		//                        std::cout << "\nscan_1 -  mass " << nt_scan[i].nt_return_precursor_mass() << "  retention time " << (nt_scan[i].nt_return_precursor_rt() / 60);
+		//                        std::cout << " -  scan_2 mass " << nt_scan[j].nt_return_precursor_mass() << "  retention time " << (nt_scan[j].nt_return_precursor_rt() / 60)
+		//                                << "   ! scan_1.return_union_b() " << c_main.nt_scan[i].return_union_b() << "  scan_2.return_union_b() " << c_main.nt_scan[j].return_union_b()
+		//                                << "  union_precursor_mass() " << union_precursor_mass(c_main.nt_scan[i], c_main.nt_scan[j]) << "  union_precursor_rt() " << union_precursor_rt(c_main.nt_scan[i], c_main.nt_scan[j]);
+		//                        std::cout << "\n\n--- partial forward match for scan " << i << " with scan " << j << "  * below fragment ion condition * " << "  ! forward_match_false " << forward_match_false << "\n\n";
+		//                    }
+		//                }
+		//            }
+		//            if (j + 1 == c_main.return_used()) {
+		//                if (!(c_main.nt_scan[i].return_union_b())) {
+		//                    c_union.nt_scan[c_union.st_used] = c_main.nt_scan[i];
+		//                    ++c_union.st_used;
+		//                    ++union_false_count;
+		//                    ++forward_match_false_matched;
+		//                }
+		//                ++forward_match_false;
+		//                if (fpf_spectralsum_DEBUG_MODE == 2) {
+		//                    std::cout << "\n--- no forward match for scan " << i << "   ! c_main.nt_scan[i].return_union_b() " << (c_main.nt_scan[i].return_union_b()) << "  forward_match_false " << forward_match_false << "  forward_match_false_matched " << forward_match_false_matched << "\n";
+		//                }
+		//            }
+		//            if (union_condition) {
+		//                if (fpf_spectralsum_DEBUG_MODE == 0) {
+		//                    if ((i > 0) && (i % st_output_interval == 0)) {
+		//                        std::cout << "\nscan - " << i << "   union itr" << c_union.return_union_itr() << " - matched " << union_true_count;
+		//                        if (c_main.st_used > 2 * st_output_interval - 1) {
+		//                            std::cout << " - delta " << union_true_count - st_used_prev;
+		//                        }
+		//                        std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
+		//                        std::cout << "   retention time - " << ((c_main.nt_scan[i].nt_return_precursor_rt()) / 60);
+		//                        st_used_prev = union_true_count;
+		//                    }
+		//                    if (i + 1 == c_main.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
+		//                        std::cout << "\nscan - " << c_main.return_used() << "   union itr" << c_union.return_union_itr() << " -  matched " << union_true_count;
+		//                        if (c_union.st_used > 2 * st_output_interval - 1) {
+		//                            std::cout << " - delta " << union_true_count - st_used_prev;
+		//                        }
+		//                        std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
+		//                        if (c_union.st_used > 2 * st_output_interval - 1) {
+		//                            std::cout << "   retention time - " << ((c_main.nt_scan[i].nt_return_precursor_rt()) / 60);
+		//                        }
+		//                    }
+		//                }
+		//                ++i;
+		//                ++j;
+		//                union_condition = false;
+		//            } else {
+		//                ++j;
+		//            }
+		//        }
+		//        if (!union_condition) {
+		//            if (fpf_spectralsum_DEBUG_MODE == 0) {
+		//                if ((i > 0) && (i % st_output_interval == 0)) {
+		//                    std::cout << "\nscan - " << i << "   union itr" << c_union.return_union_itr() << " - " << union_true_count;
+		//                    // here?
+		//                    if (c_main.st_used > 2 * st_output_interval - 1) {
+		//                        std::cout << " - delta " << union_true_count - st_used_prev;
+		//                    }
+		//                    std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
+		//                    std::cout << "   retention time - " << ((c_main.nt_scan[i].nt_return_precursor_rt()) / 60);
+		//                    st_used_prev = union_true_count;
+		//                }
+		//                if (i + 1 == c_main.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
+		//                    std::cout << "\nscan - " << c_main.return_used() << "   union itr" << c_union.return_union_itr() << " - " << union_true_count;
+		//                    if (c_union.st_used > 2 * st_output_interval - 1) {
+		//                        std::cout << " - delta " << union_true_count - st_used_prev;
+		//                    }
+		//                    std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
+		//                    if (c_union.st_used > 2 * st_output_interval - 1) {
+		//                        std::cout << "   retention time - " << ((c_main.nt_scan[i].nt_return_precursor_rt()) / 60);
+		//                    }
+		//                }
+		//            }
+		//        }
+		//    }
+		//};
+		////
+		////
+
+		//void mgf_scan_ion_reset() {
+		//    for (size_type i = size_type(); i < count_mgf_scan; ++i) {
+		//        nt_scan[i].set_union_n(false);
+		//        for (fpf_scan::scan::ion_node_type scan_ptr_itr = nt_scan[i].nt_return_ion_head_ptr(); scan_ptr_itr != NULL; scan_ptr_itr = scan_ptr_itr->return_up_node_nt()) {
+		//            scan_ptr_itr->return_data_dt()->set_init_fragment_ion_union_b(false);
+		//        }
+		//    }
+		//}
+
+
+		//
+		// * * CONSTANT MEMBER FUNCTIONS * * 
+		//
+
+
+		inline const size_type return_union_itr() const {
+			return st_union_itr;
+		};
+
+		inline scan_node_type& nt_return_scan_head_ptr() {
+			return nt_scan_head_ptr;
+		};
+		//		Returns a head pointer to a linked lift of ION classes for the 
+		//		associated SCAN class. The pointer directs to the head node of 
+		//		a linked list.
+
+		inline scan_node_type& nt_return_scan_tail_ptr() {
+			return nt_scan_tail_ptr;
+		};
+		//		Returns a tail pointer to a linked lift of ION classes for the 
+		//		associated SCAN class. The pointer directs to the head node of 
+		//		a linked list.
+
+		void cout_mgf(mgf& c_mgf) const {
+			size_type count_mgf_scan_cout = 1;
+			for (scan_node_type nt_scan_itr = c_mgf.nt_return_scan_head_ptr(); nt_scan_itr != NULL; nt_scan_itr = nt_scan_itr->return_up_node_nt()) {
+				if (count_mgf_scan_cout > 1) {
+					std::cout << "\nBEGIN IONS";
+				}
+				else {
+					std::cout << "BEGIN IONS";
+				}
+				std::cout << "\nTITLE=" << "NULL";
+				std::cout << "\nRTINSECONDS=" << nt_scan_itr->return_data_dt()->nt_return_precursor_rt();
+				std::cout << "\nPEPMASS=" << nt_scan_itr->return_data_dt()->nt_return_precursor_mass();
+				for (fpf_scan::ion_node_type nt_ion_ptr = nt_scan_itr->return_data_dt()->nt_return_ion_head_ptr(); nt_ion_ptr != NULL; nt_ion_ptr = nt_ion_ptr->return_up_node_nt()) {
+					std::cout << "\n" << nt_ion_ptr->return_data_dt()->return_fragment_ion_mz() << "   " << nt_ion_ptr->return_data_dt()->return_fragment_ion_intensity() << "   " << nt_ion_ptr->return_data_dt()->return_union_count_st();
+				}
+				std::cout << "\nEND IONS";
+				++count_mgf_scan_cout;
+			}
+			if (count_mgf_scan_cout == 1) {
+				std::cout << "\n\nNo members!";
+			}
+		};
+
+		void fout_mgf(std::ofstream& fout, mgf& c_mgf) const {
+			size_type count_mgf_scan_fout = 1;
+			std::cout << "\n\n\nOutputting...";
+			for (scan_node_type nt_scan_itr = c_mgf.nt_return_scan_head_ptr(); nt_scan_itr != NULL; nt_scan_itr = nt_scan_itr->return_up_node_nt()) {
+				if (count_mgf_scan_fout > 1) {
+					fout << "\nBEGIN IONS";
+				}
+				else {
+					fout << "BEGIN IONS";
+				}
+				fout << "\nTITLE=" << "NULL";
+				fout << "\nRTINSECONDS=" << nt_scan_itr->return_data_dt()->nt_return_precursor_rt();
+				fout << "\nPEPMASS=" << nt_scan_itr->return_data_dt()->nt_return_precursor_mass();
+				if (fpf_spectralsum_DEBUG_MODE >= 1) {
+					fout << " # " << count_mgf_scan_fout << "   ! nt_scan[i].return_union_b() " << nt_scan_itr->return_data_dt()->return_union_b() << " nt_scan[i].return_scan_union_count() " << nt_scan_itr->return_data_dt()->return_scan_union_count();
+				}
+				for (fpf_scan::ion_node_type nt_ion_ptr = nt_scan_itr->return_data_dt()->nt_return_ion_head_ptr(); nt_ion_ptr != NULL; nt_ion_ptr = nt_ion_ptr->return_up_node_nt()) {
+					fout << "\n" << nt_ion_ptr->return_data_dt()->return_fragment_ion_mz() << "   " << nt_ion_ptr->return_data_dt()->return_fragment_ion_intensity() << "   " << nt_ion_ptr->return_data_dt()->return_union_count_st();
+					if (fpf_spectralsum_DEBUG_MODE >= 1) {
+						fout << "  ! nt_scan_itr->return_data_dt()->return_union_init_b() " << nt_ion_ptr->return_data_dt()->return_union_init_b() << "  nt_scan_itr->return_data_dt()->return_union_count_st() " << nt_ion_ptr->return_data_dt()->return_union_count_st();
+					}
+				}
+				fout << "\nEND IONS";
+				++count_mgf_scan_fout;
+			}
+			if (count_mgf_scan_fout == 1) {
+				std::cout << "\n\nNo members!";
+			}
+		};
+
+	private:
+		scan_node_type nt_scan_head_ptr;
+		scan_node_type nt_scan_tail_ptr;
+		size_type st_union_itr;
 	};
-	//
-	//
 
-	inline value_type return_mean_scan_rt_vt(scan scan_1, scan scan_2) {
-		return (((scan_1.return_scan_union_count() * scan_1.return_precursor_rt())) + ((scan_2.return_scan_union_count() * scan_2.return_precursor_rt()))) / (scan_1.return_scan_union_count() + (scan_2.return_scan_union_count()));
-	};
+
 	//
+	// * * FUNCTIONS * * 
 	//
 
-	inline size_type return_sum_scan_union_count_st(scan scan_1, scan scan_2) {
-		return (scan_1.return_scan_union_count() + scan_2.return_scan_union_count());
-	};
-    //
-    //
 
-    scan scan_union(scan& scan_1, scan& scan_2) {
-        scan scan_3 = scan();
-        fpf_ion::ion* ion_union;
-        scan_3.set_precursor_mass(return_mean_scan_mass_vt(scan_1, scan_2));
-        scan_3.set_precursor_rt(return_mean_scan_rt_vt(scan_1, scan_2));
-		scan_3.set_scan_union_count(return_sum_scan_union_count_st(scan_1, scan_2));
-        scan_3.set_union_n(true);
-        for (ion_node_type scan_1_ptr_itr = scan_1.return_ion_head_ptr(); scan_1_ptr_itr != NULL; scan_1_ptr_itr = scan_1_ptr_itr->return_up_node_nt()) {
-            for (ion_node_type scan_2_ptr_itr = scan_2.return_ion_head_ptr(); scan_2_ptr_itr != NULL; scan_2_ptr_itr = scan_2_ptr_itr->return_up_node_nt()) {
-                if (union_fragment_ion_mz(scan_1_ptr_itr->return_data_dt(), scan_2_ptr_itr->return_data_dt())) {
-                    ion_union = new fpf_ion::ion();
-                    ion_union->set_fragment_ion_mz_vt(fpf_ion::return_mean_ion_mz_vt(scan_1_ptr_itr->return_data_dt(), scan_2_ptr_itr->return_data_dt()));
-                    ion_union->set_fragment_ion_intensity_st(fpf_ion::return_sum_ion_intensity_st(scan_1_ptr_itr->return_data_dt(), scan_2_ptr_itr->return_data_dt()));
-                    ion_union->set_union_count_st(fpf_ion::return_sum_ion_union_count_st(scan_1_ptr_itr->return_data_dt(), scan_2_ptr_itr->return_data_dt()));
-                    ion_union->set_init_fragment_ion_union_b(true);
-                    scan_1_ptr_itr->return_data_dt()->set_init_fragment_ion_union_b(true);
-                    scan_2_ptr_itr->return_data_dt()->set_init_fragment_ion_union_b(true);
-                    fpf_node::list_insert_tail(ion_union, scan_3.return_ion_head_ptr(), scan_3.return_ion_tail_ptr());
-                }
-                if ((scan_1_ptr_itr == scan_1.return_ion_tail_ptr()) && !scan_2_ptr_itr->return_data_dt()->return_union_init_b()) {
-                    ion_union = new fpf_ion::ion();
-                    ion_union->set_fragment_ion_mz_vt(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_mz());
-                    ion_union->set_fragment_ion_intensity_st(scan_2_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
-                    fpf_node::list_insert_tail(ion_union, scan_3.return_ion_head_ptr(), scan_3.return_ion_tail_ptr());
-                }
-            }
-            if (!scan_1_ptr_itr->return_data_dt()->return_union_init_b()) {
-                ion_union = new fpf_ion::ion();
-                ion_union->set_fragment_ion_mz_vt(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_mz());
-                ion_union->set_fragment_ion_intensity_st(scan_1_ptr_itr->return_data_dt()->return_fragment_ion_intensity());
-                fpf_node::list_insert_tail(ion_union, scan_3.return_ion_head_ptr(), scan_3.return_ion_tail_ptr());
-            }
-        }
-        return scan_3;
-    };
-    //		Returns a SCAN class that is the union of two SCAN classes. Referenced 
-    //		scan_1 and scan_2 are required to be within the conditional definition
-    // 		for spectral summing. Conditional selection is determined by -
-    //
-    //			1a - Precursor mass
-    //			1b - Retention time
-    //			2 - Fragment ion distribution
-    //			- - ?
-    //
-    //		Conditional selection is bool tested with the corresponding member functions -
-    //
-    //			1a - bool union_precursor_mass(const scan& scan_1, const scan& scan_2)
-    //			1b - bool union_precursor_rt(const scan& scan_1, const scan& scan_2)
-    //			2 - bool union_fragment_ion(const scan& scan_1, const scan & scan_2)
-    //			- - ?
-    //
-    //		Should two
-    //		fragment ions be suitable for spectral summing, the average fragment ion
-    //		mass-to-charge ratio and the summation of intensities is calculated for
-    //		the resulting SCAN class. Union SCAN classes are assigned to the PARSE_UNION
-    //		class and at program completion are	exported to a .mgf file for downstream 
-    //		analysis.
+	void set_debug(int set_fpf_spectralsum_DEBUG_MODE) {
+		fpf_spectralsum_DEBUG_MODE = set_fpf_spectralsum_DEBUG_MODE;
+	}
 
-    /*
-     *
-     */
-
-
-
-    class mgf {
-        typedef long double value_type;
-        //
-        //
-
-        typedef size_t size_type;
-        //
-        //
-
-        typedef scan* scan_node_type;
-        //
-        //
-
-        static const size_type PARSE_DEFAULT_ALLOCATION = 200000;
-        //
-        //
-
-
-
-    public:
-
-        mgf(size_type class_size = PARSE_DEFAULT_ALLOCATION) {
-            nt_scan = new scan[class_size];
-            st_capacity = class_size;
-            st_used = size_type();
-            st_union_itr = size_type();
-        };
-
-        mgf(const mgf& mgf);
-
-        ~mgf() {
-            delete[] nt_scan;
-        };
-
-        // OPERATORS
-
-        void operator=(const mgf parse_0) {
-            //mgf* tail_ptr;
-        };
-
-        // MODIFICATION MEMBER FUNCTIONS
-
-        void input_parse(std::ifstream& fin, mgf& parse_0) {
-            char c_inputstream;
-            std::string s_inputstream = "";
-            int switch_inputstream = 0;
-            value_type ss_inputstream;
-            value_type vt_inputstream;
-            value_type vt_inputstream_2;
-			fpf_ion::ion* ion_inputstream;
-            static size_type output_interval = 100;
-            std::cout << "\n\nParsing...\n";
-            while (fin.std::istream::get(c_inputstream)) {
-                if (c_inputstream != '\n') {
-                    s_inputstream += c_inputstream;
-                }
-                if (s_inputstream == "RTINSECONDS=") {
-                    switch_inputstream = 2;
-                    s_inputstream.clear();
-                }
-                if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
-                    std::istringstream(s_inputstream) >> ss_inputstream;
-                    //long double?
-                    vt_inputstream = ss_inputstream;
-                    nt_scan[st_used].set_precursor_rt(vt_inputstream);
-                    s_inputstream.clear();
-                }
-                if ((switch_inputstream == 4) && (c_inputstream == ' ')) {
-                    std::istringstream(s_inputstream) >> ss_inputstream;
-                    //long double?
-                    vt_inputstream = ss_inputstream;
-                    switch_inputstream = 5;
-                    s_inputstream.clear();
-                }
-                if ((switch_inputstream == 5) && (c_inputstream == '\n')) {
-                    std::istringstream(s_inputstream) >> ss_inputstream;
-                    //long double?
-                    vt_inputstream_2 = ss_inputstream;
-                    if (vt_inputstream_2 >= FILTER_FRAGMENT_ION_INTENSITY) {
-                        ion_inputstream = new fpf_ion::ion();
-                        ion_inputstream->set_fragment_ion_mz_vt(vt_inputstream);
-                        ion_inputstream->set_fragment_ion_intensity_st(vt_inputstream_2);
-                        fpf_node::list_insert_tail(ion_inputstream, nt_scan[st_used].return_ion_head_ptr(), nt_scan[st_used].return_ion_tail_ptr());
-                    }
-                    switch_inputstream = 4;
-                    s_inputstream.clear();
-                }
-                if (s_inputstream == "PEPMASS=") {
-                    switch_inputstream = 3;
-                    s_inputstream.clear();
-                }
-                if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
-                    std::istringstream(s_inputstream) >> ss_inputstream;
-                    vt_inputstream = ss_inputstream;
-                    nt_scan[st_used].set_precursor_mass(vt_inputstream);
-                    switch_inputstream = 4;
-                    s_inputstream.clear();
-                }
-                if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
-                    switch_inputstream = 0;
-                    if (nt_scan[st_used].return_precursor_rt() >= FILTER_PRECURSOR_RT) {
-                        ++parse_0.st_used;
-                    }
-                    if ((parse_0.st_used > 0) && (parse_0.st_used % output_interval == 0)) {
-                        std::cout << "\nscan - " << parse_0.st_used << "   retention time - " << ((nt_scan[st_used - 1].return_precursor_rt()) / 60);
-                        if (parse_0.st_used > 2 * output_interval - 1) {
-                            std::cout << "   delta - " << ((nt_scan[st_used - 1].return_precursor_rt()) / 60) - ((nt_scan[st_used - output_interval - 1].return_precursor_rt()) / 60);
-                        }
-                    }
-                }
-                if (c_inputstream == '\n') {
-                    s_inputstream.clear();
-                }
-            }
-            if (parse_0.st_used % output_interval != 0) {
-                std::cout << "\nscan - " << parse_0.st_used << "   retention time - " << ((nt_scan[st_used - 1].return_precursor_rt()) / 60);
-                if (parse_0.st_used > 2 * output_interval - 1) {
-                    std::cout << "   delta - " << ((nt_scan[st_used - 1].return_precursor_rt()) / 60) - ((nt_scan[st_used - output_interval - 1].return_precursor_rt()) / 60);
-                }
-            }
-        };
-        //
-        //
-
-        void mgf_scan_ion_sum(const mgf& c_main) {
-            static size_type st_output_interval = 100;
-            std::cout << "\n\n\nSumming fragment ion spectra...\n";
-            for (size_type i = 0; i < c_main.return_used(); ++i) {
-                scan_ion_sum(c_main.nt_scan[i]);
-                if (fpf_spectralsum_DEBUG_MODE == 0) {
-                    if ((i > 0) && (i % st_output_interval == 0)) {
-                        std::cout << "\nscan - " << i;
-                    }
-                    if (i + 1 == c_main.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                        std::cout << "\nscan - " << c_main.return_used();
-                    }
-                }
-            }
-        };
-
-        void mgf_scan_sum(const mgf& c_main, mgf& c_union) {
-            size_type st_used_prev = size_type();
-            static size_type st_output_interval = 100;
-            bool union_condition = bool();
-            size_type forward_match_false = size_type();
-            size_type forward_match_true = size_type();
-            size_type forward_match_false_matched = size_type();
-            size_type union_false_count = size_type();
-            size_type union_true_count = size_type();
-            c_union.st_union_itr = c_main.st_union_itr + 1;
-            std::cout << "\n\n\nSumming precursor ion spectra...\n";
-            for (size_type i = 0; i < c_main.return_used(); ++i) {
-                for (size_type j = i; j < c_main.return_used(); j) {
-                    if ((i != j) && (union_precursor_mass(c_main.nt_scan[i], c_main.nt_scan[j])) && union_precursor_rt(c_main.nt_scan[i], c_main.nt_scan[j])) {
-                        if (union_fragment_ion_sup_intensities(c_main.nt_scan[i], c_main.nt_scan[j])) {
-                            if (fpf_spectralsum_DEBUG_MODE == 2) {
-                                ++forward_match_true;
-                                std::cout << "\nscan_1 -  mass " << nt_scan[i].return_precursor_mass() << "  retention time " << (nt_scan[i].return_precursor_rt() / 60);
-                                std::cout << " -  scan_2 mass " << nt_scan[j].return_precursor_mass() << "  retention time " << (nt_scan[j].return_precursor_rt() / 60)
-                                        << "   ! scan_1.return_union_b() " << c_main.nt_scan[i].return_union_b() << "  scan_2.return_union_b() " << c_main.nt_scan[j].return_union_b()
-                                        << "  union_precursor_mass() " << union_precursor_mass(c_main.nt_scan[i], c_main.nt_scan[j]) << "  union_precursor_rt() " << union_precursor_rt(c_main.nt_scan[i], c_main.nt_scan[j]);
-                                std::cout << "\n\n--- forward match for scan " << i << " with scan " << j << "   ! forward_match_true " << forward_match_true << "\n\n";
-                            }
-                            c_main.nt_scan[i].set_union_n(true);
-                            c_main.nt_scan[j].set_union_n(true);
-                            c_union.nt_scan[c_union.st_used] = scan_union(c_main.nt_scan[i], c_main.nt_scan[j]);
-                            ++c_union.st_used;
-                            ++union_true_count;
-                            union_condition = true;
-                        } else {
-                            if (fpf_spectralsum_DEBUG_MODE == 2) {
-                                std::cout << "\nscan_1 -  mass " << nt_scan[i].return_precursor_mass() << "  retention time " << (nt_scan[i].return_precursor_rt() / 60);
-                                std::cout << " -  scan_2 mass " << nt_scan[j].return_precursor_mass() << "  retention time " << (nt_scan[j].return_precursor_rt() / 60)
-                                        << "   ! scan_1.return_union_b() " << c_main.nt_scan[i].return_union_b() << "  scan_2.return_union_b() " << c_main.nt_scan[j].return_union_b()
-                                        << "  union_precursor_mass() " << union_precursor_mass(c_main.nt_scan[i], c_main.nt_scan[j]) << "  union_precursor_rt() " << union_precursor_rt(c_main.nt_scan[i], c_main.nt_scan[j]);
-                                std::cout << "\n\n--- partial forward match for scan " << i << " with scan " << j << "  * below fragment ion condition * " << "  ! forward_match_false " << forward_match_false << "\n\n";
-                            }
-                        }
-                    }
-                    if (j + 1 == c_main.return_used()) {
-                        if (!(c_main.nt_scan[i].return_union_b())) {
-                            c_union.nt_scan[c_union.st_used] = c_main.nt_scan[i];
-                            ++c_union.st_used;
-                            ++union_false_count;
-                            ++forward_match_false_matched;
-                        }
-                        ++forward_match_false;
-                        if (fpf_spectralsum_DEBUG_MODE == 2) {
-                            std::cout << "\n--- no forward match for scan " << i << "   ! c_main.nt_scan[i].return_union_b() " << (c_main.nt_scan[i].return_union_b()) << "  forward_match_false " << forward_match_false << "  forward_match_false_matched " << forward_match_false_matched << "\n";
-                        }
-                    }
-                    if (union_condition) {
-                        if (fpf_spectralsum_DEBUG_MODE == 0) {
-                            if ((i > 0) && (i % st_output_interval == 0)) {
-                                std::cout << "\nscan - " << i << "   union itr" << c_union.return_union_itr() << " - matched " << union_true_count;
-                                if (c_main.st_used > 2 * st_output_interval - 1) {
-                                    std::cout << " - delta " << union_true_count - st_used_prev;
-                                }
-                                std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
-                                std::cout << "   retention time - " << ((c_main.nt_scan[i].return_precursor_rt()) / 60);
-                                st_used_prev = union_true_count;
-                            }
-                            if (i + 1 == c_main.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                                std::cout << "\nscan - " << c_main.return_used() << "   union itr" << c_union.return_union_itr() << " -  matched " << union_true_count;
-                                if (c_union.st_used > 2 * st_output_interval - 1) {
-                                    std::cout << " - delta " << union_true_count - st_used_prev;
-                                }
-                                std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
-                                if (c_union.st_used > 2 * st_output_interval - 1) {
-                                    std::cout << "   retention time - " << ((c_main.nt_scan[i].return_precursor_rt()) / 60);
-                                }
-                            }
-                        }
-                        ++i;
-                        ++j;
-                        union_condition = false;
-                    } else {
-                        ++j;
-                    }
-                }
-                if (!union_condition) {
-                    if (fpf_spectralsum_DEBUG_MODE == 0) {
-                        if ((i > 0) && (i % st_output_interval == 0)) {
-                            std::cout << "\nscan - " << i << "   union itr" << c_union.return_union_itr() << " - " << union_true_count;
-                            // here?
-                            if (c_main.st_used > 2 * st_output_interval - 1) {
-                                std::cout << " - delta " << union_true_count - st_used_prev;
-                            }
-                            std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
-                            std::cout << "   retention time - " << ((c_main.nt_scan[i].return_precursor_rt()) / 60);
-                            st_used_prev = union_true_count;
-                        }
-                        if (i + 1 == c_main.return_used() && !((i > 0) && (i % st_output_interval == 0))) {
-                            std::cout << "\nscan - " << c_main.return_used() << "   union itr" << c_union.return_union_itr() << " - " << union_true_count;
-                            if (c_union.st_used > 2 * st_output_interval - 1) {
-                                std::cout << " - delta " << union_true_count - st_used_prev;
-                            }
-                            std::cout << " - unmatched " << union_false_count << " - total " << c_union.st_used;
-                            if (c_union.st_used > 2 * st_output_interval - 1) {
-                                std::cout << "   retention time - " << ((c_main.nt_scan[i].return_precursor_rt()) / 60);
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        //
-        //
-
-        void mgf_scan_ion_reset() {
-            for (size_type i = size_type(); i < return_used(); ++i) {
-                nt_scan[i].set_union_n(false);
-                for (ion_node_type scan_ptr_itr = nt_scan[i].return_ion_head_ptr(); scan_ptr_itr != NULL; scan_ptr_itr = scan_ptr_itr->return_up_node_nt()) {
-                    scan_ptr_itr->return_data_dt()->set_init_fragment_ion_union_b(false);
-                }
-            }
-        }
-
-        // CONSTANT MEMBER FUNCTIONS
-
-        inline const scan_node_type return_scan() const {
-            return nt_scan;
-        };
-
-        inline const size_type return_capacity() const {
-            return st_capacity;
-        };
-
-        inline const size_type return_used() const {
-            return st_used;
-        };
-
-        inline const size_type return_union_itr() const {
-            return st_union_itr;
-        };
-
-        void debug_parse() const {
-            for (size_type i = size_type(); i < return_used(); ++i) {
-                std::cout << "\n" << i;
-                std::cout << "\nnt_scan[i].return_precursor_rt() " << nt_scan[i].return_precursor_rt();
-                std::cout << "\nnt_scan[i].return_precursor_mass() " << nt_scan[i].return_precursor_mass();
-                for (ion_node_type nt_scan_head_ptr = nt_scan[i].return_ion_head_ptr(); nt_scan_head_ptr != NULL; nt_scan_head_ptr = nt_scan_head_ptr->return_up_node_nt()) {
-                    std::cout << "\n" << nt_scan_head_ptr->return_data_dt()->return_fragment_ion_mz() << "  " << nt_scan_head_ptr->return_data_dt()->return_fragment_ion_intensity();
-                }
-            }
-            if (return_used() == 0) {
-                std::cout << "\n\nNo members!";
-            }
-        };
-
-        void cout_mgf() const {
-            for (unsigned i = 0; i < return_used(); ++i) {
-                if (i > 0) {
-                    std::cout << "\nBEGIN IONS";
-                } else {
-                    std::cout << "BEGIN IONS";
-                }
-                std::cout << "\nTITLE=" << "NULL";
-                std::cout << "\nRTINSECONDS=" << nt_scan[i].return_precursor_rt();
-                std::cout << "\nPEPMASS=" << nt_scan[i].return_precursor_mass();
-                for (ion_node_type nt_scan_head_ptr = nt_scan[i].return_ion_head_ptr(); nt_scan_head_ptr != NULL; nt_scan_head_ptr = nt_scan_head_ptr->return_up_node_nt()) {
-                    std::cout << "\n" << nt_scan_head_ptr->return_data_dt()->return_fragment_ion_mz() << "   " << nt_scan_head_ptr->return_data_dt()->return_fragment_ion_intensity() << "   " << nt_scan_head_ptr->return_data_dt()->return_union_count_st();
-                }
-                std::cout << "\nEND IONS";
-            }
-            if (return_used() == 0) {
-                std::cout << "\n\nNo members!";
-            }
-        };
-
-        void fout_mgf(std::ofstream& fout) const {
-            size_type union_false_count = size_type();
-            size_type union_true_count = size_type();
-            std::cout << "\n\n\nOutputting...";
-            for (unsigned i = 0; i < return_used(); ++i) {
-                if (i > 0) {
-                    fout << "\nBEGIN IONS";
-                } else {
-                    fout << "BEGIN IONS";
-                }
-                fout << "\nTITLE=" << "NULL";
-                fout << "\nRTINSECONDS=" << nt_scan[i].return_precursor_rt();
-                fout << "\nPEPMASS=" << nt_scan[i].return_precursor_mass();
-                if (fpf_spectralsum_DEBUG_MODE >= 1) {
-                    if (!nt_scan[i].return_union_b()) {
-                        ++union_false_count;
-                    }
-                    if (nt_scan[i].return_union_b()) {
-                        ++union_true_count;
-                    }
-                    fout << " # " << i << "   ! nt_scan[i].return_union_b() " << nt_scan[i].return_union_b() << " nt_scan[i].return_scan_union_count() " << nt_scan[i].return_scan_union_count() <<  "   ! union_false_count " << union_false_count << "  union_true_count " << union_true_count;
-                }
-                for (ion_node_type nt_scan_itr = nt_scan[i].return_ion_head_ptr(); nt_scan_itr != NULL; nt_scan_itr = nt_scan_itr->return_up_node_nt()) {
-                    fout << "\n" << nt_scan_itr->return_data_dt()->return_fragment_ion_mz() << " " << nt_scan_itr->return_data_dt()->return_fragment_ion_intensity();
-                    if (fpf_spectralsum_DEBUG_MODE >= 1) {
-                        fout << "  ! nt_scan_itr->return_data_dt()->return_union_init_b() " << nt_scan_itr->return_data_dt()->return_union_init_b() << "  nt_scan_itr->return_data_dt()->return_union_count_st() " << nt_scan_itr->return_data_dt()->return_union_count_st();
-                    }
-                }
-                fout << "\nEND IONS";
-            }
-            if (return_used() == 0) {
-                std::cout << "\n\nNo members!";
-            }
-        };
-
-    private:
-        scan_node_type nt_scan;
-        size_type st_capacity;
-        size_type st_used;
-        size_type st_union_itr;
-    };
-
-
-    //
-    //   * * FUNCTIONS * *
-    //
-
+	//void debug_parse(mgf& c_mgf) {
+	//	mgf::size_type st_count_itr = mgf::size_type();
+	//	for (mgf::scan_node_type nt_scan_itr_ptr = c_mgf.nt_return_scan_head_ptr(); nt_scan_itr_ptr != NULL; nt_scan_itr_ptr = nt_scan_itr_ptr->return_up_node_nt()) {
+	//		std::cout << "\n" << st_count_itr;
+	//		std::cout << "\nnt_scan[i].nt_return_precursor_rt() " << nt_scan_itr_ptr->return_data_dt()->nt_return_precursor_rt;
+	//		std::cout << "\nnt_scan[i].nt_return_precursor_mass() " << nt_scan_itr_ptr->return_data_dt()->nt_return_precursor_mz;
+	//		for (fpf_scan::scan::ion_node_type nt_ion_ptr_itr = nt_scan_itr_ptr->return_data_dt()->nt_return_ion_head_ptr; nt_ion_ptr_itr != NULL; nt_ion_ptr_itr = nt_ion_ptr_itr->return_up_node_nt()) {
+	//			std::cout << "\n" << nt_ion_ptr_itr->return_data_dt()->return_fragment_ion_mz() << "  " << nt_ion_ptr_itr->return_data_dt()->return_fragment_ion_intensity();
+	//		}
+	//		++st_count_itr;
+	//	}
+	//	if (st_count_itr == 0) {
+	//		std::cout << "\n\nNo members!";
+	//	}
+	//};
 }
 
 #endif
