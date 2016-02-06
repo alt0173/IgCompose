@@ -17,7 +17,7 @@ namespace fpf_ion {
 	//
 
 
-	typedef long double value_type;
+	typedef double value_type;
 	//
 	//
 
@@ -116,13 +116,13 @@ namespace fpf_ion {
 		//
 
 		inline static bool union_fragment_ion_mz(const data_type& d_ion_itr_1, const data_type& d_ion_itr_2) {
-			return ((d_ion_itr_1->return_fragment_ion_mz() < d_ion_itr_2->return_fragment_ion_mz() + CONDITION_FRAGMENT_ION_MZ) && (d_ion_itr_1->return_fragment_ion_mz() > d_ion_itr_2->return_fragment_ion_mz() - CONDITION_FRAGMENT_ION_MZ));
+			return ((d_ion_itr_1->return_fragment_ion_mz() <= d_ion_itr_2->return_fragment_ion_mz() + CONDITION_FRAGMENT_ION_MZ) && (d_ion_itr_1->return_fragment_ion_mz() >= d_ion_itr_2->return_fragment_ion_mz() - CONDITION_FRAGMENT_ION_MZ));
 		};
 		//
 		//
 
-		inline static bool union_fragment_ion_mz_boundconst(const data_type& d_ion_itr_1, const data_type& d_ion_itr_1_hold) {
-			return (d_ion_itr_1->return_fragment_ion_mz() < d_ion_itr_1_hold->return_fragment_ion_mz() + (CONDITION_FRAGMENT_ION_MZ * 1.1) && (d_ion_itr_1->return_fragment_ion_mz() > d_ion_itr_1_hold->return_fragment_ion_mz() - (CONDITION_FRAGMENT_ION_MZ * 1.1)));
+		inline static bool union_fragment_ion_mz_boundconst(const data_type& d_ion_itr_1, const data_type& d_ion_itr_2) {
+			return (d_ion_itr_1->return_fragment_ion_mz() <= d_ion_itr_2->return_fragment_ion_mz() + (CONDITION_FRAGMENT_ION_MZ * 1.1) && (d_ion_itr_1->return_fragment_ion_mz() >= d_ion_itr_2->return_fragment_ion_mz() - (CONDITION_FRAGMENT_ION_MZ * 1.1)));
 		};
 		//
 		//
