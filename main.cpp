@@ -4,7 +4,7 @@
  */
 
 
- /*	IgCompose v.3.5.0
+ /*	IgCompose v.6.4.0
   *
   *
   *
@@ -17,7 +17,7 @@
 #include "fpf_spectralsum.h"
 
 
-const std::string version = "v.3.5.0";
+const std::string version = "v.6.4.0";
 
 static int DEBUG_MODE = int();
 
@@ -30,32 +30,37 @@ int main() {
 	std::cin >> s_input_file;
 	std::ifstream fin_input(s_input_file);
 
-	//std::cout << "\n\nInput file?\n\n";
-	//std::string s_input_file_2;
-	//std::cin >> s_input_file_2;
-	//std::ifstream fin_input_2(s_input_file_2);
+	std::cout << "\n\nInput file?\n\n";
+	std::string s_input_file_2;
+	std::cin >> s_input_file_2;
+	std::ifstream fin_input_2(s_input_file_2);
 
-	//std::cout << "\n\nInput file?\n\n";
-	//std::string s_input_file_3;
-	//std::cin >> s_input_file_3;
-	//std::ifstream fin_input_3(s_input_file_3);
+	std::cout << "\n\nInput file?\n\n";
+	std::string s_input_file_3;
+	std::cin >> s_input_file_3;
+	std::ifstream fin_input_3(s_input_file_3);
 
-	std::cout << "\n\ndebug mode for fpf_spectralsum_h.h?\n\n";
+	std::cout << "\n\nInput file?\n\n";
+	std::string s_input_file_4;
+	std::cin >> s_input_file_4;
+	std::ifstream fin_input_4(s_input_file_4);
+
+	std::cout << "\n\ndebug mode?\n\n";
 	std::cin >> DEBUG_MODE;
 	fpf_spectralsum::set_debug(DEBUG_MODE);
 	fpf_scan::set_debug(DEBUG_MODE);
 
-	fpf_spectralsum::mgf init_mgf = fpf_spectralsum::mgf();
-	init_mgf.input_parse(fin_input, init_mgf);
-	//init_mgf.input_parse(fin_input_2, init_mgf);
-	//init_mgf.input_parse(fin_input_3, init_mgf);
+	fpf_spectralsum::mgf* init_mgf = new fpf_spectralsum::mgf();
+	init_mgf->input_parse(fin_input, init_mgf);
+	init_mgf->input_parse(fin_input_2, init_mgf);
+	//init_mgf->input_parse(fin_input_3, init_mgf);
+	//init_mgf->input_parse(fin_input_4, init_mgf);
 	if (DEBUG_MODE == 4) {
 		//init_mgf.debug_parse();
 	}
 
-	fpf_spectralsum::mgf union_parse = fpf_spectralsum::mgf();
-	init_mgf.mgf_scan_ion_sum(init_mgf);
-	init_mgf.mgf_scan_sum(init_mgf);
+	init_mgf->mgf_scan_ion_sum(init_mgf);
+	init_mgf->mgf_scan_sum(init_mgf);
 	if (DEBUG_MODE == 4) {
 		//union_parse.debug_parse();
 	}
@@ -67,7 +72,7 @@ int main() {
 	std::string s_output_file = "output.mgf";
 	std::ofstream output_fout;
 	output_fout.open(s_output_file);
-	union_parse.fout_mgf(output_fout, union_parse);
+	init_mgf->fout_mgf(output_fout, init_mgf);
 
 	std::string pong;
 	std::cout << "\n\n - \n - \n - ";
