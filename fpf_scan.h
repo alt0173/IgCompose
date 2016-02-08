@@ -1,4 +1,3 @@
-#pragma once
 /*
 *	File:   fpf_spectralsum.h
 *	Author: Lukah Dykes
@@ -44,42 +43,27 @@ namespace fpf_scan {
 	//
 	//
 
-	const size_type CONDITION_FRAGMENT_ION_SUP = 4;
+	const size_type CONDITION_FRAGMENT_ION_SUP = 5;
 	//
 	//
 
-	//
-	// * * STATIC VARIABLES * * 
-	//
-
-
-	static const value_type CONDITION_PRECURSOR_MASS = 0.0125;
+	static const value_type CONDITION_PRECURSOR_MASS = 4;
 	//
 	//
 
-	static const value_type CONDITION_PRECURSOR_RT = 150;
+	static const value_type CONDITION_PRECURSOR_RT = 300;
 	//
 	//		scan::CONDITION_PRECURSOR_RT defines the delta-range of retention
 	//		time to determine if two classes are suitable for spectral summing. 
 	//		It can be program-defined, or called from an external source.
 
-	static const size_type CONDITION_COUNT_FRAGMENT_SUP = 7;
+	static const size_type CONDITION_COUNT_FRAGMENT_SUP = 10;
 	//
 	//
 
 	class scan {
 		//
-		//		A SCAN class is a collection of doubles that contain the precursor mass,
-		//		precursor charge, mass-to-charge ratio, and retention time. SCAN classes 
-		//		are linked to the corresponding fragment ions through a pointer
-		//		assignment to an IONS class. The associated IONS class contains as a 
-		//		dynamic array of doubles the transition ions of the respective SCAN class 
-		//		element(s). Should two or more SCAN classes be determined to be suitable
-		//		for spectral summing, as tested by bool conditions, the union of 
-		//		these classes is created in a new SCAN class. SCAN classes created 
-		//		through the union process are identifiable by bool value. The 
-		//		collection of union created SCAN classes are exported to a .mgf file at 
-		//		program completion.
+		//
 
 	public:
 
@@ -239,7 +223,7 @@ namespace fpf_scan {
 				std::cout << " " << scan_1_fragment_ion_sup[i]->return_fragment_ion_intensity() << " " << scan_1_fragment_ion_sup[i]->return_fragment_ion_mz() << "   ";
 			}
 			for (size_t j = 0; j < CONDITION_COUNT_FRAGMENT_SUP; ++j) {
-				if (fpf_ion::ion::union_fragment_ion_mz(scan_1_fragment_ion_sup[i], scan_2_fragment_ion_sup[j])) {
+				if (fpf_ion::ion::union_fragment_ion_mz(scan_1_fragment_ion_sup[i], scan_2_fragment_ion_sup[j]) && (scan_1_fragment_ion_sup[i]->return_fragment_ion_mz() != 0) && (scan_1_fragment_ion_sup[j]->return_fragment_ion_mz() != 0)) {
 					++count_ion_sup_intensity;
 				}
 			}
@@ -264,7 +248,7 @@ namespace fpf_scan {
 		size_type count_scan_ion_sum = size_type();
 		for (ion_node_type nt_ion_itr = c_scan_ptr->nt_return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
 			for (ion_node_type nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr(); nt_ion_itr_2 != NULL; nt_ion_itr_2 = nt_ion_itr_2->return_up_node_nt()) {
-				if ((nt_ion_itr != nt_ion_itr_2) && fpf_ion::ion::union_fragment_ion_mz_boundconst(nt_ion_itr->dt_return_data(), nt_ion_itr_2->dt_return_data())) {					
+				if ((nt_ion_itr != nt_ion_itr_2) && fpf_ion::ion::union_fragment_ion_mz_boundconst(nt_ion_itr->dt_return_data(), nt_ion_itr_2->dt_return_data())) {
 					d_ion_union->set_fragment_ion_mz_vt(fpf_ion::return_mean_ion_mz_vt(nt_ion_itr->dt_return_data(), nt_ion_itr_2->dt_return_data()));
 					d_ion_union->set_fragment_ion_intensity_st(fpf_ion::return_sum_ion_intensity_st(nt_ion_itr->dt_return_data(), nt_ion_itr_2->dt_return_data()));
 					d_ion_union->set_union_count_st(fpf_ion::return_sum_ion_union_count_st(nt_ion_itr->dt_return_data(), nt_ion_itr_2->dt_return_data()));
@@ -274,7 +258,7 @@ namespace fpf_scan {
 						for (ion_node_type nt_output_ion_itr = c_scan_ptr->nt_return_ion_head_ptr(); nt_output_ion_itr != NULL; nt_output_ion_itr = nt_output_ion_itr->return_up_node_nt()) {
 							std::cout << " " << nt_output_ion_itr->dt_return_data()->return_fragment_ion_mz();
 						}
-					}					
+					}
 					fpf_node::list_insert_up<ion_data_type>(d_ion_union, nt_ion_itr_2, c_scan_ptr->nt_return_ion_head_ptr(), c_scan_ptr->nt_return_ion_tail_ptr());
 					++count_scan_ion_sum;
 					d_ion_union = new fpf_ion::ion();
@@ -308,7 +292,7 @@ namespace fpf_scan {
 							if (fpf_scan_DEBUG_MODE == 3) {
 								std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr)  (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
 							}
-							nt_ion_itr = nt_ion_itr->return_up_node_nt()->return_up_node_nt();							
+							nt_ion_itr = nt_ion_itr->return_up_node_nt()->return_up_node_nt();
 							fpf_node::list_remove_head<ion_data_type>(c_scan_ptr->nt_return_ion_head_ptr());
 							fpf_node::list_remove_head<ion_data_type>(c_scan_ptr->nt_return_ion_head_ptr());
 							nt_hold_ion_head_ptr = nt_ion_itr;
@@ -325,7 +309,7 @@ namespace fpf_scan {
 							fpf_node::list_remove<ion_data_type>(nt_hold_ion);
 							nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr();
 						}
-					}					
+					}
 				}
 				else {
 					if (fpf_scan_DEBUG_MODE == 3) {
