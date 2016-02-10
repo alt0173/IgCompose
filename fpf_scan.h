@@ -1,375 +1,168 @@
 /*
-*	File:   fpf_spectralsum.h
-*	Author: Lukah Dykes
-*/
+ *	File:   fpf_ion.h
+ *	Author: Lukah Dykes
+ */
 
+ // --- namespace fpf_ion class fpf_ion::ion
+ //
+ // namespace fpf_node contains object definitions for the fpf_node::node class.
+ // fpf_node::node provides functionality for a doubly linked list, which is
+ // templated for any standard C++ data type or an object with a copy
+ // constructor and assignment operator.
 
-
-#ifndef FPF_SCAN
-#define	FPF_SCAN
+#ifndef FPF_ION
+#define	FPF_ION
 #include <cstdlib> // provides - size_t, NULL
-#include <iostream> // provides - std::cin, std::cout
-#include "fpf_node.h"
-#include "fpf_ion.h"
 
-namespace fpf_scan {
+namespace fpf_ion {
 
-	typedef double value_type;
-	//
-	//		scan::value_type is the data type of elements of the SCAN class. It may 
-	//		be any C++ built-in type, or an object with a default constructor,
-	//		assignment operator, and equality operators.
-
-	typedef size_t size_type;
-	//
-	//		scan::size_type is the data type of any variable that is assigned to
-	//		enumerate quantity at run-time.
-
-	typedef fpf_node::node<fpf_ion::ion*>* ion_node_type;
-	//
-	//
-
-	typedef fpf_ion::ion* ion_data_type;
-	//
-	//
-
-
-	//
-	// * * SCOPE VARIABLES * * 
-	//
-
-
-	static int fpf_scan_DEBUG_MODE;
-	//
-	//
-
-	const size_type CONDITION_FRAGMENT_ION_SUP = 5;
-	//
-	//
-
-	static const value_type CONDITION_PRECURSOR_MASS = 0.025;
-	//
-	//
-
-	static const value_type CONDITION_PRECURSOR_RT = 300;
-	//
-	//		scan::CONDITION_PRECURSOR_RT defines the delta-range of retention
-	//		time to determine if two classes are suitable for spectral summing. 
-	//		It can be program-defined, or called from an external source.
-
-	static const size_type CONDITION_COUNT_FRAGMENT_SUP = 10;
-	//
-	//
-
-	class scan {
-		//
-		//
-
+	class ion {
 	public:
 
+		typedef ion* data_type;
+		// Defines fpf_ion::ion::data_type as a pointer to a fpf_ion::ion class.
+
+		typedef double value_type;
+		// Defines fpf_ion::ion::value_type as any standard C++ data type.
+
+		typedef size_t size_type;
+		// Defines fpf_ion::ion::size_type as a size_t type. Requires <cstdlib>.
+
+		typedef bool bool_type;
+		// Defines fpf_ion::ion::bool_type as a bool type.
+
+		ion(const value_type& vt_init_fragment_ion_mz = value_type(), const size_type& st_init_fragment_ion_int = size_type(), size_type st_init_union_count = 1, bool bt_init_union_init = bool_type()) {
+			vt_fragment_ion_mz = vt_init_fragment_ion_mz;
+			st_fragment_ion_intensity = st_init_fragment_ion_int;
+			st_union_count = st_init_union_count;
+			bt_union_init = bt_init_union_init;
+		};
+		// Defines a constructor call for fpf_ion::ion that assigns declared
+		// parameters as initial values or calls default values as ISO type defaults.
 
 		//
-		// * * CONSTRUCTORS * * 
 		//
-
-
-		scan() {
-			vt_precursor_mass = value_type();
-			vt_precursor_rt = value_type();
-			nt_ion_head_ptr = NULL;
-			nt_ion_tail_ptr = NULL;
-			b_union = bool();
-			st_scan_union_count = 1;
-		};
-
-		~scan() {
-		};
-
-
-		//
-		// * * MEMBER FUNCTIONS * * 
-		//
-
-
-		inline void set_precursor_mass(value_type vt_set_precursor_mass) {
-			vt_precursor_mass = vt_set_precursor_mass;
-		};
-
-		inline void set_precursor_rt(value_type vt_set_precursor_rt) {
-			vt_precursor_rt = vt_set_precursor_rt;
-		};
-
-		inline void set_union_n(bool b_new_union) {
-			b_union = b_new_union;
-		};
-
-		inline void set_scan_union_count(size_type st_scan_union_cout) {
-			st_scan_union_count = st_scan_union_cout;
-		};
-
-		scan operator+(const scan& scan_1);
-
-
-		//
-		// * * CONSTANT MEMBER FUNCTIONS * * 
-		//
-
-
-		inline const value_type nt_return_precursor_mass() const {
-			return vt_precursor_mass;
-		};
-		//		Returns the precursor mass of a SCAN class.
-		//
-
-		inline const value_type nt_return_precursor_rt() const {
-			return vt_precursor_rt;
-		};
-		//		Returns the precursor retention time of a SCAN class.
-		//
-
-
-		inline ion_node_type& nt_return_ion_head_ptr() {
-			return nt_ion_head_ptr;
-		};
-		//		Returns a head pointer to a linked lift of ION classes for the 
-		//		associated SCAN class. The pointer directs to the head node of 
-		//		a linked list.
-
-		inline ion_node_type& nt_return_ion_tail_ptr() {
-			return nt_ion_tail_ptr;
-		};
-		//		Returns a tail pointer to a linked lift of ION classes for the 
-		//		associated SCAN class. The pointer directs to the head node of 
-		//		a linked list.
-
-		inline bool& return_union_b() {
-			return b_union;
-		};
+		//   * * MODIFICATION MEMBER FUNCTIONS * *
 		//
 		//
 
-		inline size_type return_scan_union_count() {
-			return st_scan_union_count;
+		inline void set_fragment_ion_mz_vt(const value_type& vt_new_fragment_ion_mz) {
+			vt_fragment_ion_mz = vt_new_fragment_ion_mz;
 		};
+		// Assigns a fpf_ion::ion::value_type to fpf_ion::ion::vt_fragment_ion_mz.
+
+		inline void set_fragment_ion_intensity_st(const size_type& st_new_fragment_ion_int) {
+			st_fragment_ion_intensity = st_new_fragment_ion_int;
+		};
+		// Assigns a fpf_ion::ion::size_type to fpf_ion::ion::st_fragment_ion_intensity.
+
+		inline void set_union_count_st(size_type st_new_union_count) {
+			st_union_count = st_new_union_count;
+		};
+		// Assigns a fpf_ion::ion::size_type to fpf_ion::ion::st_union_count.
+
+		inline void set_init_fragment_ion_union_b(bool_type b_new_union_init) {
+			bt_union_init = b_new_union_init;
+		};
+		// Assigns a fpf_ion::ion::bool_type to fpf_ion::ion::bt_union_init.
+
 		//
 		//
+		//   * * PRIVATE MEMBER ACCESS FUNCTIONS * *
+		//
+		//
+
+		inline value_type return_fragment_ion_mz() const {
+			return vt_fragment_ion_mz;
+		};
+		// Returns fpf_ion::ion::vt_fragment_ion_mz.
+
+		inline size_type return_fragment_ion_intensity() const {
+			return st_fragment_ion_intensity;
+		};
+		// Returns fpf_ion::ion::st_fragment_ion_intensity.
+
+		inline size_type return_union_count_st() const {
+			return st_union_count;
+		};
+		// Returns fpf_ion::ion::st_union_count.
+
+		inline bool_type return_union_init_b() const {
+			return bt_union_init;
+		};
+		// Returns fpf_ion::ion::bt_union_init.
 
 	private:
-		value_type vt_precursor_mass;
-		value_type vt_precursor_rt;
-		ion_node_type nt_ion_head_ptr;
-		ion_node_type nt_ion_tail_ptr;
-		bool b_union;
-		size_type st_scan_union_count;
-	};
+		value_type vt_fragment_ion_mz;
+		// fpf_ion::ion::vt_fragment_ion_mz is a fpf_ion::ion::value_type data
+		// type. It can be any standard C++ data type. vt_fragment_ion_mz stores
+		// the value of a fragment ion mass-to-charge ratio in a fpf_ion::ion class.
 
+		size_type st_fragment_ion_intensity;
+		// fpf_ion::ion::st_fragment_ion_intensity is a fpf_ion::ion::size_type
+		// data type. st_fragment_ion_intensity stores the value of a fragment
+		// ion detected intensity in a fpf_ion::ion class.
+
+		size_type st_union_count;
+		// fpf_ion::ion::st_union_count is a fpf_ion::ion::size_type data type.
+		// st_union_count counts the quantity of ion classes that have been
+		// combined to create the current fpf_ion::ion class - an unsummed ion
+		// class has a value of 1, an ion class having undergone one iteration
+		// of summing has a value 2, and onwards.
+
+		bool_type bt_union_init;
+		// fpf_ion::ion::bt_union_init is a fpf_ion::ion::bool_type data type.
+		// bt_union_init is true if the fpf_ion::ion class has undergone an
+		// iteration of spectral summing. The default value of bt_union_init is false.
+	};
 
 	//
-	// * * FUNCTIONS * * 
+	//
+	//   * * FUNCTIONS * *
+	//
 	//
 
+	const ion::value_type CONDITION_FRAGMENT_ION_MZ = 0.025;
+	// fpf_ion::CONDITION_FRAGMENT_ION_MZ is a const ion::value_type with a
+	// compile-time or run-time initialised value that defines the fragment ion
+	// mass-to-charge ratio range for spectral summing.
 
-	void set_debug(int set_fpf_scan_DEBUG_MODE) {
-		fpf_scan_DEBUG_MODE = set_fpf_scan_DEBUG_MODE;
-	}
-
-	inline bool union_precursor_mass(const scan* scan_1, const scan* scan_2) {
-		return ((scan_1->nt_return_precursor_mass() <= scan_2->nt_return_precursor_mass() + CONDITION_PRECURSOR_MASS) && (scan_1->nt_return_precursor_mass() >= scan_2->nt_return_precursor_mass() - CONDITION_PRECURSOR_MASS) || scan_1->nt_return_precursor_mass() == scan_2->nt_return_precursor_mass());
+	inline static ion::bool_type union_fragment_ion_mz(const ion::data_type& d_ion_itr_1, const ion::data_type& d_ion_itr_2) {
+		return ((d_ion_itr_1->return_fragment_ion_mz() <= d_ion_itr_2->return_fragment_ion_mz() + CONDITION_FRAGMENT_ION_MZ) && (d_ion_itr_1->return_fragment_ion_mz() >= d_ion_itr_2->return_fragment_ion_mz() - CONDITION_FRAGMENT_ION_MZ));
 	};
-	//		Returns TRUE if the precursor masses of two SCAN classes 
-	//		are within the delta-value range defined by CONDITION_PRECURSOR_MASS.
+	// fpf_ion::union_fragment_ion_mz is a fpf_ion::ion::bool_type return
+	// function that returns true if two compared fpf_ion::ion classes have
+	// fpf_ion::ion::vt_fragment_ion_mz values within a range of
+	// fpf_ion::CONDITION_FRAGMENT_ION_MZ. This function has two primary roles - A return of true is indicative that
+	// 1. two fragment ions are consitwo fragment ion mass-to-charge ratios are suitable for spectral summing.
 
-	inline bool union_precursor_rt(const scan* scan_1, const scan* scan_2) {
-		return ((scan_1->nt_return_precursor_rt() <= scan_2->nt_return_precursor_rt() + CONDITION_PRECURSOR_RT) && (scan_1->nt_return_precursor_rt() >= scan_2->nt_return_precursor_rt() - CONDITION_PRECURSOR_RT));
-	};
-	//		Returns TRUE if the retention times of two SCAN classes are within the 
-	//		delta-value range defined by CONDITION_RETENTION_TIME.
-
-	bool union_fragment_ion_sup_intensities(scan* scan_1, scan* scan_2) {
-		ion_data_type default_ion = new fpf_ion::ion();
-		ion_data_type scan_1_fragment_ion_sup[CONDITION_COUNT_FRAGMENT_SUP];
-		ion_data_type scan_2_fragment_ion_sup[CONDITION_COUNT_FRAGMENT_SUP];
-		ion_data_type hold_fragment_ion_sup_intensity = new fpf_ion::ion();
-		size_type count_ion_sup_intensity = size_type();
-		for (size_t i = 0; i < CONDITION_COUNT_FRAGMENT_SUP; ++i) {
-			for (ion_node_type scan_1_ptr_itr = scan_1->nt_return_ion_head_ptr(); scan_1_ptr_itr != NULL; scan_1_ptr_itr = scan_1_ptr_itr->return_up_node_nt()) {
-				if ((i > 0) && (scan_1_ptr_itr->dt_return_data()->return_fragment_ion_intensity() <= scan_1_fragment_ion_sup[i - 1]->return_fragment_ion_intensity()) && (scan_1_ptr_itr->dt_return_data()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity()) && (scan_1_ptr_itr->dt_return_data()->return_fragment_ion_mz() != scan_1_fragment_ion_sup[i - 1]->return_fragment_ion_mz())) {
-					hold_fragment_ion_sup_intensity = scan_1_ptr_itr->dt_return_data();
-				}
-				if ((i == 0) && (scan_1_ptr_itr->dt_return_data()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity())) {
-					hold_fragment_ion_sup_intensity = scan_1_ptr_itr->dt_return_data();
-				}
-			}
-			scan_1_fragment_ion_sup[i] = hold_fragment_ion_sup_intensity;
-			hold_fragment_ion_sup_intensity = default_ion;
-		}
-		for (size_t i = 0; i < CONDITION_COUNT_FRAGMENT_SUP; ++i) {
-			for (ion_node_type scan_2_ptr_itr = scan_2->nt_return_ion_head_ptr(); scan_2_ptr_itr != NULL; scan_2_ptr_itr = scan_2_ptr_itr->return_up_node_nt()) {
-				if ((i > 0) && (scan_2_ptr_itr->dt_return_data()->return_fragment_ion_intensity() <= scan_2_fragment_ion_sup[i - 1]->return_fragment_ion_intensity()) && (scan_2_ptr_itr->dt_return_data()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity()) && (scan_2_ptr_itr->dt_return_data()->return_fragment_ion_mz() != scan_2_fragment_ion_sup[i - 1]->return_fragment_ion_mz())) {
-					hold_fragment_ion_sup_intensity = scan_2_ptr_itr->dt_return_data();
-				}
-				if ((i == 0) && (scan_2_ptr_itr->dt_return_data()->return_fragment_ion_intensity() >= hold_fragment_ion_sup_intensity->return_fragment_ion_intensity())) {
-					hold_fragment_ion_sup_intensity = scan_2_ptr_itr->dt_return_data();
-				}
-			}
-			scan_2_fragment_ion_sup[i] = hold_fragment_ion_sup_intensity;
-			hold_fragment_ion_sup_intensity = default_ion;
-		}
-		if (fpf_scan_DEBUG_MODE == 6) {
-			std::cout << "\n\n";
-		}
-		for (size_t i = 0; i < CONDITION_COUNT_FRAGMENT_SUP; ++i) {
-			if (fpf_scan_DEBUG_MODE == 6) {
-				std::cout << " " << scan_1_fragment_ion_sup[i]->return_fragment_ion_intensity() << " " << scan_1_fragment_ion_sup[i]->return_fragment_ion_mz() << "   ";
-			}
-			for (size_t j = 0; j < CONDITION_COUNT_FRAGMENT_SUP; ++j) {
-				if (fpf_ion::union_fragment_ion_mz(scan_1_fragment_ion_sup[i], scan_2_fragment_ion_sup[j]) && (scan_1_fragment_ion_sup[i]->return_fragment_ion_mz() != 0) && (scan_1_fragment_ion_sup[j]->return_fragment_ion_mz() != 0)) {
-					++count_ion_sup_intensity;
-				}
-			}
-		}
-		if (fpf_scan_DEBUG_MODE == 6) {
-			std::cout << "\n\n";
-			for (size_t j = 0; j < CONDITION_COUNT_FRAGMENT_SUP; ++j) {
-				std::cout << " " << scan_2_fragment_ion_sup[j]->return_fragment_ion_intensity() << " " << scan_2_fragment_ion_sup[j]->return_fragment_ion_mz() << "   ";
-			}
-			std::cout << "! count_ion_sup_intensity " << count_ion_sup_intensity << "\n";
-			// << "  (count_ion_sup_intensity >= CONDITION_FRAGMENT_ION_SUP) " << (count_ion_sup_intensity >= CONDITION_FRAGMENT_ION_SUP) << "\n";
-		}
-		return (count_ion_sup_intensity >= CONDITION_FRAGMENT_ION_SUP);
+	inline ion::value_type return_mean_ion_mz_vt(ion* ion_1, ion* ion_2) {
+		return (((ion_1->return_union_count_st() * (ion_1->return_fragment_ion_mz())) + ((ion_2->return_union_count_st()) * (ion_2->return_fragment_ion_mz()))) / (ion_1->return_union_count_st() + (ion_2->return_union_count_st())));
 	};
 	//
 	//
 
-	size_type scan_ion_sum(scan* c_scan_ptr) {
-		ion_node_type nt_hold_ion = ion_node_type();
-		ion_node_type nt_hold_ion_head_ptr = c_scan_ptr->nt_return_ion_head_ptr();
-		ion_data_type d_ion_union = new fpf_ion::ion();
-		size_type count_scan_ion_sum = size_type();
-		for (ion_node_type nt_ion_itr_1 = c_scan_ptr->nt_return_ion_head_ptr(); nt_ion_itr_1 != NULL; nt_ion_itr_1 = nt_ion_itr_1->return_up_node_nt()) {
-			for (ion_node_type nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr(); nt_ion_itr_2 != NULL; nt_ion_itr_2 = nt_ion_itr_2->return_up_node_nt()) {
-				if ((nt_ion_itr_1 != nt_ion_itr_2) && fpf_ion::union_fragment_ion_mz(nt_ion_itr_1->dt_return_data(), nt_ion_itr_2->dt_return_data())) {
-					d_ion_union->set_fragment_ion_mz_vt(fpf_ion::return_mean_ion_mz_vt(nt_ion_itr_1->dt_return_data(), nt_ion_itr_2->dt_return_data()));
-					d_ion_union->set_fragment_ion_intensity_st(fpf_ion::return_sum_ion_intensity_st(nt_ion_itr_1->dt_return_data(), nt_ion_itr_2->dt_return_data()));
-					d_ion_union->set_union_count_st(fpf_ion::return_sum_ion_union_count_st(nt_ion_itr_1->dt_return_data(), nt_ion_itr_2->dt_return_data()));
-					if (fpf_scan_DEBUG_MODE == 3) {
-						std::cout << "\n" << nt_ion_itr_1->dt_return_data()->return_fragment_ion_mz() << " " << nt_ion_itr_2->dt_return_data()->return_fragment_ion_mz() << " " << fpf_ion::return_mean_ion_mz_vt(nt_ion_itr_1->dt_return_data(), nt_ion_itr_2->dt_return_data());
-						std::cout << "   ! ";
-						for (ion_node_type nt_output_ion_itr = c_scan_ptr->nt_return_ion_head_ptr(); nt_output_ion_itr != NULL; nt_output_ion_itr = nt_output_ion_itr->return_up_node_nt()) {
-							std::cout << " " << nt_output_ion_itr->dt_return_data()->return_fragment_ion_mz();
-						}
-					}
-					fpf_node::list_insert_up<ion_data_type>(d_ion_union, nt_ion_itr_2, c_scan_ptr->nt_return_ion_head_ptr(), c_scan_ptr->nt_return_ion_tail_ptr());
-					++count_scan_ion_sum;
-					d_ion_union = new fpf_ion::ion();
-					if (nt_ion_itr_1 != nt_hold_ion_head_ptr) {
-						if (nt_ion_itr_1->return_up_node_nt() == nt_ion_itr_2) {
-							if (fpf_scan_DEBUG_MODE == 3) {
-								std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr)  (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-							}
-							nt_hold_ion = nt_ion_itr_1;
-							nt_ion_itr_1 = nt_ion_itr_1->return_up_node_nt()->return_up_node_nt();
-							fpf_node::list_remove<ion_data_type>(nt_hold_ion);
-							nt_hold_ion = nt_ion_itr_2;
-							fpf_node::list_remove<ion_data_type>(nt_hold_ion);
-							nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr();
-						}
-						else {
-							if (fpf_scan_DEBUG_MODE == 3) {
-								std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr)  !(nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-							}
-							nt_hold_ion = nt_ion_itr_1;
-							nt_ion_itr_1 = nt_ion_itr_1->return_up_node_nt();
-							fpf_node::list_remove<ion_data_type>(nt_hold_ion);
-							nt_hold_ion = nt_ion_itr_2;
-							fpf_node::list_remove<ion_data_type>(nt_hold_ion);
-							nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr();
-
-						}
-					}
-					else {
-						if (nt_ion_itr_1->return_up_node_nt() == nt_ion_itr_2) {
-							if (fpf_scan_DEBUG_MODE == 3) {
-								std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr)  (nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-							}
-							nt_ion_itr_1 = nt_ion_itr_1->return_up_node_nt()->return_up_node_nt();
-							fpf_node::list_remove_head<ion_data_type>(c_scan_ptr->nt_return_ion_head_ptr());
-							fpf_node::list_remove_head<ion_data_type>(c_scan_ptr->nt_return_ion_head_ptr());
-							nt_hold_ion_head_ptr = nt_ion_itr_1;
-							nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr();
-						}
-						else {
-							if (fpf_scan_DEBUG_MODE == 3) {
-								std::cout << "   !(nt_ion_itr != nt_hold_ion_head_ptr)  !(nt_ion_itr->return_up_node_nt() == nt_ion_itr_2)";
-							}
-							nt_ion_itr_1 = nt_ion_itr_1->return_up_node_nt();
-							fpf_node::list_remove_head<ion_data_type>(c_scan_ptr->nt_return_ion_head_ptr());
-							nt_hold_ion_head_ptr = nt_ion_itr_1;
-							nt_hold_ion = nt_ion_itr_2;
-							fpf_node::list_remove<ion_data_type>(nt_hold_ion);
-							nt_ion_itr_2 = c_scan_ptr->nt_return_ion_head_ptr();
-						}
-					}
-				}
-				else {
-					if (fpf_scan_DEBUG_MODE == 3) {
-						std::cout << "\n" << nt_ion_itr_1->dt_return_data()->return_fragment_ion_mz() << " " << nt_ion_itr_2->dt_return_data()->return_fragment_ion_mz() << " NULL";
-						std::cout << "   ! ";
-						for (ion_node_type nt_ion_itr = c_scan_ptr->nt_return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
-							std::cout << " " << nt_ion_itr->dt_return_data()->return_fragment_ion_mz();
-						}
-					}
-				}
-			}
-		}
-		if (fpf_scan_DEBUG_MODE == 3) {
-			std::cout << "\n* * * * *\n";
-			for (ion_node_type nt_ion_itr = c_scan_ptr->nt_return_ion_head_ptr(); nt_ion_itr != NULL; nt_ion_itr = nt_ion_itr->return_up_node_nt()) {
-				std::cout << " " << nt_ion_itr->dt_return_data()->return_fragment_ion_mz();
-			}
-			std::cout << "\n";
-		}
-		return (count_scan_ion_sum);
+	inline ion::size_type return_sum_ion_intensity_st(ion* ion_1, ion* ion_2) {
+		return (ion_1->return_fragment_ion_intensity() + ion_2->return_fragment_ion_intensity());
 	};
 	//
 	//
 
-	inline value_type return_mean_scan_mass_vt(scan* scan_1, scan* scan_2) {
-		return (((scan_1->return_scan_union_count() * scan_1->nt_return_precursor_mass()) + (scan_2->return_scan_union_count() * scan_2->nt_return_precursor_mass())) / (scan_1->return_scan_union_count() + (scan_2->return_scan_union_count())));
-	};
-	//
-	//
-
-	inline value_type return_mean_scan_rt_vt(scan* scan_1, scan* scan_2) {
-		return (((scan_1->return_scan_union_count() * scan_1->nt_return_precursor_rt()) + (scan_2->return_scan_union_count() * scan_2->nt_return_precursor_rt())) / (scan_1->return_scan_union_count() + (scan_2->return_scan_union_count())));
-	};
-	//
-	//
-
-	inline void set_scan_ion_union(scan*& scan_union, scan* scan_1, scan* scan_2) {
-		ion_data_type dt_new_ion_head_ptr = new fpf_ion::ion;
-		for (ion_node_type ion_ptr_itr = scan_1->nt_return_ion_head_ptr(); ion_ptr_itr != NULL; ion_ptr_itr = ion_ptr_itr->return_up_node_nt()) {
-			dt_new_ion_head_ptr = ion_ptr_itr->dt_return_data();
-			fpf_node::list_insert_tail<ion_data_type>(dt_new_ion_head_ptr, scan_union->nt_return_ion_head_ptr(), scan_union->nt_return_ion_tail_ptr());
-			dt_new_ion_head_ptr = new fpf_ion::ion;
-		}
-		for (ion_node_type ion_ptr_itr = scan_2->nt_return_ion_head_ptr(); ion_ptr_itr != NULL; ion_ptr_itr = ion_ptr_itr->return_up_node_nt()) {
-			dt_new_ion_head_ptr = ion_ptr_itr->dt_return_data();
-			fpf_node::list_insert_tail<ion_data_type>(dt_new_ion_head_ptr, scan_union->nt_return_ion_head_ptr(), scan_union->nt_return_ion_tail_ptr());
-			if (ion_ptr_itr->return_up_node_nt() != NULL) {
-				dt_new_ion_head_ptr = new fpf_ion::ion;
-			}
-		}
-		scan_ion_sum(scan_union);
-	};
-	//
-	//
-
-	inline size_type return_sum_scan_union_count_st(scan* scan_1, scan* scan_2) {
-		return (scan_1->return_scan_union_count() + scan_2->return_scan_union_count());
+	inline ion::size_type return_sum_ion_union_count_st(ion* ion_1, ion* ion_2) {
+		return (ion_1->return_union_count_st() + ion_2->return_union_count_st());
 	};
 	//
 	//
 }
 
 #endif
+
+
+//inline static ion::bool_type union_fragment_ion_mz_boundconst(const ion::data_type& d_ion_itr_1, const ion::data_type& d_ion_itr_2) {
+//	return (d_ion_itr_1->return_fragment_ion_mz() <= d_ion_itr_2->return_fragment_ion_mz() + (CONDITION_FRAGMENT_ION_MZ * 1.1) && (d_ion_itr_1->return_fragment_ion_mz() >= d_ion_itr_2->return_fragment_ion_mz() - (CONDITION_FRAGMENT_ION_MZ * 1.1)));
+//};
+//// fpf_ion::union_fragment_ion_mz is a fpf_ion::ion::bool_type return
+//// function that returns true if two compared fpf_ion::ion classes have
+//// fpf_ion::ion::vt_fragment_ion_mz values within a range of
+//// fpf_ion::CONDITION_FRAGMENT_ION_MZ * 1.1. A return of true is indicative that
+//// two fragment ion mass-to-charge ratios are suitable for spectral summing.
