@@ -90,9 +90,10 @@ namespace fpf_spectralsum {
 			std::string s_inputstream = "";
 			int switch_inputstream = int();
 			scan_data_type dt_scan_inputstream = new fpf_scan::scan();
-			value_type ss_inputstream;
+			value_type vt_inputstream;
 			value_type vt_fragment_ion_mz_inputstream;
-			value_type vt_fragment_ion_intensity_inputstream;
+			size_type st_inputstream;
+			size_type st_fragment_ion_intensity_inputstream;
 			value_type vt_precursor_mass_inputstream;
 			value_type vt_precursor_rt_inputstream;
 			fpf_scan::ion_data_type dt_ion_inputstream = new fpf_ion::ion();
@@ -107,16 +108,18 @@ namespace fpf_spectralsum {
 					s_inputstream.clear();
 				}
 				if ((switch_inputstream == 2) && (c_inputstream == '\n')) {
-					std::istringstream(s_inputstream) >> ss_inputstream;
+					std::istringstream(s_inputstream) >> vt_inputstream;
 					//long double?
-					vt_precursor_rt_inputstream = ss_inputstream;
+					vt_precursor_rt_inputstream = vt_inputstream;
+					//switch_inputstream = 4;
 					s_inputstream.clear();
 				}
 				if ((switch_inputstream == 4) && (c_inputstream == ' ')) {
-					std::istringstream(s_inputstream) >> ss_inputstream;
+					std::istringstream(s_inputstream) >> vt_inputstream;
 					//long double?
-					vt_fragment_ion_mz_inputstream = ss_inputstream;
+					vt_fragment_ion_mz_inputstream = vt_inputstream;
 					switch_inputstream = 5;
+					c_inputstream = '0';
 					s_inputstream.clear();
 				}
 				if (s_inputstream == "PEPMASS=") {
@@ -124,26 +127,26 @@ namespace fpf_spectralsum {
 					s_inputstream.clear();
 				}
 				if ((switch_inputstream == 3) && (c_inputstream == '\n')) {
-					std::istringstream(s_inputstream) >> ss_inputstream;
-					vt_precursor_mass_inputstream = ss_inputstream;
+					std::istringstream(s_inputstream) >> vt_inputstream;
+					vt_precursor_mass_inputstream = vt_inputstream;
 
 					switch_inputstream = 4;
 					s_inputstream.clear();
 				}
-				if ((switch_inputstream == 5) && (c_inputstream == '\n')) {
-					std::istringstream(s_inputstream) >> ss_inputstream;
+				if ((switch_inputstream == 5) && ((c_inputstream == '\n') || (c_inputstream == ' '))) {
+					std::istringstream(s_inputstream) >> st_inputstream;
 					//long double?
-					vt_fragment_ion_intensity_inputstream = ss_inputstream;
-					if (vt_fragment_ion_intensity_inputstream >= FILTER_FRAGMENT_ION_INTENSITY) {
+					st_fragment_ion_intensity_inputstream = st_inputstream;
+					if (st_fragment_ion_intensity_inputstream >= FILTER_FRAGMENT_ION_INTENSITY) {
 						dt_ion_inputstream->set_fragment_ion_mz_vt(vt_fragment_ion_mz_inputstream);
-						dt_ion_inputstream->set_fragment_ion_intensity_st(vt_fragment_ion_intensity_inputstream);
+						dt_ion_inputstream->set_fragment_ion_intensity_st(st_fragment_ion_intensity_inputstream);
 						fpf_node::list_insert_tail<fpf_scan::ion_data_type>(dt_ion_inputstream, dt_scan_inputstream->nt_return_ion_head_ptr(), dt_scan_inputstream->nt_return_ion_tail_ptr());
 						dt_ion_inputstream = new fpf_ion::ion();
 					}
 					switch_inputstream = 4;
 					s_inputstream.clear();
 				}
-				if ((switch_inputstream == 4) && ((c_inputstream == 'E'))) {
+				if (s_inputstream == "END") {
 					switch_inputstream = 0;
 					if (vt_precursor_rt_inputstream >= FILTER_PRECURSOR_RT) {
 						dt_scan_inputstream->set_precursor_mass(vt_precursor_mass_inputstream);
@@ -422,7 +425,7 @@ namespace fpf_spectralsum {
 
 	inline void display_interface() {
 		const size_type display_width = 75;
-		const std::string display_version = "v.6.8.0";
+		const std::string display_version = "v.7.2.0";
 		std::string display_title = "--IgCompose " + display_version + " --";
 		std::string display_fpf = "Flinders Proteomics Facility - 2016";
 		//
