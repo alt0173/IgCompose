@@ -1,168 +1,227 @@
 /*
- *	File:   fpf_ion.h
+ *	File:   fpf_node.h
  *	Author: Lukah Dykes
  */
 
- // --- namespace fpf_ion class fpf_ion::ion
+ // --- namespace fpf_node class fpf_node::node
  //
  // namespace fpf_node contains object definitions for the fpf_node::node class.
  // fpf_node::node provides functionality for a doubly linked list, which is
  // templated for any standard C++ data type or an object with a copy
  // constructor and assignment operator.
 
-#ifndef FPF_ION
-#define	FPF_ION
+#ifndef FPF_NODE
+#define	FPF_NODE
 #include <cstdlib> // provides - size_t, NULL
+#include <iostream> // provides - std::cout
 
-namespace fpf_ion {
-
-	class ion {
+namespace fpf_node {
+	template <class element>
+	class node {
 	public:
 
-		typedef ion* data_type;
-		// Defines fpf_ion::ion::data_type as a pointer to a fpf_ion::ion class.
+		typedef element data_type;
+		// Defines fpf_node::node::data_type as a template type. It may be any
+		// standard C++ data type or an object with a copy constructor and
+		// assignment operator.
 
-		typedef double value_type;
-		// Defines fpf_ion::ion::value_type as any standard C++ data type.
+		typedef node<element>* node_type;
+		// Defines fpf_node::node::node_type as a pointer to a fpf_node::node
+		// class of template type.
 
-		typedef size_t size_type;
-		// Defines fpf_ion::ion::size_type as a size_t type. Requires <cstdlib>.
-
-		typedef bool bool_type;
-		// Defines fpf_ion::ion::bool_type as a bool type.
-
-		ion(const value_type& vt_init_fragment_ion_mz = value_type(), const size_type& st_init_fragment_ion_int = size_type(), size_type st_init_union_count = 1, bool bt_init_union_init = bool_type()) {
-			vt_fragment_ion_mz = vt_init_fragment_ion_mz;
-			st_fragment_ion_intensity = st_init_fragment_ion_int;
-			st_union_count = st_init_union_count;
-			bt_union_init = bt_init_union_init;
+		node(const data_type& d_init_data = data_type(), node_type nt_init_up_node = NULL, node_type nt_init_down_node = NULL) {
+			d_data = d_init_data;
+			nt_up_node = nt_init_up_node;
+			nt_down_node = nt_init_down_node;
 		};
-		// Defines a constructor call for fpf_ion::ion that assigns declared
+		// Defines a constructor call for fpf_node::node that assigns declared
 		// parameters as initial values or calls default values as ISO type defaults.
 
 		//
 		//
-		//   * * MODIFICATION MEMBER FUNCTIONS * *
+		// * * MODIFICATION MEMBER FUNCTIONS * *
 		//
 		//
 
-		inline void set_fragment_ion_mz_vt(const value_type& vt_new_fragment_ion_mz) {
-			vt_fragment_ion_mz = vt_new_fragment_ion_mz;
+		void set_data_dt(const data_type& d_new_data) {
+			d_data = d_new_data;
 		};
-		// Assigns a fpf_ion::ion::value_type to fpf_ion::ion::vt_fragment_ion_mz.
+		// Assigns a fpf_node::node::data_type to fpf_node::node::d_data.
 
-		inline void set_fragment_ion_intensity_st(const size_type& st_new_fragment_ion_int) {
-			st_fragment_ion_intensity = st_new_fragment_ion_int;
+		void set_up_node_nt(node_type nt_new_link) {
+			nt_up_node = nt_new_link;
 		};
-		// Assigns a fpf_ion::ion::size_type to fpf_ion::ion::st_fragment_ion_intensity.
+		// Assigns a fpf_node::node::node_type to fpf_node::node::nt_up_node.
 
-		inline void set_union_count_st(size_type st_new_union_count) {
-			st_union_count = st_new_union_count;
+		void set_down_node_nt(node_type nt_new_link) {
+			nt_down_node = nt_new_link;
 		};
-		// Assigns a fpf_ion::ion::size_type to fpf_ion::ion::st_union_count.
-
-		inline void set_init_fragment_ion_union_b(bool_type b_new_union_init) {
-			bt_union_init = b_new_union_init;
-		};
-		// Assigns a fpf_ion::ion::bool_type to fpf_ion::ion::bt_union_init.
+		// Assigns a fpf_node::node::node_type to fpf_node::node::nt_down_node.
 
 		//
 		//
-		//   * * PRIVATE MEMBER ACCESS FUNCTIONS * *
+		// * * PRIVATE MEMBER ACCESS FUNCTIONS * *
 		//
 		//
 
-		inline value_type return_fragment_ion_mz() const {
-			return vt_fragment_ion_mz;
+		data_type dt_return_data() const {
+			return d_data;
 		};
-		// Returns fpf_ion::ion::vt_fragment_ion_mz.
+		// Returns fpf_node::node::d_data.
 
-		inline size_type return_fragment_ion_intensity() const {
-			return st_fragment_ion_intensity;
+		node_type return_up_node_nt() {
+			return nt_up_node;
 		};
-		// Returns fpf_ion::ion::st_fragment_ion_intensity.
+		// Returns fpf_node::node::nt_up_node.
 
-		inline size_type return_union_count_st() const {
-			return st_union_count;
+		node_type return_down_node_nt() {
+			return nt_down_node;
 		};
-		// Returns fpf_ion::ion::st_union_count.
+		// Returns fpf_node::node::nt_down_node.
 
-		inline bool_type return_union_init_b() const {
-			return bt_union_init;
+		const node_type return_up_node_nt() const {
+			return nt_up_node;
 		};
-		// Returns fpf_ion::ion::bt_union_init.
+		// Returns constant fpf_node::node::nt_up_node.
+
+		const node_type return_down_node_nt() const {
+			return nt_down_node;
+		};
+		// Returns constant fpf_node::node::nt_down_node.
 
 	private:
-		value_type vt_fragment_ion_mz;
-		// fpf_ion::ion::vt_fragment_ion_mz is a fpf_ion::ion::value_type data
-		// type. It can be any standard C++ data type. vt_fragment_ion_mz stores
-		// the value of a fragment ion mass-to-charge ratio in a fpf_ion::ion class.
+		data_type d_data;
+		// fpf_node::node::d_data is a fpf_node::node::data_type. It can be any
+		// standard C++ data type or an object with a copy constructor and
+		// assignment operator
 
-		size_type st_fragment_ion_intensity;
-		// fpf_ion::ion::st_fragment_ion_intensity is a fpf_ion::ion::size_type
-		// data type. st_fragment_ion_intensity stores the value of a fragment
-		// ion detected intensity in a fpf_ion::ion class.
+		node_type nt_up_node;
+		// fpf_node::node::nt_up_node is a fpf_node::node::node_type. Through
+		// functional assignment nt_up_node points to the subsequent node_type
+		// in the doubly linked list. Should nt_up_node be the last node_type in
+		// the list, it points to NULL.
 
-		size_type st_union_count;
-		// fpf_ion::ion::st_union_count is a fpf_ion::ion::size_type data type.
-		// st_union_count counts the quantity of ion classes that have been
-		// combined to create the current fpf_ion::ion class - an unsummed ion
-		// class has a value of 1, an ion class having undergone one iteration
-		// of summing has a value 2, and onwards.
-
-		bool_type bt_union_init;
-		// fpf_ion::ion::bt_union_init is a fpf_ion::ion::bool_type data type.
-		// bt_union_init is true if the fpf_ion::ion class has undergone an
-		// iteration of spectral summing. The default value of bt_union_init is false.
+		node_type nt_down_node;
+		// fpf_node::node::nt_down_node is a fpf_node::node::node_type. Through
+		// functional assignment nt_down_node points to the antecedent node_type
+		// in the doubly linked list. Should nt_down_node be the first node_type
+		// in the list, it points to NULL.
 	};
 
 	//
 	//
-	//   * * FUNCTIONS * *
+	// * * FUNCTIONS * *
 	//
 	//
-
-	const ion::value_type CONDITION_FRAGMENT_ION_MZ = 0.025;
-	// fpf_ion::CONDITION_FRAGMENT_ION_MZ is a const ion::value_type with a
-	// compile-time or run-time initialised value that defines the fragment ion
-	// mass-to-charge ratio range for spectral summing.
-
-	inline static ion::bool_type union_fragment_ion_mz(const ion::data_type& d_ion_itr_1, const ion::data_type& d_ion_itr_2) {
-		return ((d_ion_itr_1->return_fragment_ion_mz() <= d_ion_itr_2->return_fragment_ion_mz() + CONDITION_FRAGMENT_ION_MZ) && (d_ion_itr_1->return_fragment_ion_mz() >= d_ion_itr_2->return_fragment_ion_mz() - CONDITION_FRAGMENT_ION_MZ));
+	
+	template <class element>
+	void list_insert_head(const typename node<element>::data_type dt_new_data, typename node<element>::node_type& nt_node_head_ptr, typename node<element>::node_type& nt_node_tail_ptr) {
+		node<element>::node_type nt_new_ptr = new node;
+		nt_new_ptr->set_data_dt(dt_new_data);
+		if (nt_node_head_ptr == NULL) {
+			nt_node_head_ptr = nt_new_ptr;
+		}
+		if (nt_node_tail_ptr == NULL) {
+			nt_node_tail_ptr = nt_new_ptr;
+		}
+		nt_new_ptr->set_up_node_nt(nt_node_head_ptr);
+		nt_node_head_ptr->set_down_node_nt(nt_new_ptr);
+		nt_node_head_ptr = nt_node_head_ptr->return_down_node_nt();
 	};
-	// fpf_ion::union_fragment_ion_mz is a fpf_ion::ion::bool_type return
-	// function that returns true if two compared fpf_ion::ion classes have
-	// fpf_ion::ion::vt_fragment_ion_mz values within a range of
-	// fpf_ion::CONDITION_FRAGMENT_ION_MZ. This function has two primary roles - A return of true is indicative that
-	// 1. two fragment ions are consitwo fragment ion mass-to-charge ratios are suitable for spectral summing.
+	// fpf_node::list_insert_head initialises a fpf_node::node::node_type,
+	// assigns fpf_node::node::data_type through a called parameter, and assigns
+	// this node as the first node in a called doubly linked list. If the called
+	// list is empty the created node is declared as both the first and last node.
 
-	inline ion::value_type return_mean_ion_mz_vt(ion* ion_1, ion* ion_2) {
-		return (((ion_1->return_union_count_st() * (ion_1->return_fragment_ion_mz())) + ((ion_2->return_union_count_st()) * (ion_2->return_fragment_ion_mz()))) / (ion_1->return_union_count_st() + (ion_2->return_union_count_st())));
+	template <class element>
+	void list_insert_tail(const typename node<element>::data_type& dt_new_data, typename node<element>::node_type& nt_node_head_ptr, typename node<element>::node_type& nt_node_tail_ptr) {
+		node<element>::node_type nt_new_ptr = new node<element>;
+		nt_new_ptr->set_data_dt(dt_new_data);
+		if (nt_node_head_ptr == NULL) {
+			nt_node_head_ptr = nt_new_ptr;
+		}
+		if (nt_node_tail_ptr == NULL) {
+			nt_node_tail_ptr = nt_new_ptr;
+		}
+		else {
+			nt_new_ptr->set_down_node_nt(nt_node_tail_ptr);
+			nt_node_tail_ptr->set_up_node_nt(nt_new_ptr);
+			nt_node_tail_ptr = nt_new_ptr;
+		}
 	};
-	//
-	//
+	// fpf_node::list_insert_tail initialises a fpf_node::node::node_type,
+	// assigns fpf_node::node::data_type through a called parameter, and assigns
+	// this node_type as the last node_type in a called doubly linked list. If the called
+	// list is empty the created node is declared as both the first and last node_type.
 
-	inline ion::size_type return_sum_ion_intensity_st(ion* ion_1, ion* ion_2) {
-		return (ion_1->return_fragment_ion_intensity() + ion_2->return_fragment_ion_intensity());
+	template <class element>
+	void list_insert_up(const typename node<element>::data_type& dt_new_data, typename node<element>::node_type& nt_current_ptr, typename node<element>::node_type& nt_node_head_ptr, typename node<element>::node_type& nt_node_tail_ptr) {
+		if (nt_current_ptr != nt_node_tail_ptr) {
+			node<element>::node_type nt_new_ptr = new node<element>;
+			nt_new_ptr->set_data_dt(dt_new_data);
+			nt_current_ptr->return_up_node_nt()->set_down_node_nt(nt_new_ptr);
+			nt_new_ptr->set_up_node_nt(nt_current_ptr->return_up_node_nt());
+			nt_new_ptr->set_down_node_nt(nt_current_ptr);
+			nt_current_ptr->set_up_node_nt(nt_new_ptr);
+		}
+		else {
+			list_insert_tail<element>(dt_new_data, nt_node_head_ptr, nt_node_tail_ptr);
+		}
 	};
-	//
-	//
+	// fpf_node::list_insert_up initialises a fpf_node::node::node_type, assigns
+	// fpf_node::node::data_type through a called parameter, and assigns this
+	// node_type as the subsequent node_type to a called node_type in a doubly
+	// linked list. If the referenced node_type is the last in the list,
+	// fpf_node::list_insert_tail is called in place.
 
-	inline ion::size_type return_sum_ion_union_count_st(ion* ion_1, ion* ion_2) {
-		return (ion_1->return_union_count_st() + ion_2->return_union_count_st());
-	};
+	template <class element>
+	void list_remove_head(typename node<element>::node_type& nt_ion_head_ptr) {
+		if (nt_ion_head_ptr != NULL) {
+			node<element>::node_type nt_del_ptr;
+			nt_del_ptr = nt_ion_head_ptr;
+			nt_ion_head_ptr = nt_ion_head_ptr->return_up_node_nt();
+			nt_ion_head_ptr->set_down_node_nt(NULL);
+			delete nt_del_ptr;
+		}
+	}
+	// fpf_node::list_remove_head deletes the first fpf_node::node::node_type in
+	// a doubly linked list and assigns the subsequent node_type as the new
+	// first node_type in the list. If there is no subsequent node_type the
+	// first node_type is set as NULL.
+
+	template <class element>
+	void list_remove(typename node<element>::node_type& nt_ptr) {
+		//
+		//
+		// head/tail case?
+		//
+		//
+		node<element>::node_type nt_del_ptr;
+		nt_del_ptr = nt_ptr;
+		nt_ptr->return_down_node_nt()->set_up_node_nt(nt_del_ptr->return_up_node_nt());
+		nt_ptr->return_up_node_nt()->set_down_node_nt(nt_del_ptr->return_down_node_nt());
+		delete nt_del_ptr;
+	}
 	//
 	//
 }
 
 #endif
 
+// - - - incomplete - - -
 
-//inline static ion::bool_type union_fragment_ion_mz_boundconst(const ion::data_type& d_ion_itr_1, const ion::data_type& d_ion_itr_2) {
-//	return (d_ion_itr_1->return_fragment_ion_mz() <= d_ion_itr_2->return_fragment_ion_mz() + (CONDITION_FRAGMENT_ION_MZ * 1.1) && (d_ion_itr_1->return_fragment_ion_mz() >= d_ion_itr_2->return_fragment_ion_mz() - (CONDITION_FRAGMENT_ION_MZ * 1.1)));
+//template <class element>
+//void list_copy(typename node<element>::node_type nt_call_ptr,  typename node<element>::node_type& nt_new_head_ptr,  typename node<element>::node_type& nt_new_tail_ptr) {
+//	if (nt_call_ptr == NULL) {
+//		return;
+//	}
+//	nt_new_head_ptr = NULL;
+//	nt_new_tail_ptr = NULL;
+//	list_insert_head(nt_call_ptr->dt_return_data(), nt_new_head_ptr, nt_new_tail_ptr);
+//	nt_call_ptr = nt_call_ptr->return_up_node_nt();
+//	while (nt_call_ptr != NULL) {
+//		list_insert_tail(nt_call_ptr->dt_return_data(), nt_new_head_ptr, nt_new_tail_ptr);
+//		nt_new_tail_ptr = nt_new_tail_ptr->return_up_node_nt();
+//		nt_call_ptr = nt_call_ptr->return_up_node_nt();
+//	}
 //};
-//// fpf_ion::union_fragment_ion_mz is a fpf_ion::ion::bool_type return
-//// function that returns true if two compared fpf_ion::ion classes have
-//// fpf_ion::ion::vt_fragment_ion_mz values within a range of
-//// fpf_ion::CONDITION_FRAGMENT_ION_MZ * 1.1. A return of true is indicative that
-//// two fragment ion mass-to-charge ratios are suitable for spectral summing.
