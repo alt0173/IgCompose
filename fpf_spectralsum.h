@@ -3,7 +3,7 @@
 // Lukah Dykes - Flinders Proteomics Facility - 2016
 // 
 // * * * * *
-
+ 
 #ifndef FPF_SPECTRALSUM
 #define	FPF_SPECTRALSUM
 #include <cstdlib> // provides - size_t, NULL
