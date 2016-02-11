@@ -1,13 +1,8 @@
-/*
- *	File:   mgf.cpp
- *	Author: Lukah Dykes
- */
-
- /*	IgCompose v0.7.2.0
-  *
-  *
-  *
-  */
+// * * IgCompose v0.7.5.0 * *
+// 
+// Lukah Dykes - Flinders Proteomics Facility - 2016
+// 
+// * * * * *
 
 #include <cstdlib> // provides - EXIT_SUCCESS, size_t, NULL
 #include <iostream> // provides - std::cin, std::cout, std::ofstream::open
@@ -79,11 +74,11 @@ int main() {
 	std::cin >> pong;
 	std::cout << "\n\n\nCheck count? - ";
 	std::cout << "\n\ninput files - " << i_input_count;
-	std::cout << "\nprecursor ion mass window - " << (fpf_scan::CONDITION_PRECURSOR_MASS * 2);
-	std::cout << "\nprecursor ion rt window - " << (fpf_scan::CONDITION_PRECURSOR_RT * 2);
-	std::cout << "\nfragment ion maxima peak similarity - " << (fpf_scan::CONDITION_FRAGMENT_ION_SUP) << " of " << fpf_scan::CONDITION_COUNT_FRAGMENT_SUP;
-	std::cout << "\nfragment ion mz window - " << (fpf_fion::vt_CONDITION_FRAGMENT_ION_MZ * 2);
-	std::cout << "\nnoise floor - " << fpf_spectralsum::FILTER_FRAGMENT_ION_INTENSITY;
+	std::cout << "\nprecursor ion mass window - " << (fpf_scan::CONDITION_PION_MASS * 2);
+	std::cout << "\nprecursor ion rt window - " << (fpf_scan::CONDITION_PION_RT * 2);
+	std::cout << "\nfragment ion maxima peak similarity - " << (fpf_fion::st_CONDITION_FION_SUP) << " of " << fpf_fion::st_CONDITION_COUNT_FION_SUP;
+	std::cout << "\nfragment ion mz window - " << (fpf_fion::vt_CONDITION_FION_MZ * 2);
+	std::cout << "\nnoise floor - " << fpf_spectralsum::FILTER_FION_INTENSITY;
 	std::cout << "\n\n\nEnter any key to exit...\n\n> ";
 	std::cin >> pong;
 
