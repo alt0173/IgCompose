@@ -1,7 +1,8 @@
-/*
- *	File:   fpf_node.h
- *	Author: Lukah Dykes
- */
+// * * fpf_node.h * *
+// 
+// Lukah Dykes - Flinders Proteomics Facility - 2016
+// 
+// * * * * *
 
  // --- namespace fpf_node class node
  // 
@@ -170,12 +171,12 @@ namespace fpf_node {
 	// node_type is the last in the list, list_insert_tail is called in place.
 
 	template <class element>
-	void list_remove_head(typename node<element>::node_type& nt_ion_head_ptr) {
-		if (nt_ion_head_ptr != NULL) {
+	void list_remove_head(typename node<element>::node_type& nt_fion_head_ptr) {
+		if (nt_fion_head_ptr != NULL) {
 			node<element>::node_type nt_del_ptr;
-			nt_del_ptr = nt_ion_head_ptr;
-			nt_ion_head_ptr = nt_ion_head_ptr->nt_return_up_node();
-			nt_ion_head_ptr->set_down_node_nt(NULL);
+			nt_del_ptr = nt_fion_head_ptr;
+			nt_fion_head_ptr = nt_fion_head_ptr->nt_return_up_node();
+			nt_fion_head_ptr->set_down_node_nt(NULL);
 			delete nt_del_ptr;
 		}
 	}
