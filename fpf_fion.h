@@ -9,7 +9,7 @@
  // namespace fpf_fion contains object definitions for the fion class. An fion
  // class declares private members to store the values of a fragment fion
  // mass-to-charge ratio, detected intensity, and an integer count of the
- // quantity of fion classes an fion class is composed of (initially 1). The
+ // quantity of fion classes a fion class is composed of (initially 1). The
  // fpf_fion function union_fragment_fion_mz() boolean tests if two fion class
  // mass-to-charge ratios are suitable for spectral summing - A true boolean
  // value calls return_mean_fion_mz_vt() and return_sum_ion_intensity_st() to
