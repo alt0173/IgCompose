@@ -199,6 +199,17 @@ namespace fpf_node {
 	}
 	//
 	//
+
+	template <class element>
+	void list_remove_all(typename node<element>::node_type& nt_node_head_ptr) {
+		for (typename node<element>::node_type nt_ptr_itr = nt_node_head_ptr; nt_ptr_itr->nt_return_up_node() != NULL; nt_ptr_itr) {
+			typename node<element>::node_type nt_hold_ptr = nt_ptr_itr;
+			nt_ptr_itr = nt_ptr_itr->nt_return_up_node();
+			delete nt_hold_ptr;
+		}
+	}
+	//
+	//
 }
 
 #endif
