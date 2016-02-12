@@ -3,7 +3,7 @@
 // Lukah Dykes - Flinders Proteomics Facility - 2016
 // 
 // * * * * *
- 
+
 #ifndef FPF_SPECTRALSUM
 #define	FPF_SPECTRALSUM
 #include <cstdlib> // provides - size_t, NULL
@@ -338,9 +338,16 @@ namespace fpf_spectralsum {
 		//		associated SCAN class. The pointer directs to the head node of
 		//		a linked list.
 
-		void cout_mgf(mgf& c_mgf) const {
+		//
+		//
+		//
+		void cout_mgf(mgf*& c_mgf) const {
 			size_type count_mgf_scan_cout = 1;
-			for (scan_node_type nt_scan_itr = c_mgf.nt_return_scan_head_ptr(); nt_scan_itr != NULL; nt_scan_itr = nt_scan_itr->nt_return_up_node()) {
+			for (scan_node_type nt_scan_ptr_itr = c_mgf->nt_return_scan_head_ptr(); nt_scan_ptr_itr != NULL; nt_scan_ptr_itr = nt_scan_ptr_itr->nt_return_up_node()) {
+				if (c_mgf->nt_return_scan_head_ptr() == NULL) {
+					std::cout << "\n\nException: No scan data found. Refer to fpf_spectralsum::input_parse().";
+					break;
+				}
 				if (count_mgf_scan_cout > 1) {
 					std::cout << "\nBEGIN IONS";
 				}
@@ -348,9 +355,9 @@ namespace fpf_spectralsum {
 					std::cout << "BEGIN IONS";
 				}
 				std::cout << "\nTITLE=" << "NULL";
-				std::cout << "\nRTINSECONDS=" << nt_scan_itr->dt_return_data()->nt_return_precursor_rt();
-				std::cout << "\nPEPMASS=" << nt_scan_itr->dt_return_data()->nt_return_precursor_mass();
-				for (fpf_scan::scan::fion_node_type nt_ion_ptr = nt_scan_itr->dt_return_data()->nt_return_fion_head_ptr(); nt_ion_ptr != NULL; nt_ion_ptr = nt_ion_ptr->nt_return_up_node()) {
+				std::cout << "\nRTINSECONDS=" << nt_scan_ptr_itr->dt_return_data()->nt_return_precursor_rt();
+				std::cout << "\nPEPMASS=" << nt_scan_ptr_itr->dt_return_data()->nt_return_precursor_mass();
+				for (fpf_scan::scan::fion_node_type nt_ion_ptr = nt_scan_ptr_itr->dt_return_data()->nt_return_fion_head_ptr(); nt_ion_ptr != NULL; nt_ion_ptr = nt_ion_ptr->nt_return_up_node()) {
 					std::cout << "\n" << nt_ion_ptr->dt_return_data()->vt_return_fion_mz() << "   " << nt_ion_ptr->dt_return_data()->return_fion_intensity() << "   " << nt_ion_ptr->dt_return_data()->st_return_union_count();
 				}
 				std::cout << "\nEND IONS";
@@ -362,13 +369,13 @@ namespace fpf_spectralsum {
 		};
 
 		void fout_mgf(std::ofstream& fout, mgf*& c_mgf) const {
-			if (c_mgf->nt_return_scan_head_ptr() == NULL) {
-				//
-				// break?
-			}
 			size_type count_mgf_scan_fout = 1;
 			std::cout << "\n\n\nOutputting...";
 			for (scan_node_type nt_scan_ptr_itr = c_mgf->nt_return_scan_head_ptr(); nt_scan_ptr_itr != NULL; nt_scan_ptr_itr = nt_scan_ptr_itr->nt_return_up_node()) {
+				if (c_mgf->nt_return_scan_head_ptr() == NULL) {
+					std::cout << "\n\nException: No scan data found. Refer to fpf_spectralsum::input_parse().";
+					break;
+				}
 				if (count_mgf_scan_fout > 1) {
 					fout << "\nBEGIN IONS";
 				}
