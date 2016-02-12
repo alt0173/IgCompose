@@ -22,7 +22,11 @@ namespace fpf_scan {
 		// Defines size_type as a size_t type. Requires <cstdlib>.
 
 		typedef fpf_node::node<fpf_fion::fion*>* fion_node_type;
-		// Defines fion_node_type as a pointer to a node doubly linked list
+		/*
+		*
+		*
+		*/
+		// Defines fion_node_type as a pointer to a doubly linked list
 		// templated as a pointer to a fion class.
 
 		typedef fpf_fion::fion* fion_data_type;
@@ -43,6 +47,7 @@ namespace fpf_scan {
 		// st_scan_union_count (representing an unsummed scan class).
 
 		~scan() {
+			fpf_node::list_remove_all<fion_data_type>(nt_fion_head_ptr);
 		};
 		// ~scan() defines the default destructor for the scan class.
 
@@ -76,7 +81,12 @@ namespace fpf_scan {
 		inline const value_type nt_return_precursor_mass() const {
 			return vt_pion_mass;
 		};
-		// nt_return_precursor_mass() returns vt_pion_mass, the precursor
+		/*
+		*
+		*
+		*
+		*/
+		// nt_return_precursor_mass() references(does it?) the value_type vt_pion_mass, the precursor
 		// mass of the referenced scan class.
 
 		inline const value_type nt_return_precursor_rt() const {
