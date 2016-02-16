@@ -22,11 +22,78 @@ int main() {
 	while (c_main_input != '0') {
 		std::cout << "\n\nInput?\n\n> ";
 		std::cin >> c_main_input;
+		if (c_main_input == 'P') {
+			char c_settings_input = '1';
+			fpf_spectralsum::display_interface_settings();
+			fpf_spectralsum::display_interface_set_settings();
+			while (c_settings_input != '0') {
+				std::cout << "\n\nInput?\n\n> ";
+				std::cin >> c_settings_input;
+				if (c_settings_input == 'M') {
+					fpf_scan::scan::value_type new_CONDITION_PION_MASS;
+					std::cout << "\n\nNew value for precursor mass window?\n\n> ";
+					std::cin >> new_CONDITION_PION_MASS;
+					while (std::cin.fail()) {
+						std::cout << "\n\n";
+						std::cin.clear();
+						std::cin.ignore(256, '\n');
+						std::cout << "\n\nNew value for precursor mass window?\n\n> ";
+						std::cin >> new_CONDITION_PION_MASS;
+					}
+					std::cout << "\n";
+					fpf_scan::set_CONDITION_PION_MASS(new_CONDITION_PION_MASS);
+					fpf_spectralsum::display_interface_settings();
+					fpf_spectralsum::display_interface_set_settings();
+				}
+				if (c_settings_input == 'R') {
+					fpf_scan::scan::value_type new_CONDITION_PION_RT;
+					std::cout << "\n\nNew value for precursor retention time window?\n\n> ";
+					std::cin >> new_CONDITION_PION_RT;
+					while (std::cin.fail()) {
+						std::cout << "\n\n";
+						std::cin.clear();
+						std::cin.ignore(256, '\n');
+						std::cout << "\n\nNew value for precursor retention time window?\n\n> ";
+						std::cin >> new_CONDITION_PION_RT;
+					}
+					std::cout << "\n";
+					fpf_scan::set_CONDITION_PION_RT(new_CONDITION_PION_RT);
+					fpf_spectralsum::display_interface_settings();
+					fpf_spectralsum::display_interface_set_settings();
+				}
+				if (c_settings_input == 'N') {
+					fpf_scan::scan::value_type new_FILTER_FION_INTENSITY;
+					std::cout << "\n\nNew value for the fragment ion noise floor?\n\n> ";
+					std::cin >> new_FILTER_FION_INTENSITY;
+					while (std::cin.fail()) {
+						std::cout << "\n\n";
+						std::cin.clear();
+						std::cin.ignore(256, '\n');
+						std::cout << "\n\nNew value for the fragment ion noise floor?\n\n> ";
+						std::cin >> new_FILTER_FION_INTENSITY;
+					}
+					std::cout << "\n";
+					fpf_spectralsum::set_FILTER_FION_INTENSITY(new_FILTER_FION_INTENSITY);
+					fpf_spectralsum::display_interface_settings();
+					fpf_spectralsum::display_interface_set_settings();
+				}
+				if (c_settings_input != '0') {
+					std::cin.clear();
+					std::cin.ignore(256, '\n');
+				}
+				else {
+					fpf_spectralsum::display_interface_settings();
+					fpf_spectralsum::display_main_menu();
+				}
+			}
+		}
 		if (c_main_input == 'D') {
-			std::cout << "\n\ndebug mode?\n\n> ";
+			std::cout << "\n\nDebug mode?\n\n> ";
 			std::cin >> DEBUG_MODE;
 			fpf_spectralsum::set_debug(DEBUG_MODE);
 			fpf_scan::set_debug(DEBUG_MODE);
+			fpf_spectralsum::display_interface_settings();
+			fpf_spectralsum::display_interface_set_settings();
 		}
 		if (c_main_input != 0) {
 			std::cin.clear();
@@ -74,10 +141,10 @@ int main() {
 	std::cin >> pong;
 	std::cout << "\n\n\nCheck count? - ";
 	std::cout << "\n\ninput files - " << i_input_count;
-	std::cout << "\nprecursor ion mass window - " << (fpf_scan::CONDITION_PION_MASS * 2);
-	std::cout << "\nprecursor ion rt window - " << (fpf_scan::CONDITION_PION_RT * 2);
+	std::cout << "\nprecursor ion mass window - " << fpf_scan::vt_CONDITION_PION_MASS;
+	std::cout << "\nprecursor ion rt window - " << fpf_scan::vt_CONDITION_PION_RT;
 	std::cout << "\nfragment ion maxima peak similarity - " << (fpf_fion::st_CONDITION_FION_SUP) << " of " << fpf_fion::st_CONDITION_COUNT_FION_SUP;
-	std::cout << "\nfragment ion mz window - " << (fpf_fion::vt_CONDITION_FION_MZ * 2);
+	std::cout << "\nfragment ion mz window - " << fpf_fion::vt_CONDITION_FION_MZ;
 	std::cout << "\nnoise floor - " << fpf_spectralsum::FILTER_FION_INTENSITY;
 	std::cout << "\n\n\nEnter any key to exit...\n\n> ";
 	std::cin >> pong;
