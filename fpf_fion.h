@@ -12,7 +12,7 @@
  // quantity of fion classes a fion class is composed of (initially 1). The
  // fpf_fion function union_fragment_fion_mz() boolean tests if two fion class
  // mass-to-charge ratios are suitable for spectral summing - A true boolean
- // value calls return_mean_fion_mz_vt() and return_sum_ion_intensity_st() to
+ // value calls vt_return_mean_fion_mz() and st_return_sum_fion_intensity() to
  // calculate the mean mass-to-charge ratio and summed intensity of the two fion
  // classes, taking into consideration previous summing through st_union_count.
 
@@ -25,7 +25,7 @@ namespace fpf_fion {
 	public:
 
 		typedef double value_type;
-		// Defines fpf_fion::fion::value_type as a standard C++ data type.
+		// Defines fpf_fion::fion::value_type as any standard C++ data type.
 
 		typedef size_t size_type;
 		// Defines fpf_fion::fion::size_type as a size_t type. Requires <cstdlib>.
@@ -53,7 +53,7 @@ namespace fpf_fion {
 
 		//
 		//
-		//   * * MODIFICATION MEMBER FUNCTIONS * *
+		//   * * PRIVATE MEMBER MODIFICATION FUNCTIONS * *
 		//
 		//
 
@@ -118,16 +118,16 @@ namespace fpf_fion {
 	//
 	//
 
-	const fion::value_type vt_CONDITION_FION_MZ = 0.025;
+	fion::value_type vt_CONDITION_FION_MZ = 0.050;
 	// vt_CONDITION_FION_MZ is a value_type with a compile-time or
 	// run-time initialised value that defines the fragment ion mass-to-charge
 	// ratio range for spectral summing.
 
-	const fion::size_type st_CONDITION_FION_SUP = 5;
+	fion::size_type st_CONDITION_FION_SUP = 5;
 	// st_CONDITION_FION_SUP is a size_type with a compile-time or run-time
 	// initialised value that defines the required quantity of the
 	// st_CONDITION_COUNT_FION_SUP most intense fragment ions in a
-	// fpf_scan::scan class that match the the st_CONDITION_COUNT_FION_SUP most
+	// fpf_scan::scan class that match the st_CONDITION_COUNT_FION_SUP most
 	// intense fragment ions of a compared fpf_scan::scan class to be suitable
 	// for spectral summing. Fragment ions are tested to be within a
 	// mass-to-charge ratio range as initialised by vt_CONDITION_FION_MZ.
@@ -147,35 +147,45 @@ namespace fpf_fion {
 	//
 	//
 
+	void set_CONDITION_FION_MZ(fion::value_type vt_set_CONDITION_FION_MZ) {
+		// 
+		vt_CONDITION_FION_MZ = vt_set_CONDITION_FION_MZ;
+	}
+
+	void set_CONDITION_FION_SUP(fion::size_type st_set_CONDITION_FION_SUP) {
+		// 
+		st_CONDITION_FION_SUP = st_set_CONDITION_FION_SUP;
+	}
+
 	inline static fion::bool_type union_fragment_fion_mz(const fion::data_type& d_fion_itr_1, const fion::data_type& d_fion_itr_2) {
-		return ((d_fion_itr_1->vt_return_fion_mz() <= d_fion_itr_2->vt_return_fion_mz() + vt_CONDITION_FION_MZ) && (d_fion_itr_1->vt_return_fion_mz() >= d_fion_itr_2->vt_return_fion_mz() - vt_CONDITION_FION_MZ));
+		return ((d_fion_itr_1->vt_return_fion_mz() <= d_fion_itr_2->vt_return_fion_mz() + (vt_CONDITION_FION_MZ / 2)) && (d_fion_itr_1->vt_return_fion_mz() >= d_fion_itr_2->vt_return_fion_mz() - (vt_CONDITION_FION_MZ / 2)));
 	};
 	// union_fragment_fion_mz() is a bool_type return function that returns true if
 	// two compared fion classes have vt_fion_mz values within a range of
 	// vt_CONDITION_FION_MZ. A return of true is indicative that two
 	// fragment fion mass-to-charge ratios are suitable for spectral summing.
 
-	inline fion::value_type return_mean_fion_mz_vt(fion* fion_1, fion* fion_2) {
+	inline fion::value_type vt_return_mean_fion_mz(fion* fion_1, fion* fion_2) {
 		return (((fion_1->st_return_union_count() * (fion_1->vt_return_fion_mz())) + ((fion_2->st_return_union_count()) * (fion_2->vt_return_fion_mz()))) / (fion_1->st_return_union_count() + (fion_2->st_return_union_count())));
 	};
-	// return_mean_fion_mz_vt() is a value_type return function that returns the
+	// vt_return_mean_fion_mz() is a value_type return function that returns the
 	// mean mass-to-charge ratio of two fion classes. This function is called
 	// when assigning value to a combined fion class from two fion classes
 	// suitable for spectral summing. Previous summing is taken into
 	// consideration through st_union_count.
 
-	inline fion::size_type return_sum_ion_intensity_st(fion* fion_1, fion* fion_2) {
+	inline fion::size_type st_return_sum_fion_intensity(fion* fion_1, fion* fion_2) {
 		return (fion_1->return_fion_intensity() + fion_2->return_fion_intensity());
 	};
-	// return_sum_ion_intensity_st() is a size_type return function that returns
+	// st_return_sum_fion_intensity() is a size_type return function that returns
 	// the sum of the intensity of two fion classes. This function is called when
 	// assigning value to a combined fion class from two fion classes suitable for
 	// spectral summing. Previous summing is taken into consideration through st_union_count.
 
-	inline fion::size_type return_sum_fion_union_count_st(fion* fion_1, fion* fion_2) {
+	inline fion::size_type st_return_sum_fion_union_count(fion* fion_1, fion* fion_2) {
 		return (fion_1->st_return_union_count() + fion_2->st_return_union_count());
 	};
-	// return_sum_fion_union_count_st() is a size_type return function that
+	// st_return_sum_fion_union_count() is a size_type return function that
 	// returns the sum of the union count of two fion classes. This function is
 	// called when assigning value to a combined fion class from two fion classes
 	// suitable for spectral summing. The cumulative value of st_union_count
