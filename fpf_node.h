@@ -38,7 +38,7 @@ namespace fpf_node {
 
 		//
 		//
-		// * * MODIFICATION MEMBER FUNCTIONS * *
+		//   * * PRIVATE MEMBER MODIFICATION FUNCTIONS * *
 		//
 		//
 
@@ -107,7 +107,7 @@ namespace fpf_node {
 
 	//
 	//
-	// * * FUNCTIONS * *
+	//   * * NAMESPACE VARIABLES * *
 	//
 	//
 
@@ -147,8 +147,8 @@ namespace fpf_node {
 		}
 	};
 	// list_insert_tail() initialises a node_type, assigns data_type through a
-	// called parameter, and assigns this node_type as the last node_type in a
-	// called doubly linked list. If the called list is empty the created node
+	// referenced parameter, and assigns this node_type as the last node_type in a
+	// referenced doubly linked list. If the list is empty the created node
 	// is declared as both the first and last node_type.
 
 	template <class element>
@@ -166,8 +166,8 @@ namespace fpf_node {
 		}
 	};
 	// list_insert_up() initialises a node_type, assigns data_type through a
-	// called parameter, and assigns this node_type as the subsequent node_type
-	// to a called node_type in a doubly linked list. If the referenced
+	// referenced parameter, and assigns this node_type as the subsequent node_type
+	// to a referenced node_type in a doubly linked list. If the referenced
 	// node_type is the last in the list, list_insert_tail is called in place.
 
 	template <class element>
