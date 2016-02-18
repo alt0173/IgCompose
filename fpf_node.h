@@ -9,7 +9,7 @@
  // namespace fpf_node contains object definitions for the node class. node provides functionality
  // for a doubly linked list, which is templated for a standard C++ data type or an object with a
  // copy constructor and assignment operator.
-
+ 
 #ifndef FPF_NODE
 #define	FPF_NODE
 #include <cstdlib> // provides - size_t, NULL
