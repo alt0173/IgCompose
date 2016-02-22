@@ -7,20 +7,25 @@
  // --- namespace fpf_fion class fion
  // 
  // namespace fpf_fion contains object definitions for the fion class. An fion
- // class declares private members to store the values of a fragment fion
- // mass-to-charge ratio, detected intensity, and an integer count of the
- // quantity of fion classes a fion class is composed of (initially 1). The
- // fpf_fion function union_fragment_fion_mz() boolean tests if two fion class
+ // class declares private members to store the values of a fragment ion
+ // mass-to-charge ratio, detected intensity, and integer count of the
+ // quantity of fion classes the fion class is composed of (initially 1). 
+ //
+ // The fpf_fion function union_fion_mz() boolean tests if two fion class fragment ion
  // mass-to-charge ratios are suitable for spectral summing - A true boolean
  // value calls vt_return_mean_fion_mz() and st_return_sum_fion_intensity() to
  // calculate the mean mass-to-charge ratio and summed intensity of the two fion
  // classes, taking into consideration previous summing through st_fion_union_count.
+ // Fragment ion spectral summing is called from the parent fpf_scan scan class function scan_fion_sum().
 
 #ifndef FPF_FION
 #define	FPF_FION
 #include <cstdlib> // provides - size_t, NULL
 
 namespace fpf_fion {
+
+	class fion;
+	// Forward declaration for class fion.
 
 	typedef double value_type;
 	// Defines fpf_fion::fion::value_type as any standard C++ data type.
@@ -85,7 +90,7 @@ namespace fpf_fion {
 		//
 		//
 		//
-		//   * * PRIVATE MEMBER MODIFICATION FUNCTIONS * *
+		//   * * MEMBER MODIFICATION FUNCTIONS * *
 		//
 		//
 		//
@@ -108,7 +113,7 @@ namespace fpf_fion {
 		//
 		//
 		//
-		//   * * PRIVATE MEMBER ACCESS FUNCTIONS * *
+		//   * * MEMBER ACCESS FUNCTIONS * *
 		//
 		//
 		//
@@ -165,8 +170,8 @@ namespace fpf_fion {
 		st_CONDITION_FION_SUP = st_set_CONDITION_FION_SUP;
 	}
 
-	inline bool_type union_fragment_fion_mz(const data_type& d_fion_itr_1, const data_type& d_fion_itr_2) {
-		// union_fragment_fion_mz() is a bool_type return function that returns true if
+	inline bool_type union_fion_mz(const data_type& d_fion_itr_1, const data_type& d_fion_itr_2) {
+		// union_fion_mz() is a bool_type return function that returns true if
 		// two compared fion classes have vt_fion_mz values within a range of
 		// vt_CONDITION_FION_MZ. A return of true is indicative that two
 		// fragment fion mass-to-charge ratios are suitable for spectral summing.
