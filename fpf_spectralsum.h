@@ -6,14 +6,26 @@
 
 // --- namespace fpf_spectralsum class mgf
 // 
-// namespace fpf_spectralsum contains object definitions for the mgf class. A mgf
-// class declares private members to store to pointers to the first and last element of a doubly linked link containing 
-// precursor ion data as fpf_scan scan classes. Associated fragment ion data is stored in the respective fpf_fion fion class. 
-//
-// Initally, the function mgf_input_parse() reads user-inputted mgf files and stores data in scan and fion classes.
-// The function mgf_scan_fion_sum() calls the created data structures and performs fragment ion spectral summing through 
-// the fpf_scan function scan_fion_sum(). Precursor ion summing is determined with the function mgf_scan_sum(). Following
-// spectral summing, the modified data structures are outputted as a new mgf file through the function fout_mgf().
+// namespace fpf_spectralsum contains object definitions for the mgf class. A
+// mgf class declares private members to store pointers to the first and last
+// element of a doubly linked link containing precursor ion data as fpf_scan
+// scan classes. The scan class precursor ion data is precursor ion mass in
+// daltons, retention time in seconds, and the list of associated fragment ion
+// data as fpf_fion fion classes. An additional run-time variable stores a value
+// of how many scan classes a scan class is composed of (initially 1). A fion
+// class stores a fragment ion mass-to-charge ratio in daltons and intensity in
+// detected counts. The fion class also stores a value representing fion class
+// composition.
+// 
+// Initally, the function mgf_input_parse() reads user-inputted mgf files and
+// stores data in scan and fion classes. Precursor ion summing is determined
+// with the function mgf_scan_sum(). Fragment ion summing is also performed
+// through mgf_scan_sum() as the subfunction fpf_scan scan_fion_sum(). Following
+// precursor ion spectral summing, the function mgf_scan_fion_sum() calls the
+// created data structures and performs fragment ion spectral summing through
+// scan_fion_sum() for those scans that were not subject to any spectral
+// summing. The modified data structures are outputted as a new mgf file through
+// the function fout_mgf().
 
 #ifndef FPF_SPECTRALSUM
 #define	FPF_SPECTRALSUM
@@ -55,18 +67,20 @@ namespace fpf_spectralsum {
 	//    count_mgf_scan_fout, return_scan_union_count(), and
 	//    st_return_union_count() are explicitly included.
 	// 2. Displays scan class spectral sum boolean tests on the console.
-	//    Compared precurse ion masses, retention times and fragment ion maxima
+	//    Compared precursor ion masses, retention times and fragment ion maxima
 	//    successful and unsuccessful comparisons are annotated.
 
 	size_type st_count_mgf_scan = size_type();
 	// st_count_mgf_scan is a size_type that stores the quantity of scan classes
-	// that have been parsed from the input mgf file(s). The value of st_count_mgf_scan 
-	// is dynamically increased as the input mgf file(s) are read through mgf_input_parse().
+	// that have been parsed from the input mgf file(s). The value of
+	// st_count_mgf_scan is dynamically increased as the input mgf file(s) are
+	// read through mgf_input_parse().
 
 	size_type st_count_mgf_scan_summed = size_type();
-	// st_count_mgf_scan_summed is a size_type that stores the quantity of scan classes
-	// that have been spectral summed. The value of st_count_mgf_scan_summed 
-	// is dynamically increased as the scan classes are read through mgf_scan_sum().
+	// st_count_mgf_scan_summed is a size_type that stores the quantity of scan
+	// classes that have been spectral summed. The value of
+	// st_count_mgf_scan_summed is dynamically increased as the scan classes are
+	// read through mgf_scan_sum().
 
 	value_type vt_FILTER_PION_RT = 0;
 	// vt_FILTER_PION_RT is a value_type with a compile-time or run-time
@@ -86,7 +100,8 @@ namespace fpf_spectralsum {
 
 		mgf() {
 			// mgf() defines the default constructor for the mgf class. It
-			// initialises member values as ISO type defaults (NULL for pointer types).
+			// initialises member values as ISO type defaults (NULL for pointer
+			// types).
 			nt_scan_head_ptr = scan_node_type();
 			nt_scan_tail_ptr = scan_node_type();
 		};
@@ -103,31 +118,33 @@ namespace fpf_spectralsum {
 		//
 
 		inline scan_node_type& nt_return_scan_head_ptr() {
-			// nt_return_scan_head_ptr() returns nt_scan_head_ptr, a pointer to the
-			// first fpf_scan::scan class in a doubly linked list as defined in
-			// fpf_node. Collectively the nodes of the list represent the detected precursor
-			// ions of the sample(s).
+			// nt_return_scan_head_ptr() returns nt_scan_head_ptr, a pointer to
+			// the first fpf_scan::scan class in a doubly linked list as defined
+			// in fpf_node. Collectively the nodes of the list represent the
+			// detected precursor ions of the sample(s).
 			return nt_scan_head_ptr;
 		};
 
 		inline scan_node_type& nt_return_scan_tail_ptr() {
-			// nt_return_scan_tail_ptr() returns nt_scan_tail_ptr, a pointer to the
-			// last fpf_scan::scan class in a doubly linked list as defined in
-			// fpf_node. Collectively the nodes of the list represent the detected precursor
-			// ions of the sample(s).
+			// nt_return_scan_tail_ptr() returns nt_scan_tail_ptr, a pointer to
+			// the last fpf_scan::scan class in a doubly linked list as defined
+			// in fpf_node. Collectively the nodes of the list represent the
+			// detected precursor ions of the sample(s).
 			return nt_scan_tail_ptr;
 		};
 
 	private:
 		scan_node_type nt_scan_head_ptr;
-		// nt_scan_head_ptr is an scan_node_type that stores a pointer to the first fpf_scan::scan class
-		// in a doubly linked list as defined in fpf_node. Collectively the nodes of the list
-		// represent the precursor ions of the sample(s).
+		// nt_scan_head_ptr is an scan_node_type that stores a pointer to the
+		// first fpf_scan::scan class in a doubly linked list as defined in
+		// fpf_node. Collectively the nodes of the list represent the precursor
+		// ions of the sample(s).
 
 		scan_node_type nt_scan_tail_ptr;
-		// nt_scan_tail_ptr is an scan_node_type that stores a pointer to the last fpf_scan::scan class
-		// in a doubly linked list as defined in fpf_node. Collectively the nodes of the list
-		// represent the precursor ions of the sample(s).
+		// nt_scan_tail_ptr is an scan_node_type that stores a pointer to the
+		// last fpf_scan::scan class in a doubly linked list as defined in
+		// fpf_node. Collectively the nodes of the list represent the precursor
+		// ions of the sample(s).
 	};
 
 	//
@@ -139,7 +156,8 @@ namespace fpf_spectralsum {
 	//
 
 	inline void set_FILTER_FION_INTENSITY(value_type vt_set_FILTER_FION_INTENSITY) {
-		// set_FILTER_FION_INTENSITY() assigns a value_type to vt_FILTER_FION_INTENSITY.
+		// set_FILTER_FION_INTENSITY() assigns a value_type to
+		// vt_FILTER_FION_INTENSITY.
 		vt_FILTER_FION_INTENSITY = vt_set_FILTER_FION_INTENSITY;
 	}
 
@@ -149,8 +167,11 @@ namespace fpf_spectralsum {
 	}
 
 	inline void display_interface_settings() {
-		// display_interface_settings() displays to the console the initialised values of various run-time parameters
-		// relating to parsing conditions of the input file(s) and parametric conditions of spectral summing.
+		// display_interface_settings() displays to the console the initialised
+		// values of various run-time parameters relating to parsing conditions
+		// of the input file(s) and parametric conditions of spectral summing.
+		const size_type st_indent_1 = 2;
+		const size_type st_indent_2 = 4;
 		std::string display_default = "Spectral summing parameters:";
 		std::string display_menu_precursor_mass = "Precursor mass range - ";
 		std::string display_menu_precursor_rt = "Precursor retention time range - ";
@@ -158,32 +179,32 @@ namespace fpf_spectralsum {
 		std::string display_menu_fragment_ion_sup_intensities = "Fragment ion intensity maxima count - ";
 		std::string display_menu_fion_noise_floor = "Fragment ion noise floor - ";
 		std::cout << "\n\n\n";
-		for (size_type i = 0; i < 2; ++i) {
+		for (size_type i = 0; i < st_indent_1; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_default;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_precursor_mass << fpf_scan::vt_CONDITION_PION_MASS;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_precursor_rt << fpf_scan::vt_CONDITION_PION_RT;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_fragment_ion_mz << fpf_fion::vt_CONDITION_FION_MZ;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_fragment_ion_sup_intensities << fpf_fion::st_CONDITION_FION_SUP << " of " << fpf_fion::st_CONDITION_COUNT_FION_SUP;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_fion_noise_floor << vt_FILTER_FION_INTENSITY;
@@ -191,27 +212,29 @@ namespace fpf_spectralsum {
 
 	inline void display_main_menu() {
 		// display_main_menu() displays to the console the main menu options.
+		const size_type st_indent_1 = 2;
+		const size_type st_indent_2 = 4;
 		std::string display_menu_set_header = "Menu options:";
 		std::string display_menu_set_continue = "0 - Continue to input file selection";
 		std::string display_menu_set_parameters = "P - Modify parameters";
 		std::string display_menu_set_debug = "D - Debug mode";
 		std::cout << "\n\n\n";
-		for (size_type i = 0; i < 2; ++i) {
+		for (size_type i = 0; i < st_indent_1; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_header;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_parameters;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_debug;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_continue;
@@ -219,8 +242,10 @@ namespace fpf_spectralsum {
 	}
 
 	inline void display_introduction() {
-		// display_introduction() displays to the console the header and introduction.
+		// display_introduction() displays to the console the header and
+		// introduction.
 		const size_type display_width = 75;
+		const size_type st_indent = 4;
 		const std::string display_version = "v0.8.5.0";
 		std::string display_title = "-- IgCompose " + display_version + " --";
 		std::string display_fpf = "Flinders Proteomics Facility - 2016";
@@ -236,7 +261,7 @@ namespace fpf_spectralsum {
 		}
 		std::cout << display_fpf;
 		std::cout << "\n\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_intro;
@@ -247,46 +272,48 @@ namespace fpf_spectralsum {
 	inline void display_interface_set_settings() {
 		// display_interface_set_settings() displays to the console the run-time parameter modification options.
 		const size_type display_width = 75;
+		const size_type st_indent_1 = 2;
+		const size_type st_indent_2 = 4;
 		std::string display_menu_set_header = "Input to modify parameter:";
 		std::string display_menu_set_precursor_mass = "M - Set precursor mass range";
 		std::string display_menu_set_precursor_rt = "R - Set precursor retention time range";
 		std::string display_menu_set_fragment_ion_mz = "Z - Set fragment ion mass-to-charge ratio range";
-		std::string display_menu_set_fragment_ion_sup_intensities = "I - Set fragment ion intensity maxima count [not available, please wait]";
+		std::string display_menu_set_fragment_ion_sup_intensities = "I - Set fragment ion intensity maxima count";
 		std::string display_menu_set_fragment_ion_sup_count_intensities = "C - Set fragment ion intensity maxima comp [not available, please wait]";
 		std::string display_menu_set_noise_floor = "N - Set fragment ion noise floor";
 		std::string display_menu_return_main = "0 - Return to main menu";
 		std::cout << "\n\n\n";
-		for (size_type i = 0; i < 2; ++i) {
+		for (size_type i = 0; i < st_indent_1; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_header;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_precursor_mass;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_precursor_rt;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_fragment_ion_mz;
 		std::cout << "\n\n";
-		//for (size_type i = 0; i < 4; ++i) {
-		//	std::cout << " ";
-		//}
-		//std::cout << display_menu_set_fragment_ion_sup_intensities;
-		//std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
+			std::cout << " ";
+		}
+		std::cout << display_menu_set_fragment_ion_sup_intensities;
+		std::cout << "\n\n";
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_set_noise_floor;
 		std::cout << "\n\n";
-		for (size_type i = 0; i < 4; ++i) {
+		for (size_type i = 0; i < st_indent_2; ++i) {
 			std::cout << " ";
 		}
 		std::cout << display_menu_return_main;
@@ -340,21 +367,38 @@ namespace fpf_spectralsum {
 						display_interface_set_settings();
 					}
 					if (c_settings_input == 'Z') {
-						fpf_scan::value_type new_FILTER_FION_IMZ;
+						fpf_scan::value_type new_FILTER_FION_MZ;
 						std::cout << "\n\nNew value for the fragment ion mass-to-charge ratio range?\n\n> ";
-						std::cin >> new_FILTER_FION_IMZ;
+						std::cin >> new_FILTER_FION_MZ;
 						while (std::cin.fail()) {
 							std::cout << "\n\n";
 							std::cin.clear();
 							std::cin.ignore(256, '\n');
 							std::cout << "\n\nNew value for the fragment ion mass-to-charge ratio range?\n\n> ";
-							std::cin >> new_FILTER_FION_IMZ;
+							std::cin >> new_FILTER_FION_MZ;
 						}
 						std::cout << "\n";
-						fpf_fion::set_CONDITION_FION_MZ(new_FILTER_FION_IMZ);
+						fpf_fion::set_CONDITION_FION_MZ(new_FILTER_FION_MZ);
 						display_interface_settings();
 						display_interface_set_settings();
 					}
+					if (c_settings_input == 'I') {
+						fpf_scan::size_type new_CONDITION_FION_SUP;
+						std::cout << "\n\nNew value for the fragment ion maxima comparison count?\n\n> ";
+						std::cin >> new_CONDITION_FION_SUP;
+						while (std::cin.fail()) {
+							std::cout << "\n\n";
+							std::cin.clear();
+							std::cin.ignore(256, '\n');
+							std::cout << "\n\nNew value for the fragment ion maxima comparison count?\n\n> ";
+							std::cin >> new_CONDITION_FION_SUP;
+						}
+						std::cout << "\n";
+						fpf_fion::set_CONDITION_FION_SUP(new_CONDITION_FION_SUP);
+						display_interface_settings();
+						display_interface_set_settings();
+					}
+					
 					if (c_settings_input == 'N') {
 						fpf_scan::value_type new_FILTER_FION_INTENSITY;
 						std::cout << "\n\nNew value for the fragment ion noise floor?\n\n> ";
@@ -409,8 +453,8 @@ namespace fpf_spectralsum {
 	}
 
 	inline size_type input_file_count() {
-		// input_file_count() prompts the user to assign a run-time initialised size_type that determines the quantity of input
-		// mgf files.
+		// input_file_count() prompts the user to assign a run-time initialised
+		// size_type that determines the quantity of input mgf files.
 		std::cout << "\n\n# of input files?\n\n> ";
 		int i_input_count;
 		std::cin >> i_input_count;
@@ -425,8 +469,10 @@ namespace fpf_spectralsum {
 	}
 
 	inline void input_file_assign(size_type st_input_count, std::string sa_input_file[]) {
-		// input_file_assign() prompts the user to assign run-time initialised std::string(s) that determines the filenames
-		// of input mfg files. Such files are parsed and assigned to data structures through mgf_input_parse().
+		// input_file_assign() prompts the user to assign run-time initialised
+		// std::string(s) that determines the filenames of input mfg files. Such
+		// files are parsed and assigned to data structures through
+		// mgf_input_parse().
 		for (size_type i = 0; i < st_input_count; ++i) {
 			std::cout << "\n\nInput file";
 			if (st_input_count > 1) {
@@ -529,28 +575,30 @@ namespace fpf_spectralsum {
 	};
 
 	void mgf_scan_fion_sum(mgf*& c_mgf) {
-		// mgf_scan_fion_sum() is a void type function that performs
-		// intra-scan class summing of fion classes for all scan classes in
-		// a doubly linked list of a mgf class. The scan classes of an mgf
-		// class are iterated with scan_ptr_itr, for which
-		// fpf_scan::scan_fion_sum() is called.
+		// mgf_scan_fion_sum() is a void type function that performs intra-scan
+		// class summing of fion classes for all scan classes in a doubly linked
+		// list of a mgf class that have not been combined (st_scan_union_count
+		// == 1). The scan classes of an mgf class are iterated with
+		// scan_ptr_itr, for which fpf_scan::scan_fion_sum() is called.
 		size_type count_mgf_fion_summed = size_type();
 		const size_type st_output_interval = 100;
 		std::cout << "\n\n\nSumming fragment fion spectra...\n";
 		for (scan_node_type scan_ptr_itr = c_mgf->nt_return_scan_head_ptr(); scan_ptr_itr != NULL; scan_ptr_itr = scan_ptr_itr->nt_return_up_node()) {
-			size_type scan_union_sum_count = fpf_scan::scan_fion_sum(scan_ptr_itr->dt_return_data());
-			++count_mgf_fion_summed;
-			if (fpf_spectralsum_DEBUG_MODE == 0) {
-				if ((count_mgf_fion_summed > 0) && (count_mgf_fion_summed % st_output_interval == 0)) {
-					std::cout << "\nscan - " << count_mgf_fion_summed;
-					if (fpf_spectralsum_DEBUG_MODE == 1) {
-						std::cout << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_rt() << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_mass() << "  " << scan_union_sum_count;
+			if (scan_ptr_itr->dt_return_data()->return_scan_union_count() == 1) {
+				size_type scan_union_sum_count = fpf_scan::scan_fion_sum(scan_ptr_itr->dt_return_data());
+				++count_mgf_fion_summed;
+				if (fpf_spectralsum_DEBUG_MODE == 0) {
+					if ((count_mgf_fion_summed > 0) && (count_mgf_fion_summed % st_output_interval == 0)) {
+						std::cout << "\nscan - " << count_mgf_fion_summed;
+						if (fpf_spectralsum_DEBUG_MODE == 1) {
+							std::cout << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_rt() << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_mass() << "  " << scan_union_sum_count;
+						}
 					}
-				}
-				if ((count_mgf_fion_summed == st_count_mgf_scan) && !((count_mgf_fion_summed > 0) && (count_mgf_fion_summed % st_output_interval == 0))) {
-					std::cout << "\nscan - " << count_mgf_fion_summed;
-					if (fpf_spectralsum_DEBUG_MODE == 1) {
-						std::cout << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_rt() << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_mass() << "  " << scan_union_sum_count;
+					if ((count_mgf_fion_summed == st_count_mgf_scan) && !((count_mgf_fion_summed > 0) && (count_mgf_fion_summed % st_output_interval == 0))) {
+						std::cout << "\nscan - " << count_mgf_fion_summed;
+						if (fpf_spectralsum_DEBUG_MODE == 1) {
+							std::cout << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_rt() << " " << scan_ptr_itr->dt_return_data()->vt_return_pion_mass() << "  " << scan_union_sum_count;
+						}
 					}
 				}
 			}
@@ -558,31 +606,40 @@ namespace fpf_spectralsum {
 	};
 
 	void mgf_scan_sum(mgf*& c_mgf) {
-		// mgf_scan_sum() is a void type function that performs the primary role of scan class
-		// summing. The declared iterators nt_scan_ptr_itr_1 and nt_scan_ptr_itr_2 iterate
-		// through the doubly linked list of scan classes of the mgf class pointed to by c_mgf.
-		// Two scan classes pointed to by the iterators are compared and are determined suitable
+		// mgf_scan_sum() is a void type function that performs the primary role
+		// of scan class summing. The declared iterators nt_scan_ptr_itr_1 and
+		// nt_scan_ptr_itr_2 iterate through the doubly linked list of scan
+		// classes of the mgf class pointed to by c_mgf. Two scan classes
+		// pointed to by the iterators are compared and are determined suitable
 		// for spectral summing if -
 		// 
 		// 1. The iterators are not pointing to the same scan class.
-		// 2. The precursor ion masses, fpf_scan::vt_pion_mass, are within a delta-range of fpf_scan::vt_CONDITION_PION_MASS.
-		// 3. The precursor retention times, fpf_scan::vt_pion_rt, are within a delta-range of fpf_scan::vt_CONDITION_PION_RT.
-		// 4. fpf_ion::st_CONDITION_FION_SUP of the fpf_ion::st_CONDITION_COUNT_FION_SUP most
-		//    intense fragment ions are within a mass-to-charge ratio range of fpf_ion::vt_CONDITION_FION_MZ.
+		// 2. The precursor ion masses, fpf_scan::vt_pion_mass, are within a
+		//    delta-range of fpf_scan::vt_CONDITION_PION_MASS.
+		// 3. The precursor retention times, fpf_scan::vt_pion_rt, are within a
+		//    delta-range of fpf_scan::vt_CONDITION_PION_RT.
+		// 4. fpf_ion::st_CONDITION_FION_SUP of the
+		//    fpf_ion::st_CONDITION_COUNT_FION_SUP most intense fragment ions
+		//    are within a mass-to-charge ratio range of
+		//    fpf_ion::vt_CONDITION_FION_MZ.
 		// 
-		// Two scan classes meeting these conditions will be summed through the following
-		// process -
+		// Two scan classes meeting these conditions will be summed through the
+		// following process -
 		// 
 		// 1. A new scan class is created.
-		// 2. The mass-to-charge ratio of the new scan class precursor ion is determined with vt_return_mean_pion_mass().
-		// 3. The retention time of the new scan class precursor ion is determined with vt_return_mean_pion_rt().
-		// 4. The total quantity of scan classes that have been combined into the new scan class
-		//    is determined with st_return_sum_scan_union_count().
-		// 5. The new scan class is inserted after the second compared scan class, pointed to by nt_scan_ptr_itr_2.
+		// 2. The mass-to-charge ratio of the new scan class precursor ion is
+		//    determined with vt_return_mean_pion_mass().
+		// 3. The retention time of the new scan class precursor ion is
+		//    determined with vt_return_mean_pion_rt().
+		// 4. The total quantity of scan classes that have been combined into
+		//    the new scan class is determined with
+		//    st_return_sum_scan_union_count().
+		// 5. The new scan class is inserted after the second compared scan
+		//    class, pointed to by nt_scan_ptr_itr_2.
 		// 6. The two compared scan classes are removed
 		// 
-		// The summing process continues through c_mgf, such that all possible scan class
-		// summation is completed.
+		// The summing process continues through c_mgf, such that all possible
+		// scan class summation is completed.
 		scan_node_type nt_hold_scan = scan_node_type();
 		scan_node_type nt_hold_scan_head_ptr = c_mgf->nt_return_scan_head_ptr();
 		scan_data_type dt_scan_union = new fpf_scan::scan();
@@ -590,8 +647,9 @@ namespace fpf_spectralsum {
 		const size_type st_output_interval = 100;
 		std::cout << "\n\n\nSumming scans...\n";
 		for (scan_node_type nt_scan_ptr_itr_1 = c_mgf->nt_return_scan_head_ptr(); nt_scan_ptr_itr_1 != NULL; nt_scan_ptr_itr_1 = nt_scan_ptr_itr_1->nt_return_up_node()) {
-			// nt_scan_ptr_itr_1 iterates through the scan classes of the doubly linked list of the mgf class pointed to by
-			// c_mgf. It corresponds to the first scan being compared.
+			// nt_scan_ptr_itr_1 iterates through the scan classes of the doubly
+			// linked list of the mgf class pointed to by c_mgf. It corresponds
+			// to the first scan being compared.
 			++count_scan;
 			if ((count_scan > 0) && (count_scan % st_output_interval == 0)) {
 				if (fpf_spectralsum_DEBUG_MODE == 0) {
@@ -599,15 +657,19 @@ namespace fpf_spectralsum {
 				}
 			}
 			for (scan_node_type nt_scan_ptr_itr_2 = c_mgf->nt_return_scan_head_ptr(); nt_scan_ptr_itr_2 != NULL; nt_scan_ptr_itr_2 = nt_scan_ptr_itr_2->nt_return_up_node()) {
-				// nt_scan_ptr_itr_2 iterates through the scan classes of the doubly linked list of the mgf class pointed to by
-				// c_mgf. It corresponds to the second scan being compared.
+				// nt_scan_ptr_itr_2 iterates through the scan classes of the
+				// doubly linked list of the mgf class pointed to by c_mgf. It
+				// corresponds to the second scan being compared.
 				if ((nt_scan_ptr_itr_1 != nt_scan_ptr_itr_2)
 					&& fpf_scan::union_pion_mass(nt_scan_ptr_itr_1->dt_return_data(), nt_scan_ptr_itr_2->dt_return_data())
 					&& fpf_scan::union_pion_rt(nt_scan_ptr_itr_1->dt_return_data(), nt_scan_ptr_itr_2->dt_return_data())) {
 					// Tests if the two compared scan classes are -
+					//
 					// 1. Not the same scan class.
-					// 2. Within a mass delta-range defined by fpf_scan::vt_CONDITION_PION_MASS.
-					// 3. Within a retention time delta-range defined by fpf_scan::vt_CONDITION_PION_RT.
+					// 2. Within a mass delta-range defined by
+					//    fpf_scan::vt_CONDITION_PION_MASS.
+					// 3. Within a retention time delta-range defined by
+					//    fpf_scan::vt_CONDITION_PION_RT.
 					if (union_fion_sup_intensities(nt_scan_ptr_itr_1->dt_return_data(), nt_scan_ptr_itr_2->dt_return_data())) {
 						++count_scan;
 						++st_count_mgf_scan_summed;
@@ -616,11 +678,13 @@ namespace fpf_spectralsum {
 						dt_scan_union->set_scan_union_count(fpf_scan::st_return_sum_scan_union_count(nt_scan_ptr_itr_1->dt_return_data(), nt_scan_ptr_itr_2->dt_return_data()));
 						fpf_scan::set_scan_fion_union(dt_scan_union, nt_scan_ptr_itr_1->dt_return_data(), nt_scan_ptr_itr_2->dt_return_data());
 						fpf_node::list_insert_up<scan_data_type>(dt_scan_union, nt_scan_ptr_itr_2, c_mgf->nt_return_scan_head_ptr(), c_mgf->nt_return_scan_tail_ptr());
-						// Creates a new scan class with values determined by vt_return_mean_fion_mz(),
-						// st_return_sum_fion_intensity(), and st_return_sum_fion_union_count().
+						// Creates a new scan class with values determined by
+						// vt_return_mean_fion_mz(),
+						// st_return_sum_fion_intensity(), and
+						// st_return_sum_fion_union_count().
 						dt_scan_union = new fpf_scan::scan();
 						if (fpf_spectralsum_DEBUG_MODE == 2) {
-							// not correct count here
+							// ! not correct count here
 							std::cout << "\nMatch for scan " << count_scan << " with scan " << count_scan + st_count_mgf_scan_summed << "\n\n";
 							std::cout << "   ! " << nt_scan_ptr_itr_1->dt_return_data()->vt_return_pion_rt() << " " << nt_scan_ptr_itr_1->dt_return_data()->vt_return_pion_mass();
 							std::cout << "  " << nt_scan_ptr_itr_2->dt_return_data()->vt_return_pion_rt() << " " << nt_scan_ptr_itr_2->dt_return_data()->vt_return_pion_mass();
@@ -633,26 +697,33 @@ namespace fpf_spectralsum {
 							}
 						}
 						if (nt_scan_ptr_itr_1 != nt_hold_scan_head_ptr) {
-							// Removes the compared scan classes after creation of the new scan
-							// class. The four permutative algorithmic conditions are:
+							// Removes the compared scan classes after creation
+							// of the new scan class. The four permutative
+							// algorithmic conditions are:
 							// 
-							// 1. nt_scan_ptr_itr_1 is the first scan class of the doubly linked
-							//    list and nt_scan_ptr_itr_2 subsequently follows.
-							// 2. nt_scan_ptr_itr_1 is the first scan class of the doubly linked
-							//    list and nt_scan_ptr_itr_2 does not subsequently follow.
-							// 3. nt_scan_ptr_itr_1 is not the first scan class of the doubly
-							//    linked list and nt_scan_ptr_itr_2 subsequently follows.
-							// 4. nt_scan_ptr_itr_1 is not the first scan class of the doubly
-							//    linked list and nt_scan_ptr_itr_2 does not subsequently follow.
+							// 1. nt_scan_ptr_itr_1 is the first scan class of
+							//    the doubly linked list and nt_scan_ptr_itr_2
+							//    subsequently follows.
+							// 2. nt_scan_ptr_itr_1 is the first scan class of
+							//    the doubly linked list and nt_scan_ptr_itr_2
+							//    does not subsequently follow.
+							// 3. nt_scan_ptr_itr_1 is not the first scan class
+							//    of the doubly linked list and
+							//    nt_scan_ptr_itr_2 subsequently follows.
+							// 4. nt_scan_ptr_itr_1 is not the first scan class
+							//    of the doubly linked list and
+							//    nt_scan_ptr_itr_2 does not subsequently
+							//    follow.
 							// 
-							// During, nt_scan_ptr_itr_1 is pointed to the scan class following
-							// the first removed scan class, while nt_scan_ptr_itr_2 is pointed
-							// to the first scan class of the doubly linked list (or
-							// alternatively, to nt_scan_ptr_itr_1, such that the for loop
-							// directive nt_scan_ptr_itr_2 =
-							// nt_scan_ptr_itr_2->nt_return_up_node() iterates it to the
-							// subsequent scan class). The compared scan classes
-							// are removed from memory.
+							// During, nt_scan_ptr_itr_1 is pointed to the scan
+							// class following the first removed scan class,
+							// while nt_scan_ptr_itr_2 is pointed to the first
+							// scan class of the doubly linked list (or
+							// alternatively, to nt_scan_ptr_itr_1, such that
+							// the for loop directive nt_scan_ptr_itr_2 =
+							// nt_scan_ptr_itr_2->nt_return_up_node() iterates
+							// it to the subsequent scan class). The compared
+							// scan classes are removed from memory.
 							if (nt_scan_ptr_itr_1->nt_return_up_node() == nt_scan_ptr_itr_2) {
 								if (fpf_spectralsum_DEBUG_MODE == 2) {
 									std::cout << "   (nt_ion_itr != nt_hold_ion_head_ptr)  (nt_ion_itr->nt_return_up_node() == nt_ion_itr_2)\n";
@@ -720,8 +791,9 @@ namespace fpf_spectralsum {
 	};
 
 	inline std::string output_file_assign(size_type st_input_count, std::string sa_input_file[]) {
-		// output_file_assign() dynamically creates an output file name as a std::string composed
-		// of the input file(s) and various program and run-time determined parameters.
+		// output_file_assign() dynamically creates an output file name as a
+		// std::string composed of the input file(s) and various compile-time
+		// and run-time determined parameters.
 		std::string s_output_file;
 		for (size_type i = 0; i < st_input_count; ++i) {
 			s_output_file += sa_input_file[i];
@@ -766,7 +838,8 @@ namespace fpf_spectralsum {
 	}
 
 	void const cout_mgf(mgf*& c_mgf) {
-		// cout_mgf() outputs the modified data structures to the console in the standard mgf format.
+		// cout_mgf() outputs the modified data structures to the console in the
+		// standard mgf format.
 		size_type count_mgf_scan_cout = 1;
 		for (scan_node_type nt_scan_ptr_itr = c_mgf->nt_return_scan_head_ptr(); nt_scan_ptr_itr != NULL; nt_scan_ptr_itr = nt_scan_ptr_itr->nt_return_up_node()) {
 			if (c_mgf->nt_return_scan_head_ptr() == NULL) {
@@ -795,7 +868,8 @@ namespace fpf_spectralsum {
 	};
 
 	void const fout_mgf(std::ofstream& fout, mgf*& c_mgf) {
-		// fout_mgf() outputs the modified data structures to a new file of the standard mgf format.
+		// fout_mgf() outputs the modified data structures to a new file of the
+		// standard mgf format.
 		size_type count_mgf_scan_fout = 1;
 		std::cout << "\n\n\nOutputting...";
 		for (scan_node_type nt_scan_ptr_itr = c_mgf->nt_return_scan_head_ptr(); nt_scan_ptr_itr != NULL; nt_scan_ptr_itr = nt_scan_ptr_itr->nt_return_up_node()) {
@@ -835,7 +909,9 @@ namespace fpf_spectralsum {
 	};
 
 	inline void display_program_exit(size_type st_input_count) {
-		// display_program_exit() displays summary information from program execution to the console and prompts the user to enter a key to terminate run-time.
+		// display_program_exit() displays summary information from program
+		// execution to the console and prompts the user to enter a key to
+		// terminate run-time.
 		std::string pong;
 		std::cout << "\n\n - \n - \n - ";
 		std::cout << "\n\ninput files - " << st_input_count;

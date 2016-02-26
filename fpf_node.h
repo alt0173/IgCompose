@@ -26,7 +26,7 @@ namespace fpf_node {
 		typedef node<element>* node_type;
 		// Defines node_type as a pointer to a node class of template type.
 
-		node(const data_type& d_init_data = data_type(), node_type nt_init_up_node = node_type(), node_type nt_init_down_node = node_type()) {
+		node(data_type d_init_data = data_type(), node_type nt_init_up_node = node_type(), node_type nt_init_down_node = node_type()) {
 			// node() defines a constructor call for a node class that assigns
 			// declared parameters as initial values or calls default values as
 			// ISO type defaults (0 for standard C++ data types, NULL for
@@ -67,7 +67,7 @@ namespace fpf_node {
 		//
 		//
 
-		data_type dt_return_data() const {
+		data_type dt_return_data() {
 			// dt_return_data() returns d_data.
 			return d_data;
 		};

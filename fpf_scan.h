@@ -434,16 +434,6 @@ namespace fpf_scan {
 							}
 							nt_fion_ptr_itr_1 = nt_fion_ptr_itr_1->nt_return_up_node();
 							fpf_node::list_remove_head<fion_data_type>(c_scan_ptr->nt_return_fion_head_ptr());
-							// copy constructor here?
-							//
-							//
-							//
-							//
-							// * * * * *
-							//
-							//
-							//
-							//
 							nt_hold_fion_head_ptr = nt_fion_ptr_itr_1;
 							nt_hold_fion = nt_fion_ptr_itr_2;
 							fpf_node::list_remove<fion_data_type>(nt_hold_fion);
