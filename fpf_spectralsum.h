@@ -1,4 +1,4 @@
-// * * fpf_spectralsum.h * * 
+// * * fpf_spectralsum.h * *  
 // 
 // Lukah Dykes - Flinders Proteomics Facility - 2016
 // 
