@@ -1,4 +1,4 @@
-// * * fpf_node.h * * 
+// * * fpf_node.h * *
 // 
 // Lukah Dykes - Flinders Proteomics Facility - 2016
 // 
@@ -6,9 +6,9 @@
 
  // --- namespace fpf_node class node
  // 
- // namespace fpf_node contains object definitions for the node class. node provides functionality
- // for a doubly linked list, which is templated for a standard C++ data type or an object with a
- // copy constructor and assignment operator.
+ // namespace fpf_node contains object definitions for the node class. node
+ // provides functionality for a doubly linked list, which is templated for a
+ // standard C++ data type or an object with a copy constructor and assignment operator.
 
 #ifndef FPF_NODE
 #define	FPF_NODE
@@ -121,8 +121,8 @@ namespace fpf_node {
 	void list_insert_head(const typename node<element>::data_type dt_new_data, typename node<element>::node_type& nt_node_head_ptr, typename node<element>::node_type& nt_node_tail_ptr) {
 		// list_insert_head() initialises a node_type, assigns data_type through
 		// a called parameter, and assigns this node as the first node in a
-		// referenced doubly linked list. If the called list is empty the created
-		// node is declared as both the first and last node.
+		// referenced doubly linked list. If the called list is empty the
+		// created node is declared as both the first and last node.
 		node<element>::node_type nt_new_ptr = new node;
 		nt_new_ptr->set_data_dt(dt_new_data);
 		if (nt_node_head_ptr == NULL) {

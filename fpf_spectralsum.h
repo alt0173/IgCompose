@@ -1,4 +1,4 @@
-// * * fpf_spectralsum.h * *  
+// * * fpf_spectralsum.h * *
 // 
 // Lukah Dykes - Flinders Proteomics Facility - 2016
 // 
@@ -57,10 +57,10 @@ namespace fpf_spectralsum {
 	// Defines scan_data_type as a pointer to a scan class.
 
 	size_type fpf_spectralsum_DEBUG_MODE = size_type();
-	// fpf_spectralsum_DEBUG_MODE is a size_type with a run-time initialised
-	// value that determines the relevant debug mode to implement. This value
-	// also sets fpf_scan_DEBUG_MODE. The default value is 0. Debug mode values
-	// relevant to fpf_spectralsum are:
+	// fpf_spectralsum_DEBUG_MODE is a size_type with a compile-time or run-time
+	// initialised value that determines the relevant debug mode to implement.
+	// This value also sets fpf_scan_DEBUG_MODE. The default value is 0. Debug
+	// mode values relevant to fpf_spectralsum are:
 	// 0. Default value for fpf_spectralsum_DEBUG_MODE. The program will execute
 	//    standard functionality.
 	// 1. Creates debug information for outputted file. Values for
@@ -107,6 +107,7 @@ namespace fpf_spectralsum {
 		};
 
 		~mgf() {
+			// ~mgf() defines the default destructor for the scan class.
 		};
 
 		//
@@ -121,7 +122,7 @@ namespace fpf_spectralsum {
 			// nt_return_scan_head_ptr() returns nt_scan_head_ptr, a pointer to
 			// the first fpf_scan::scan class in a doubly linked list as defined
 			// in fpf_node. Collectively the nodes of the list represent the
-			// detected precursor ions of the sample(s).
+			// scans of the sample(s).
 			return nt_scan_head_ptr;
 		};
 
@@ -129,7 +130,7 @@ namespace fpf_spectralsum {
 			// nt_return_scan_tail_ptr() returns nt_scan_tail_ptr, a pointer to
 			// the last fpf_scan::scan class in a doubly linked list as defined
 			// in fpf_node. Collectively the nodes of the list represent the
-			// detected precursor ions of the sample(s).
+			// scans of the sample(s).
 			return nt_scan_tail_ptr;
 		};
 
@@ -270,7 +271,8 @@ namespace fpf_spectralsum {
 	}
 
 	inline void display_interface_set_settings() {
-		// display_interface_set_settings() displays to the console the run-time parameter modification options.
+		// display_interface_set_settings() displays to the console the run-time
+		// parameter modification options.
 		const size_type display_width = 75;
 		const size_type st_indent_1 = 2;
 		const size_type st_indent_2 = 4;
@@ -321,20 +323,20 @@ namespace fpf_spectralsum {
 	}
 
 	inline void display_interface() {
-		// display_interface() displays to the console various prompts dependent on user-inputted values that guide the user
-		// through the menus.
+		// display_interface() displays to the console various prompts dependent
+		// on user-inputted values that guide the user through the menus.
 		char c_main_input = '1';
 		while (c_main_input != '0') {
 			std::cout << "\n\nInput?\n\n> ";
 			std::cin >> c_main_input;
 			if (c_main_input == 'P') {
-				char c_settings_input = '1';
+				char c_parameters_input = '1';
 				display_interface_settings();
 				display_interface_set_settings();
-				while (c_settings_input != '0') {
+				while (c_parameters_input != '0') {
 					std::cout << "\n\nInput?\n\n> ";
-					std::cin >> c_settings_input;
-					if (c_settings_input == 'M') {
+					std::cin >> c_parameters_input;
+					if (c_parameters_input == 'M') {
 						fpf_scan::value_type new_CONDITION_PION_MASS;
 						std::cout << "\n\nNew value for the precursor ion mass range?\n\n> ";
 						std::cin >> new_CONDITION_PION_MASS;
@@ -350,7 +352,7 @@ namespace fpf_spectralsum {
 						display_interface_settings();
 						display_interface_set_settings();
 					}
-					if (c_settings_input == 'R') {
+					if (c_parameters_input == 'R') {
 						fpf_scan::value_type new_CONDITION_PION_RT;
 						std::cout << "\n\nNew value for the precursor ion retention time range?\n\n> ";
 						std::cin >> new_CONDITION_PION_RT;
@@ -366,7 +368,7 @@ namespace fpf_spectralsum {
 						display_interface_settings();
 						display_interface_set_settings();
 					}
-					if (c_settings_input == 'Z') {
+					if (c_parameters_input == 'Z') {
 						fpf_scan::value_type new_FILTER_FION_MZ;
 						std::cout << "\n\nNew value for the fragment ion mass-to-charge ratio range?\n\n> ";
 						std::cin >> new_FILTER_FION_MZ;
@@ -382,7 +384,7 @@ namespace fpf_spectralsum {
 						display_interface_settings();
 						display_interface_set_settings();
 					}
-					if (c_settings_input == 'I') {
+					if (c_parameters_input == 'I') {
 						fpf_scan::size_type new_CONDITION_FION_SUP;
 						std::cout << "\n\nNew value for the fragment ion maxima comparison count?\n\n> ";
 						std::cin >> new_CONDITION_FION_SUP;
@@ -399,7 +401,7 @@ namespace fpf_spectralsum {
 						display_interface_set_settings();
 					}
 					
-					if (c_settings_input == 'N') {
+					if (c_parameters_input == 'N') {
 						fpf_scan::value_type new_FILTER_FION_INTENSITY;
 						std::cout << "\n\nNew value for the fragment ion noise floor?\n\n> ";
 						std::cin >> new_FILTER_FION_INTENSITY;
@@ -415,7 +417,7 @@ namespace fpf_spectralsum {
 						display_interface_settings();
 						display_interface_set_settings();
 					}
-					if (c_settings_input != '0') {
+					if (c_parameters_input != '0') {
 						std::cin.clear();
 						std::cin.ignore(256, '\n');
 					}
@@ -620,8 +622,7 @@ namespace fpf_spectralsum {
 		//    delta-range of fpf_scan::vt_CONDITION_PION_RT.
 		// 4. fpf_ion::st_CONDITION_FION_SUP of the
 		//    fpf_ion::st_CONDITION_COUNT_FION_SUP most intense fragment ions
-		//    are within a mass-to-charge ratio range of
-		//    fpf_ion::vt_CONDITION_FION_MZ.
+		//    are within a mass-to-charge ratio range of fpf_ion::vt_CONDITION_FION_MZ.
 		// 
 		// Two scan classes meeting these conditions will be summed through the
 		// following process -
@@ -632,8 +633,7 @@ namespace fpf_spectralsum {
 		// 3. The retention time of the new scan class precursor ion is
 		//    determined with vt_return_mean_pion_rt().
 		// 4. The total quantity of scan classes that have been combined into
-		//    the new scan class is determined with
-		//    st_return_sum_scan_union_count().
+		//    the new scan class is determined with st_return_sum_scan_union_count().
 		// 5. The new scan class is inserted after the second compared scan
 		//    class, pointed to by nt_scan_ptr_itr_2.
 		// 6. The two compared scan classes are removed
