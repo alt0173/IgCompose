@@ -17,8 +17,8 @@
 // spectral summing, initially the precursor ion mass is compared among
 // precursor ions. If this value is within a compile-time (default 0.05 Da) or
 // run-time (user input) initialised range, the program next tests if the
-// precursor retention time is compared to be within a compile-time (default 600
-// s) or run-time initialised range. Should these two tests return true, the
+// precursor retention time is within a compile-time (default 600 s) or
+// run-time initialised range. Should these two tests return true, the
 // (default 10) most intense fragment ions are compared between the two
 // precursor ions. Should (default 4) of these be within a mass-to-charge ratio
 // range (default 0.05 Da) the two scans are combined. Note that, from a
