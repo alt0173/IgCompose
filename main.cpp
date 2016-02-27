@@ -44,7 +44,6 @@
 //    and summed detected intensity is determined and stored in a new fion
 //    class.
 // 
-// 
 // This process continues through the entirety of the created data structures.
 // Those scan classes that do not undergo any spectral summing are subjected to
 // fragment ion summing (as a correction and compression measure). Upon

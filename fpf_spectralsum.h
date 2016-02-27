@@ -499,11 +499,11 @@ namespace fpf_spectralsum {
 		int switch_inputstream = int();
 		scan_data_type dt_scan_inputstream = new fpf_scan::scan();
 		value_type vt_inputstream;
+		value_type vt_precursor_mass_inputstream;
+		value_type vt_precursor_rt_inputstream;
 		value_type vt_fragment_ion_mz_inputstream;
 		size_type st_inputstream;
 		size_type st_fragment_ion_intensity_inputstream;
-		value_type vt_precursor_mass_inputstream;
-		value_type vt_precursor_rt_inputstream;
 		fpf_scan::fion_data_type dt_ion_inputstream = new fpf_fion::fion();
 		const size_type OUTPUT_INTERVAL = 100;
 		std::cout << "\n\nParsing...\n";

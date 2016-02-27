@@ -206,14 +206,6 @@ namespace fpf_scan {
 	//
 
 	void set_debug(size_type set_fpf_scan_DEBUG_MODE) {
-		// set_debug() assigns a integer value to fpf_scan_DEBUG_MODE. The value
-		// of global DEBUG_MODE determines fpf_scan_DEBUG_MODE in the main
-		// namespace. The default value is 0. Debug mode values relevant to
-		// fpf_scan are:
-		// 6. output fion class test for spectral summing
-		// 7. output fion class test for spectral summing with explicit boolean
-		//    test
-		// *** Small (<5 scan class) test files are recommended.
 		fpf_scan_DEBUG_MODE = set_fpf_scan_DEBUG_MODE;
 	}
 
