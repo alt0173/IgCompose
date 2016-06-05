@@ -1,4 +1,4 @@
-// * * IgCompose v0.8.6.0 * *
+// * * IgCompose v0.8.6.2 * *
 // 
 // Lukah Dykes - Flinders Proteomics Facility - 2016
 // 
