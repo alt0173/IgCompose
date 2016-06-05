@@ -4,6 +4,8 @@
 // 
 // * * * * *
 
+// Now with git!
+
 // --- namespace fpf_spectralsum class mgf
 // 
 // namespace fpf_spectralsum contains object definitions for the mgf class. A

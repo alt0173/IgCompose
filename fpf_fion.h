@@ -4,6 +4,8 @@
 // 
 // * * * * *
 
+// Now with git!
+
  // --- namespace fpf_fion class fion
  // 
  // namespace fpf_fion contains object definitions for the fion class. An fion

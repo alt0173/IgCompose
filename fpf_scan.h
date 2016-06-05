@@ -4,6 +4,8 @@
 //
 // * * * * *
 
+// Now with git!
+
 // --- namespace fpf_scan class scan
 // 
 // namespace fpf_scan contains object definitions for the scan class. A scan
